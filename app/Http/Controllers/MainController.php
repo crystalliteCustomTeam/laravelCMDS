@@ -197,8 +197,7 @@ class MainController extends Controller
         ->join('users','users.id','=','areausers.WSID')
         ->select('users.name as UName','users.id as UID')
         ->get();
-        print_r($users);
-        die();
+       
         return view('areaedit', ["PAGE_TITLE" => "AREA DETAIL EDIT", "USERNAME" => $loginUser->name,'Areas' => $areaDetail,'AreaUsers'=>$users]);
     }
 

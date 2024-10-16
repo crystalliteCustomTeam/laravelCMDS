@@ -199,7 +199,7 @@
                                     <ul style="columns: 4; -webkit-columns: 2; -moz-columns: 2;">
                                         <li>
 
-                                            <input type="checkbox" name="users[]" value="{{ $USER->id }}">
+                                            <input type="checkbox" name="users[]" value="{{ $USER->UID }}">
                                             <label for="users">{{ $USER->name }}</label>
                                         </li>
                                     </ul>

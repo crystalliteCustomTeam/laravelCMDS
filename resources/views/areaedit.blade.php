@@ -49,11 +49,8 @@
                         <table class="table">
                             <thead class="thead-dark">
                                 <tr>
-                                    <th scope="col">Date</th>
-                                    <th scope="col">Description</th>
-                                    <th scope="col">Risk Level</th>
-                                    <th scope="col">Area</th>
-                                    <th scope="col">Image/Video</th>
+                                    <th colspan="6">Name</th>
+                                    <th colspan="6">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -61,23 +58,19 @@
 
                                 @if ($AreaUsers)
                                     @foreach ($AreaUsers as $AreaUser)
-                                    <tr>
-                                        <td>{{ $AreaUser->UName}}</td>
-                                        <td>No Helmet</td>
-                                        <td>Low</td>
-                                        <td>Area {{ $i + 1 }}</td>
-                                        <td><button><i class="fa-solid fa-eye"></i></button></td>
-                                    </tr>
+                                        <tr>
+                                            <td colspan="6">{{ $AreaUser->UName }}</td>
+                                            <td colspan="6"><a class="btn btn-danger">Remove</a></td>
+                                        </tr>
                                     @endforeach
                                 @endif
                                 @for ($i = 0; $i < 6; $i++)
-                                    
                                 @endfor
                             </tbody>
                         </table>
                         <div class="main_loadmore-btn">
                             <button class="load-more">
-                                Load More
+                                Add More Users
                             </button>
                         </div>
                     </div>
@@ -88,44 +81,7 @@
 
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script>
-        $(document).ready(function(e) {
-                    $.ajaxSetup({
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        }
-                    });
-
-                    $('#createArea').on('submit', (e) => {
-                        e.preventDefault();
-                        let form = document.getElementById(
-                            'createArea'); // Make sure this is an actual form element
-                        let formData = new FormData(form);
-                        $.ajax({
-                            type: 'POST',
-                            url: "{{ route('worksite.area') }}",
-                            data: formData,
-                            contentType: false,
-                            processData: false,
-                            success: function(response) {
-                                if (response.Code === 200) {
-                                    alert(response.Message); // Capture image ID
-                                    $("#AreaID").val(response.AID);
-                                    let modal = new bootstrap.Modal(document.getElementById(
-                                        'exampleModal1'));
-                                    modal.show();
-                                }
-                            },
-                            error: function(response) {
-                                alert("Error ! : " + response.Message);
-                            }
-                        });
-                    });
-
-
-                    {{-- end of user assign modal  --}}
 
 
 
-
-                @endsection
+@endsection
