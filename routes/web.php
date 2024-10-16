@@ -20,6 +20,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/worksite/area/user/assgin', [MainController::class, 'areaUserAssign'])->name('worksite.area.user');
     Route::get('/singleworksite/{id}/{area}', [MainController::class, 'workarea'])->name('worksite.area.detail');
     Route::get('/singleworksite/{id}', [MainController::class, 'singleworksite'])->name('worksite.singleworksite');
+    Route::get('/notifications', [MainController::class, 'notifications'])->name('notifications');
+    Route::post('/notifications/create', [MainController::class, 'notificationsCreate'])->name('notifications.create');
+    Route::post('/notifications/worksite/send', [MainController::class, 'notificationsSend'])->name('notifications.send');
+    Route::get('/guideline', [MainController::class, 'guide'])->name('guideline');
+    Route::get('/guideline/checkpoint', [MainController::class, 'checkpoint'])->name('checkpoint');
+    Route::post('/guideline/checkpoint/create', [MainController::class, 'checkpointCreate'])->name('checkpoint.create');
 });
 
 require __DIR__ . '/auth.php';

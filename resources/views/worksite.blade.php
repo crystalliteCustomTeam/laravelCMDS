@@ -241,9 +241,9 @@
                                                         return xhr;
                                                     },
                                                     success: function(response) {
-                                                        if (response.success) {
+                                                        if (response.Code === 200) {
                                                           
-                                                            console.log("Work Site Created"); // Capture image ID
+                                                            alert("Work Site Created"); // Capture image ID
                                                             window.location.reload(true);
                                                         }
                                                     },

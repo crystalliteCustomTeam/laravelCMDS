@@ -32,16 +32,16 @@
                                 <img src="{{ asset('assets/images/construction-site-nav.png') }}" alt="">
                                 <span class="nav-item">Work Sites</span>
                             </a></li>
-                        <li><a href="{{ route('notification') }}" class="navigat-items">
+                        <li><a href="{{ route('notifications') }}" class="navigat-items">
                                 <img src="{{ asset('assets/images/alarm-nav.png') }}" alt="">
                                 <span class="nav-item">Communication</span>
                             </a></li>
-                        <li><a href="{{ route('safety-guidelines') }}" class="navigat-items">
+                        <li><a href="{{ route('guideline') }}" class="navigat-items">
                                 <img src="{{ asset('assets/images/checking-nav.png') }}" alt="">
                                 <span class="nav-item">Safety Guidelines</span>
                             </a>
                             <ul id="navigation">
-                                <li><a href="{{ route('check-points') }}" class="navigat-items">
+                                <li><a href="{{ route('checkpoint') }}" class="navigat-items">
                                         <img src="{{ asset('assets/images/checkinglist-nav.png') }}" alt="">
                                         <span class="nav-item">Check Points</span>
                                     </a></li>
@@ -329,45 +329,68 @@
             // Container where icons will be displayed
             const iconContainer = document.getElementById('iconContainer');
 
-            // Populate the icon container with all icons
             allIcons.forEach(iconClass => {
                 const iconElement = document.createElement('i');
                 iconElement.className = `${iconClass} fa-2x icon-option`;
                 iconElement.style.cursor = 'pointer';
+
+                // Add onclick event listener
+                iconElement.onclick = function() {
+                    // Your click event logic here
+                    alert(`Icon ${iconClass} clicked!`);
+                    const iconModal = bootstrap.Modal.getInstance(document.getElementById('iconModal'));
+                    iconModal.hide();
+                    // You can add more functionality as needed
+                };
+
                 iconContainer.appendChild(iconElement);
             });
 
-            // Handle icon selection
-            iconContainer.addEventListener('click', function(e) {
-                if (e.target && e.target.matches('.icon-option')) {
-                    const selectedIcon = e.target.className;
+            const svgIcons = document.querySelectorAll('.svg-inline--fa');
 
-                    // Update the hidden input with the selected icon class
-                    document.getElementById('selectedIconInput').value = selectedIcon;
+            svgIcons.forEach(iconElement => {
+                // Add onclick event listener
+                iconElement.onclick = function() {
+                    // Get the 'data-icon' attribute value
+                    const dataIconValue = iconElement.getAttribute('data-icon');
 
-                    // Update the preview in the main modal
-                    document.getElementById('selectedIconPreview').className = selectedIcon;
+                    // Your click event logic here
+                    console.log(`Icon clicked! Data-icon value: ${dataIconValue}`);
 
-                    // Hide the icon selection modal
-                    const iconModal = bootstrap.Modal.getInstance(document.getElementById('iconModal'));
-                    iconModal.hide();
-                }
+                    // You can add more functionality as needed
+                };
             });
 
-            // Handle search input to filter icons
-            const iconSearch = document.getElementById('iconSearch');
-            iconSearch.addEventListener('input', function() {
-                const searchValue = iconSearch.value.toLowerCase();
-                const icons = iconContainer.querySelectorAll('.icon-option');
+            // // Handle icon selection
+            // iconContainer.addEventListener('click', function(e) {
+            //     if (e.target && e.target.matches('.icon-option')) {
+            //         const selectedIcon = e.target.className;
 
-                icons.forEach(icon => {
-                    if (icon.className.toLowerCase().includes(searchValue)) {
-                        icon.style.display = 'inline-block';
-                    } else {
-                        icon.style.display = 'none';
-                    }
-                });
-            });
+            //         // Update the hidden input with the selected icon class
+            //         document.getElementById('selectedIconInput').value = selectedIcon;
+
+            //         // Update the preview in the main modal
+            //         document.getElementById('selectedIconPreview').className = selectedIcon;
+
+            //         // Hide the icon selection modal
+
+            //     }
+            // });
+
+            // // Handle search input to filter icons
+            // const iconSearch = document.getElementById('iconSearch');
+            // iconSearch.addEventListener('input', function() {
+            //     const searchValue = iconSearch.value.toLowerCase();
+            //     const icons = iconContainer.querySelectorAll('.icon-option');
+
+            //     icons.forEach(icon => {
+            //         if (icon.className.toLowerCase().includes(searchValue)) {
+            //             icon.style.display = 'inline-block';
+            //         } else {
+            //             icon.style.display = 'none';
+            //         }
+            //     });
+            // });
         });
     </script>
 
