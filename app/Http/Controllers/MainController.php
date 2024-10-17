@@ -7,6 +7,7 @@ use App\Models\AreaUser;
 use App\Models\Checkpoints;
 use App\Models\Image;
 use App\Models\Notification;
+use App\Models\Safety;
 use App\Models\User;
 use App\Models\UserMeta;
 use App\Models\WorkSite;
@@ -299,7 +300,9 @@ class MainController extends Controller
     public function guide(Request $request)
     {
         $loginUser = Auth::user();
-        return view('guidelines', ["PAGE_TITLE" => "SAFETY GUIDELINES ", "USERNAME" => $loginUser->name]);
+        $checkpoint = Checkpoints::where('CreatedBy', $loginUser->id)->get();
+        $checkpoint = Checkpoints::where('CreatedBy', $loginUser->id)->get();
+        return view('guidelines', ["PAGE_TITLE" => "SAFETY GUIDELINES ", "USERNAME" => $loginUser->name, "Checkpoint" => $checkpoint]);
     }
 
     public function checkpoint(Request $request)
@@ -323,5 +326,21 @@ class MainController extends Controller
             return response()->json(["Message" => "Checkpoint", "Code" => 200], 200);
         }
         return response()->json(["Message" => "Checkpoint Not Created", "Code" => 500], 500);
+    }
+
+    public function guideCreate(Request $request)
+    {
+        $loginUser = Auth::user();
+        $safety = Safety::create([
+            "icon" => "car",
+            "Images" => "Car",
+            "title" => $request['title'],
+            "description" => $request['description'],
+            "CreatedBy" => $loginUser->id,
+        ]);
+        if ($safety) {
+            return response()->json(["Message" => "Safety Created", "Code" => 200], 200);
+        }
+        return response()->json(["Message" => "Safety Not Created", "Code" => 500], 500);
     }
 }

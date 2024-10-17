@@ -8,4 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 class Safety extends Model
 {
     use HasFactory;
+    protected $table = 'safety';
+    protected $fillable = [
+        'icon',
+        'Images',
+        'title',
+        'description',
+        'CreatedBy'
+    ];
 }

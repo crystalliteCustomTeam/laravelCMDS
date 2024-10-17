@@ -26,6 +26,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/guideline', [MainController::class, 'guide'])->name('guideline');
     Route::get('/guideline/checkpoint', [MainController::class, 'checkpoint'])->name('checkpoint');
     Route::post('/guideline/checkpoint/create', [MainController::class, 'checkpointCreate'])->name('checkpoint.create');
+    Route::post('/guideline/create', [MainController::class, 'guideCreate'])->name('guideline.create');
 });
 
 require __DIR__ . '/auth.php';
