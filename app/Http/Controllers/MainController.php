@@ -301,8 +301,8 @@ class MainController extends Controller
     {
         $loginUser = Auth::user();
         $checkpoint = Checkpoints::where('CreatedBy', $loginUser->id)->get();
-        $checkpoint = Checkpoints::where('CreatedBy', $loginUser->id)->get();
-        return view('guidelines', ["PAGE_TITLE" => "SAFETY GUIDELINES ", "USERNAME" => $loginUser->name, "Checkpoint" => $checkpoint]);
+        $Safety = Safety::where('CreatedBy', $loginUser->id)->get();
+        return view('guidelines', ["PAGE_TITLE" => "SAFETY GUIDELINES ", "USERNAME" => $loginUser->name, "Checkpoint" => $checkpoint, "Safety" => $Safety]);
     }
 
     public function checkpoint(Request $request)

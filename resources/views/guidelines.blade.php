@@ -14,74 +14,27 @@
                     </div>
                     <div class="mt-5 main-safety-card">
                         <ul>
-                            <li>
-                                <div class="safety-card">
-                                    <div class="icons">
-                                        <img src="{{ asset('assets/images/setting-icon.png') }}" alt="">
-                                    </div>
-                                    <div class="card-content">
-                                        <h5>Rooftop</h5>
-                                    </div>
-                                    <ul>
-                                        <li><button data-bs-toggle="modal" data-bs-target="#exampleModal" type="button"><i
-                                                    class="fa-solid fa-pen-to-square"></i></button></li>
-                                        <li><button><i class="fa-solid fa-trash"></i></button></li>
-                                    </ul>
-                                </div>
+                            @if ($Safety)
+                                @foreach ($Safety as $Saf)
+                                    <li>
+                                        <div class="safety-card">
+                                            <div class="icons">
+                                                <img src="{{ asset('assets/images/setting-icon.png') }}" alt="">
+                                            </div>
+                                            <div class="card-content">
+                                                <h5>{{ $Saf->title }}</h5>
+                                            </div>
+                                            <ul>
+                                                <li><button data-bs-toggle="modal" data-bs-target="#exampleModal"
+                                                        type="button"><i class="fa-solid fa-pen-to-square"></i></button>
+                                                </li>
+                                                <li><button><i class="fa-solid fa-trash"></i></button></li>
+                                            </ul>
+                                        </div>
+                                    </li>
+                                @endforeach
+                            @endif
 
-
-                            </li>
-                            <li>
-                                <div class="safety-card">
-                                    <div class="icons">
-                                        <img src="{{ asset('assets/images/setting-icon.png') }}" alt="">
-                                    </div>
-                                    <div class="card-content">
-                                        <h5>Rooftop</h5>
-                                    </div>
-                                    <ul>
-                                        <li><button data-bs-toggle="modal" data-bs-target="#exampleModal" type="button"><i
-                                                    class="fa-solid fa-pen-to-square"></i></button></li>
-                                        <li><button><i class="fa-solid fa-trash"></i></button></li>
-                                    </ul>
-                                </div>
-
-
-                            </li>
-                            <li>
-                                <div class="safety-card">
-                                    <div class="icons">
-                                        <img src="{{ asset('assets/images/setting-icon.png') }}" alt="">
-                                    </div>
-                                    <div class="card-content">
-                                        <h5>Rooftop</h5>
-                                    </div>
-                                    <ul>
-                                        <li><button data-bs-toggle="modal" data-bs-target="#exampleModal" type="button"><i
-                                                    class="fa-solid fa-pen-to-square"></i></button></li>
-                                        <li><button><i class="fa-solid fa-trash"></i></button></li>
-                                    </ul>
-                                </div>
-
-
-                            </li>
-                            <li>
-                                <div class="safety-card">
-                                    <div class="icons">
-                                        <img src="{{ asset('assets/images/setting-icon.png') }}" alt="">
-                                    </div>
-                                    <div class="card-content">
-                                        <h5>Rooftop</h5>
-                                    </div>
-                                    <ul>
-                                        <li><button data-bs-toggle="modal" data-bs-target="#exampleModal" type="button"><i
-                                                    class="fa-solid fa-pen-to-square"></i></button></li>
-                                        <li><button><i class="fa-solid fa-trash"></i></button></li>
-                                    </ul>
-                                </div>
-
-
-                            </li>
                         </ul>
 
                     </div>
@@ -286,6 +239,28 @@
 
 
 
+
+            $('#guideline').on('submit', (e) => {
+                e.preventDefault();
+
+                let formData1 = new FormData(document.getElementById("guideline"));
+                $.ajax({
+                    type: 'POST',
+                    url: "{{ route('guideline.create') }}",
+                    data: formData1,
+                    contentType: false,
+                    processData: false,
+                    success: function(response) {
+                        if (response.Code === 200) {
+                            alert("Guidline Created");
+                            window.location.reload();
+                        }
+                    },
+                    error: function(response) {
+                        alert("Error ! : " + response.Message);
+                    }
+                });
+            });
 
             $('#guideline').on('submit', (e) => {
                 e.preventDefault();
