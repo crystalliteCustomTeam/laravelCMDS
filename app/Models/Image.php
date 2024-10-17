@@ -8,5 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Image extends Model
 {
     use HasFactory;
-    protected $fillable = ['image_path', 'save_image_by']; // Add save_image_by to fillable fields
+    
+    protected $table = 'images';
+    protected $fillable = ['image_path','image_title', 'save_image_by']; // Add save_image_by to fillable fields
 }

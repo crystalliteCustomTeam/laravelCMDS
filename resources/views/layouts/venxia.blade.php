@@ -178,50 +178,7 @@
         }
     </script>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Parent Modal with Two Child Modals (exampleModal, exampleModal1, exampleModal2)
-            const parentModalElement = document.getElementById('exampleModal');
-            const childModalElement1 = document.getElementById('exampleModal1');
-            const childModalElement2 = document.getElementById('exampleModal2');
 
-            if (parentModalElement && childModalElement1 && childModalElement2) {
-                const parentModal = new bootstrap.Modal(parentModalElement);
-                const childModal1 = new bootstrap.Modal(childModalElement1);
-                const childModal2 = new bootstrap.Modal(childModalElement2);
-
-                function handleModalToggle(childModalElement, parentModal) {
-                    childModalElement.addEventListener('hidden.bs.modal', function() {
-                        parentModal.show();
-                    });
-
-                    childModalElement.addEventListener('show.bs.modal', function() {
-                        parentModal.hide();
-                    });
-                }
-
-                handleModalToggle(childModalElement1, parentModal);
-                handleModalToggle(childModalElement2, parentModal);
-            }
-
-            // Separate Parent Modal with One Child Modal (exampleModal3, exampleModal4)
-            const singleParentModalElement = document.getElementById('exampleModal3');
-            const singleChildModalElement = document.getElementById('exampleModal4');
-
-            if (singleParentModalElement && singleChildModalElement) {
-                const singleParentModal = new bootstrap.Modal(singleParentModalElement);
-                const singleChildModal = new bootstrap.Modal(singleChildModalElement);
-
-                singleChildModalElement.addEventListener('hidden.bs.modal', function() {
-                    singleParentModal.show();
-                });
-
-                singleChildModalElement.addEventListener('show.bs.modal', function() {
-                    singleParentModal.hide();
-                });
-            }
-        });
-    </script>
 
     <!-- JavaScript to Handle Icon Population and Selection -->
     <script>
@@ -360,37 +317,6 @@
                     // You can add more functionality as needed
                 };
             });
-
-            // // Handle icon selection
-            // iconContainer.addEventListener('click', function(e) {
-            //     if (e.target && e.target.matches('.icon-option')) {
-            //         const selectedIcon = e.target.className;
-
-            //         // Update the hidden input with the selected icon class
-            //         document.getElementById('selectedIconInput').value = selectedIcon;
-
-            //         // Update the preview in the main modal
-            //         document.getElementById('selectedIconPreview').className = selectedIcon;
-
-            //         // Hide the icon selection modal
-
-            //     }
-            // });
-
-            // // Handle search input to filter icons
-            // const iconSearch = document.getElementById('iconSearch');
-            // iconSearch.addEventListener('input', function() {
-            //     const searchValue = iconSearch.value.toLowerCase();
-            //     const icons = iconContainer.querySelectorAll('.icon-option');
-
-            //     icons.forEach(icon => {
-            //         if (icon.className.toLowerCase().includes(searchValue)) {
-            //             icon.style.display = 'inline-block';
-            //         } else {
-            //             icon.style.display = 'none';
-            //         }
-            //     });
-            // });
         });
     </script>
 
@@ -410,24 +336,9 @@
         });
     </script>
 
-    <script>
-        function toggleSelect(element) {
-            element.classList.toggle('selected');
-        }
-    </script>
 
-    <script>
-        document.getElementById('uploadButton').addEventListener('click', function() {
-            document.getElementById('fileInput').click();
-        });
 
-        // Optional: Handle the file selection
-        document.getElementById('fileInput').addEventListener('change', function(event) {
-            const files = event.target.files;
-            // Process the selected files here (e.g., preview, upload)
-            console.log(files); // Example: log the selected files
-        });
-    </script>
+   
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -447,6 +358,8 @@
             });
         });
     </script>
+
+    
 
 </body>
 

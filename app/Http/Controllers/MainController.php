@@ -309,7 +309,8 @@ class MainController extends Controller
     {
         $loginUser = Auth::user();
         $checkpoint = Checkpoints::where('CreatedBy', $loginUser->id)->get();
-        return view('checkpoints', ["PAGE_TITLE" => "CHECKPOINTS", "USERNAME" => $loginUser->name, "checkpoint" => $checkpoint]);
+        $allImages = Image::where('save_image_by',$loginUser->id)->get();
+        return view('checkpoints', ["PAGE_TITLE" => "CHECKPOINTS", "USERNAME" => $loginUser->name, "checkpoint" => $checkpoint , "Images" => $allImages]);
     }
 
     public function checkpointCreate(Request $request)
@@ -318,8 +319,8 @@ class MainController extends Controller
         $checkpoint = Checkpoints::create([
             "title" => $request['title'],
             "Description" => $request['description'],
-            "Images" => "abc",
-            "Videos" => "abc",
+            "Images" => $request['FeaturedImage'],
+            "Videos" => ($request['videoURL'] == "") ? "NO URL ADDED" : $request['videoURL'],
             "CreatedBy" => $loginUser->id,
         ]);
         if ($checkpoint) {
@@ -342,5 +343,33 @@ class MainController extends Controller
             return response()->json(["Message" => "Safety Created", "Code" => 200], 200);
         }
         return response()->json(["Message" => "Safety Not Created", "Code" => 500], 500);
+    }
+
+    public function media(Request $request)
+    {
+        $loginUser = Auth::user();
+        $allImages = Image::where('save_image_by',$loginUser->id)->get();
+        return view('media', ["PAGE_TITLE" => "MEDIA", "USERNAME" => $loginUser->name,"Images"=>$allImages]);
+    }
+
+    public function Mediaupload(Request $request)
+    {
+        $files = $request->file('files');
+        $loginUser = Auth::user();
+        if ($request->hasFile('files')) {
+            foreach ($files as $file) {
+                $filename = time() . '-' . $file->getClientOriginalName();
+                $file->move(public_path('uploads'), $filename);
+                Image::create([
+                    'image_path' => 'uploads/' . $filename,
+                    'image_title' => $file->getClientOriginalName(),
+                    'save_image_by' => $loginUser->id,  // Replace with the correct user info
+                ]);
+            }
+
+            return response()->json(['success' => 'Files uploaded successfully!']);
+        } else {
+            return response()->json(['error' => 'No files found!'], 400);
+        }
     }
 }

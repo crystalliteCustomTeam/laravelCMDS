@@ -53,11 +53,14 @@
                     <form id="checkpointsform">
                         <div class="flex-input">
                             <label for="Image">Image:</label>
-                            {{-- <button type="button" data-bs-toggle="modal" data-bs-target="#exampleModal1" type="button">Select Images </button> --}}
+                            <input type="hidden" name="FeaturedImage" value="" id="FeaturedImage" />
+                            <img src="" id="FeaturedImageSRC" width="150px" height="150px" style="display: none" />
+                            <button type="button" id="FeaturedImageBTN" data-bs-toggle="modal"
+                                data-bs-target="#exampleModal1" type="button">Select Images </button>
                         </div>
                         <div class="flex-input">
                             <label for="Image">Video:</label>
-                            {{-- <button type="button" data-bs-toggle="modal" data-bs-target="#exampleModal1" type="button">Select Videos </button> --}}
+                            <input type="text" name="videoURL" placeholder="Video Url"  />
                         </div>
                         <div class="flex-input">
                             <label for="Image">Title:</label>
@@ -134,63 +137,78 @@
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link active" id="home-tab" data-bs-toggle="tab"
                                     data-bs-target="#home-tab-pane" type="button" role="tab"
-                                    aria-controls="home-tab-pane" aria-selected="true">Upload</button>
+                                    aria-controls="home-tab-pane" aria-selected="false">Upload</button>
                             </li>
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link" id="profile-tab" data-bs-toggle="tab"
                                     data-bs-target="#profile-tab-pane" type="button" role="tab"
-                                    aria-controls="profile-tab-pane" aria-selected="false">Media</button>
+                                    aria-controls="profile-tab-pane" aria-selected="true">Media</button>
                             </li>
 
                         </ul>
                         <div class="tab-content" id="myTabContent">
-                            <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel"
-                                aria-labelledby="home-tab" tabindex="0">
+                            <div class="tab-pane fade " id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab"
+                                tabindex="0">
                                 <div class="main-upload">
                                     <h5>Upload an image / Video </h5>
                                     <button type="button" id="uploadButton">Upload</button>
-                                    <input type="file" id="fileInput" accept="image/*" style="display: none;" multiple>
+                                    <input type="file" id="fileInput" accept="image/*" style="display: none;"
+                                        multiple>
                                 </div>
                             </div>
-                            <div class="tab-pane fade" id="profile-tab-pane" role="tabpanel"
+                            <div class="tab-pane fade show active" id="profile-tab-pane" role="tabpanel"
                                 aria-labelledby="profile-tab" tabindex="0">
                                 <div class="mediaaa">
                                     <form action="">
                                         <div class="media-selection-page">
                                             <ul id="work-site-list">
-                                                @for ($i = 0; $i < 10; $i++)
-                                                    <li class="work-site-item" onclick="toggleSelect(this)">
-                                                        <div class="work-site-box work-site-box{{ $i + 1 }}">
-                                                            <div class="work-site-img">
-                                                                <img src="{{ asset('assets/images/work-site-img.png') }}"
-                                                                    alt="">
+                                                @if ($Images)
+                                                    @foreach ($Images as $Image)
+                                                        <li class="work-site-item"
+                                                            onclick="selectImage('{{ $Image->image_path }}')">
+                                                            <div class="work-site-box work-site-box-{{ $Image->id }}">
+                                                                <div class="work-site-img">
+                                                                    <img src="{{ asset($Image->image_path) }}"
+                                                                        alt="">
+                                                                </div>
+                                                                <div class="work-side-content mb-0">
+                                                                    <h6>{{ $Image->image_title }}</h6>
+                                                                </div>
                                                             </div>
-                                                            <div class="work-side-content mb-0">
-                                                                <h6>IMG_238{{ $i + 1 }}.jpg</h6>
-                                                            </div>
-                                                        </div>
-                                                    </li>
-                                                @endfor
+                                                        </li>
+                                                    @endforeach
+                                                @endif
+
                                             </ul>
                                         </div>
-                                        <div class="main_creat-btn">
-                                            <button type="submit">Submit</button>
-                                        </div>
+
                                     </form>
                                 </div>
                             </div>
                         </div>
                     </div>
-
-
-
-
                 </div>
             </div>
         </div>
     </div>
 
     {{-- end of Gallary modal  --}}
+    <script>
+        function selectImage(imagePath) {
+            $("#FeaturedImage").val(imagePath);
+            let ImageURL = window.location.origin + "/" + imagePath;
+            $("#FeaturedImageSRC").attr('src', ImageURL);
+            $("#FeaturedImageSRC").show();
+            $('.modal-backdrop').hide();
+            const exampleModal1 = bootstrap.Modal.getInstance(document.getElementById('exampleModal1'));
+            exampleModal1.hide();
+            const exampleModal = document.getElementById('exampleModal');
+            exampleModal.classList.add('show');
+            exampleModal.style.display = 'block';  
+            $('.modal-backdrop').show();
+        }
+    </script>
+
 
 
 @endsection

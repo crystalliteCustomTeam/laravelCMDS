@@ -24,6 +24,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/notifications/create', [MainController::class, 'notificationsCreate'])->name('notifications.create');
     Route::post('/notifications/worksite/send', [MainController::class, 'notificationsSend'])->name('notifications.send');
     Route::get('/guideline', [MainController::class, 'guide'])->name('guideline');
+    Route::get('/media', [MainController::class, 'media'])->name('media');
+    Route::post('/upload-files', [MainController::class, 'Mediaupload'])->name('media.upload');
     Route::get('/guideline/checkpoint', [MainController::class, 'checkpoint'])->name('checkpoint');
     Route::post('/guideline/checkpoint/create', [MainController::class, 'checkpointCreate'])->name('checkpoint.create');
     Route::post('/guideline/create', [MainController::class, 'guideCreate'])->name('guideline.create');
