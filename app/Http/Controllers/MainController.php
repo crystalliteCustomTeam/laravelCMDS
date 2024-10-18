@@ -134,7 +134,8 @@ class MainController extends Controller
 
         $user = Auth::user();
         $allsites = WorkSite::where('CreateBy', $user->id)->get();
-        return view('worksite', ["PAGE_TITLE" => "WORKSITE", "USERNAME" => $user->name, "SITES" => $allsites]);
+        $allImages = Image::where('save_image_by',$user->id)->get();
+        return view('worksite', ["PAGE_TITLE" => "WORKSITE", "USERNAME" => $user->name, "SITES" => $allsites, "Images" =>$allImages]);
 
     }
 
@@ -213,9 +214,10 @@ class MainController extends Controller
         $start_date = $request['start_date'];
         $end_date = $request['end_date'];
         $description = $request['description'];
+        $featuredImage = $request['FeaturedImage'];
         $CreateBy = $user->id;
 
-        if ($Name == "" || $start_date == "" || $end_date == "" || $description == "") {
+        if ($Name == "" || $start_date == "" || $end_date == "" || $description == "" || $featuredImage == "") {
             return response()->json(["Message" => "Cannot Leave Feild Blank "], 500);
         }
 
@@ -224,6 +226,7 @@ class MainController extends Controller
             "Start_Date" => $start_date,
             "End_Date" => $end_date,
             "Description" => $description,
+            "FeaturedImage" => $featuredImage,
             "CreateBy" => $CreateBy,
         ]);
 

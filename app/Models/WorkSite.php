@@ -15,6 +15,7 @@ class WorkSite extends Model
         'Start_Date',
         'End_Date',
         'Description',
+        'FeaturedImage',
         'CreateBy'
     ];
 }

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string("Start_Date");
             $table->string("End_Date");
             $table->longText('Description');
+            $table->text("FeaturedImage");
             $table->bigInteger('CreateBy');
             $table->timestamps();
         });

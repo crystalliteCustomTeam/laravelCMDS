@@ -16,7 +16,7 @@
                         <ul>
                             @if ($checkpoint)
                                 @foreach ($checkpoint as $ckp)
-                                    <li>
+                                    <li class="mt-2 mr-2">
                                         <div class="area">{{ $ckp->title }}</div>
                                         <ul>
                                             <li><button data-bs-toggle="modal" data-bs-target="#exampleModal"

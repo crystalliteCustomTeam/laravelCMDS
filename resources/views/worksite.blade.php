@@ -15,54 +15,63 @@
                     </div>
                     <div class="mt-5 main-card-container site-work">
                         <ul>
-                          @if ($SITES)
-                              @foreach ($SITES as $SITE)
-                              <li>
+                            @if ($SITES)
+                                @foreach ($SITES as $SITE)
+                                    <li>
 
-                                <div class="work-site-box">
-                                    <a href="{{ route('worksite.singleworksite', ['id' => $SITE->id ]) }}">
-                                        <div class="work-site-img">
-                                            <img src="{{ asset('assets/images/work-site-img.png') }}" alt="">
-                                        </div>
-                                        <div class="work-side-content">
-                                            <h6>{{ $SITE->Name }}</h6>
-                                            <ul>
-                                                <li>
-                                                    <span><img src="{{ asset('assets/images/black-user.png') }}"
-                                                            alt=""></span>
-                                                    <span>50</span>
-                                                </li>
-                                                <li>
-                                                    <span><img src="{{ asset('assets/images/black-alarm.png') }}"
-                                                            alt=""></span>
-                                                    <span>10</span>
-                                                </li>
-                                                <li>
-                                                    <span><img src="{{ asset('assets/images/near-mises.png') }}"
-                                                            alt=""></span>
-                                                    <span>50</span>
-                                                </li>
-                                                <li>
-                                                    <span><img src="{{ asset('assets/images/accidents.png') }}"
-                                                            alt=""></span>
-                                                    <span>10</span>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </a>
-                                    <div class="main_editss-options">
-                                        <ul>
-                                            <li><button data-bs-toggle="modal" data-bs-target="#exampleModal"
-                                                    type="button"><i class="fa-solid fa-pen-to-square"></i></button>
-                                            </li>
-                                            <li><button><i class="fa-solid fa-trash"></i></button></li>
-                                        </ul>
-                                    </div>
-                                </div>
+                                        <div class="work-site-box">
+                                            <a href="{{ route('worksite.singleworksite', ['id' => $SITE->id]) }}">
+                                                <div class="work-site-img">
+                                                    @if ($SITE->FeaturedImage == '')
+                                                        <img src="{{ asset('assets/images/work-site-img.png') }}"
+                                                            alt="">
+                                                    @else
+                                                    <img src="{{ asset($SITE->FeaturedImage) }}"
+                                                            alt="">
+                                                    @endif
 
-                            </li>
-                              @endforeach
-                          @endif
+
+                                                </div>
+                                                <div class="work-side-content">
+                                                    <h6>{{ $SITE->Name }}</h6>
+                                                    <ul>
+                                                        <li>
+                                                            <span><img src="{{ asset('assets/images/black-user.png') }}"
+                                                                    alt=""></span>
+                                                            <span>50</span>
+                                                        </li>
+                                                        <li>
+                                                            <span><img src="{{ asset('assets/images/black-alarm.png') }}"
+                                                                    alt=""></span>
+                                                            <span>10</span>
+                                                        </li>
+                                                        <li>
+                                                            <span><img src="{{ asset('assets/images/near-mises.png') }}"
+                                                                    alt=""></span>
+                                                            <span>50</span>
+                                                        </li>
+                                                        <li>
+                                                            <span><img src="{{ asset('assets/images/accidents.png') }}"
+                                                                    alt=""></span>
+                                                            <span>10</span>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </a>
+                                            <div class="main_editss-options">
+                                                <ul>
+                                                    <li><button data-bs-toggle="modal" data-bs-target="#exampleModal"
+                                                            type="button"><i
+                                                                class="fa-solid fa-pen-to-square"></i></button>
+                                                    </li>
+                                                    <li><button><i class="fa-solid fa-trash"></i></button></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+
+                                    </li>
+                                @endforeach
+                            @endif
                         </ul>
 
                     </div>
@@ -88,10 +97,10 @@
                     <form id="work_site_form">
                         <div class="flex-input">
                             <label for="Image">Image:</label>
-                            <button type="button" data-bs-toggle="modal" data-bs-target="#exampleModal1"
-                                type="button">Select Images </button>
-                            <input type="hidden" name="fImage" value="" id="fImage" />
-                            <image src="" width="150px" hight="150px" id="fimagesrc" />
+                            <input type="hidden" name="FeaturedImage" value="" id="FeaturedImage" />
+                            <img src="" id="FeaturedImageSRC" width="150px" height="150px" style="display: none" />
+                            <button type="button" id="FeaturedImageBTN" data-bs-toggle="modal"
+                                data-bs-target="#exampleModal1" type="button">Select Images </button>
                         </div>
                         <div class="flex-input">
                             <label for="Image">Work Site Name:</label>
@@ -108,7 +117,7 @@
                             </div>
 
                         </div>
-                       
+
                         <div class="flex-input brief">
                             <label for="Image">Work Site Description </label>
                             <textarea name="description" placeholder="Description"></textarea>
@@ -129,6 +138,48 @@
 
     {{-- user Gallary  --}}
 
+
+    <script>
+        $(document).ready(function(e) {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+
+
+
+            $('#work_site_form').on('submit', (e) => {
+                e.preventDefault();
+                alert("working");
+                let formData1 = new FormData(document.getElementById("work_site_form"));
+                $.ajax({
+                    type: 'POST',
+                    url: "{{ route('create.worksite') }}",
+                    data: formData1,
+                    contentType: false,
+                    processData: false,
+                    success: function(response) {
+                        if (response.Code === 200) {
+
+                            alert("Work Site Created"); // Capture image ID
+                            window.location.reload(true);
+                        }
+                    },
+                    error: function(response) {
+                        alert("Error ! : " + response.Message);
+                    }
+                });
+            });
+
+
+        });
+    </script>
+
+
+
+    {{-- end of Gallary modal  --}}
+
     <div class="modal fade" id="exampleModal1" tabindex="-1" aria-labelledby="exampleModalLabel1" aria-hidden="true">
         <div class="modal-dialog assing-userss">
             <div class="modal-content assing-userss">
@@ -142,163 +193,76 @@
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link active" id="home-tab" data-bs-toggle="tab"
                                     data-bs-target="#home-tab-pane" type="button" role="tab"
-                                    aria-controls="home-tab-pane" aria-selected="true">Upload</button>
+                                    aria-controls="home-tab-pane" aria-selected="false">Upload</button>
                             </li>
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link" id="profile-tab" data-bs-toggle="tab"
                                     data-bs-target="#profile-tab-pane" type="button" role="tab"
-                                    aria-controls="profile-tab-pane" aria-selected="false">Media</button>
+                                    aria-controls="profile-tab-pane" aria-selected="true">Media</button>
                             </li>
 
                         </ul>
                         <div class="tab-content" id="myTabContent">
-                            <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel"
-                                aria-labelledby="home-tab" tabindex="0">
+                            <div class="tab-pane fade " id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab"
+                                tabindex="0">
                                 <div class="main-upload">
-                                    <form id="imageUploadForm" enctype="multipart/form-data">
-                                        @csrf
-                                        <h5>Upload an image / Video </h5>
-
-                                        <input type="file" name="image" id="fileInput" accept="image/*">
-                                        <button type="submit">Upload</button>
-                                    </form>
-                                    <script>
-                                        $(document).ready(function(e) {
-                                            $.ajaxSetup({
-                                                headers: {
-                                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                                                }
-                                            });
-
-                                            $('#imageUploadForm').on('submit', function(e) {
-                                                e.preventDefault();
-                                                let formData = new FormData(this);
-
-                                                // Show the uploading status
-                                                $('#uploadingStatus').show();
-                                                $('#progressBarContainer').show();
-
-                                                $.ajax({
-                                                    type: 'POST',
-                                                    url: "{{ route('image.worksite.image') }}",
-                                                    data: formData,
-                                                    contentType: false,
-                                                    processData: false,
-                                                    xhr: function() {
-                                                        var xhr = new XMLHttpRequest();
-                                                        xhr.upload.addEventListener('progress', function(e) {
-                                                            if (e.lengthComputable) {
-                                                                var percentComplete = (e.loaded / e.total) * 100;
-                                                                $('#progressBar').css('width', percentComplete + '%');
-                                                            }
-                                                        }, false);
-                                                        return xhr;
-                                                    },
-                                                    success: function(response) {
-                                                        if (response.success) {
-                                                            $('#uploadingStatus').hide();
-                                                            $('#progressBarContainer').hide();
-                                                            $('#progressBar').css('width', '0%'); // Reset progress bar
-                                                            $('#uploadSuccess').show();
-                                                            $('#uploadedImage').attr('src', '/images/' + response.image).show();
-                                                            $("#fImage").attr('value', response.name);
-                                                            $("#fimagesrc").attr('src', '/images/' + response.image);
-                                                            $("#exampleModal1").css('display', 'none');
-                                                            let backdrops = document.querySelectorAll('.modal-backdrop');
-                                                            backdrops.forEach(function(backdrop) {
-                                                                backdrop.style.display = "none";
-                                                            });
-                                                            console.log('Uploaded Image ID:', response.id); // Capture image ID
-                                                        }
-                                                    },
-                                                    error: function(response) {
-                                                        console.log(response);
-                                                        alert('Image upload failed.');
-                                                        $('#uploadingStatus').hide();
-                                                        $('#progressBarContainer').hide();
-                                                    }
-                                                });
-                                            });
-
-                                            $('#work_site_form').on('submit',(e)=>{
-                                                e.preventDefault();
-                                                alert("working");
-                                                let formData1 = new FormData(document.getElementById("work_site_form"));
-                                                $.ajax({
-                                                    type: 'POST',
-                                                    url: "{{ route('create.worksite') }}",
-                                                    data: formData1,
-                                                    contentType: false,
-                                                    processData: false,
-                                                    xhr: function() {
-                                                        var xhr = new XMLHttpRequest();
-                                                        xhr.upload.addEventListener('progress', function(e) {
-                                                            if (e.lengthComputable) {
-                                                                var percentComplete = (e.loaded / e.total) * 100;
-                                                                $('#progressBar').css('width', percentComplete + '%');
-                                                            }
-                                                        }, false);
-                                                        return xhr;
-                                                    },
-                                                    success: function(response) {
-                                                        if (response.Code === 200) {
-                                                          
-                                                            alert("Work Site Created"); // Capture image ID
-                                                            window.location.reload(true);
-                                                        }
-                                                    },
-                                                    error: function(response) {
-                                                       alert("Error ! : "+response.Message);
-                                                    }
-                                                });
-                                            });
-
-
-                                        });
-                                    </script>
-
+                                    <h5>Upload an image / Video </h5>
+                                    <button type="button" id="uploadButton">Upload</button>
+                                    <input type="file" id="fileInput" accept="image/*" style="display: none;"
+                                        multiple>
                                 </div>
                             </div>
-                            <div class="tab-pane fade" id="profile-tab-pane" role="tabpanel"
+                            <div class="tab-pane fade show active" id="profile-tab-pane" role="tabpanel"
                                 aria-labelledby="profile-tab" tabindex="0">
                                 <div class="mediaaa">
                                     <form action="">
                                         <div class="media-selection-page">
                                             <ul id="work-site-list">
-                                                @for ($i = 0; $i < 10; $i++)
-                                                    <li class="work-site-item" onclick="toggleSelect(this)">
-                                                        <div class="work-site-box work-site-box{{ $i + 1 }}">
-                                                            <div class="work-site-img">
-                                                                <img src="{{ asset('assets/images/work-site-img.png') }}"
-                                                                    alt="">
+                                                @if ($Images)
+                                                    @foreach ($Images as $Image)
+                                                        <li class="work-site-item"
+                                                            onclick="selectImage('{{ $Image->image_path }}')">
+                                                            <div class="work-site-box work-site-box-{{ $Image->id }}">
+                                                                <div class="work-site-img">
+                                                                    <img src="{{ asset($Image->image_path) }}"
+                                                                        alt="">
+                                                                </div>
+                                                                <div class="work-side-content mb-0">
+                                                                    <h6>{{ $Image->image_title }}</h6>
+                                                                </div>
                                                             </div>
-                                                            <div class="work-side-content mb-0">
-                                                                <h6>IMG_238{{ $i + 1 }}.jpg</h6>
-                                                            </div>
-                                                        </div>
-                                                    </li>
-                                                @endfor
+                                                        </li>
+                                                    @endforeach
+                                                @endif
+
                                             </ul>
                                         </div>
-                                        <div class="main_creat-btn">
-                                            <button type="submit">Submit</button>
-                                        </div>
+
                                     </form>
                                 </div>
                             </div>
                         </div>
                     </div>
-
-
-
-
                 </div>
             </div>
         </div>
     </div>
 
-    {{-- end of Gallary modal  --}}
-
+    <script>
+        function selectImage(imagePath) {
+            $("#FeaturedImage").val(imagePath);
+            let ImageURL = window.location.origin + "/" + imagePath;
+            $("#FeaturedImageSRC").attr('src', ImageURL);
+            $("#FeaturedImageSRC").show();
+            $('.modal-backdrop').hide();
+            const exampleModal1 = bootstrap.Modal.getInstance(document.getElementById('exampleModal1'));
+            exampleModal1.hide();
+            const exampleModal = document.getElementById('exampleModal');
+            exampleModal.classList.add('show');
+            exampleModal.style.display = 'block';
+            $('.modal-backdrop').show();
+        }
+    </script>
 
 
 @endsection
