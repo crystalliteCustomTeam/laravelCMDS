@@ -43,29 +43,13 @@ class MainController extends Controller
         $name = $request['name'];
         $email = $request['email'];
         $role = $request['role'];
+        $profileImage = $request['FeaturedImage'];
+
+        $password = $request['password'];
         $USERCOUNT = User::where('email', '=', $email)->count();
         if ($USERCOUNT > 0) {
             return response()->json(["Message" => "Email Found Please Use Different Email"], 500);
         }
-
-        $request->validate([
-            'image' => 'required|mimes:jpeg,jpg,png|max:2048',
-        ]);
-
-        // Handle file upload
-        $image = $request->file('image');
-        $imageName = time() . '.' . $image->extension();
-        $image->move(public_path('images'), $imageName);
-
-        // Save image path and save_image_by to database
-        $imageRecord = Image::create([
-            'image_path' => $imageName,
-            'save_image_by' => $user->id, // Save the user or identifier
-        ]);
-
-        $profileImage = $imageName;
-        $password = $request['password'];
-        $createdBy = $user->id;
 
         if ($name == "" || $email == "" || $role == "" || $profileImage == "") {
             return response()->json(["Message" => "Cannot Leave Feild Blank "], 500);
@@ -85,13 +69,13 @@ class MainController extends Controller
             "userId" => $UserID->id,
             "featuredImage" => $profileImage,
             "role" => $role,
-            "createBy" => $createdBy,
+            "createBy" => $user->id,
         ]);
         $data = [
             "Message" => "User Created",
             "UserID" => $userMeta->id,
         ];
-        return response()->json(['success' => true, $data], 200);
+        return response()->json(['success' => true, $data, 'Code' => 200], 200);
 
     }
 
@@ -119,13 +103,14 @@ class MainController extends Controller
 
     public function EditUser(Request $request, $userID)
     {
-        echo $userID;
+
         $user = Auth::user();
         $usersData = User::join('usermeta', 'users.id', '=', 'usermeta.userId')
             ->where('users.id', '=', $userID)
-            ->select('users.*', 'usermeta.*')
+            ->select('users.*', 'users.id as UID' , 'usermeta.*')
             ->get();
-        return view('useredit', ["PAGE_TITLE" => "EDIT USER", "USERNAME" => $user->name, "USER_DATA" => $usersData]);
+        $Images = Image::where('save_image_by', $user->id)->get();
+        return view('useredit', ["PAGE_TITLE" => "EDIT USER", "USERNAME" => $user->name, "USER_DATA" => $usersData, "Images" => $Images]);
 
     }
 
@@ -134,8 +119,8 @@ class MainController extends Controller
 
         $user = Auth::user();
         $allsites = WorkSite::where('CreateBy', $user->id)->get();
-        $allImages = Image::where('save_image_by',$user->id)->get();
-        return view('worksite', ["PAGE_TITLE" => "WORKSITE", "USERNAME" => $user->name, "SITES" => $allsites, "Images" =>$allImages]);
+        $allImages = Image::where('save_image_by', $user->id)->get();
+        return view('worksite', ["PAGE_TITLE" => "WORKSITE", "USERNAME" => $user->name, "SITES" => $allsites, "Images" => $allImages]);
 
     }
 
@@ -312,8 +297,8 @@ class MainController extends Controller
     {
         $loginUser = Auth::user();
         $checkpoint = Checkpoints::where('CreatedBy', $loginUser->id)->get();
-        $allImages = Image::where('save_image_by',$loginUser->id)->get();
-        return view('checkpoints', ["PAGE_TITLE" => "CHECKPOINTS", "USERNAME" => $loginUser->name, "checkpoint" => $checkpoint , "Images" => $allImages]);
+        $allImages = Image::where('save_image_by', $loginUser->id)->get();
+        return view('checkpoints', ["PAGE_TITLE" => "CHECKPOINTS", "USERNAME" => $loginUser->name, "checkpoint" => $checkpoint, "Images" => $allImages]);
     }
 
     public function checkpointCreate(Request $request)
@@ -351,8 +336,8 @@ class MainController extends Controller
     public function media(Request $request)
     {
         $loginUser = Auth::user();
-        $allImages = Image::where('save_image_by',$loginUser->id)->get();
-        return view('media', ["PAGE_TITLE" => "MEDIA", "USERNAME" => $loginUser->name,"Images"=>$allImages]);
+        $allImages = Image::where('save_image_by', $loginUser->id)->get();
+        return view('media', ["PAGE_TITLE" => "MEDIA", "USERNAME" => $loginUser->name, "Images" => $allImages]);
     }
 
     public function Mediaupload(Request $request)
@@ -366,7 +351,7 @@ class MainController extends Controller
                 Image::create([
                     'image_path' => 'uploads/' . $filename,
                     'image_title' => $file->getClientOriginalName(),
-                    'save_image_by' => $loginUser->id,  // Replace with the correct user info
+                    'save_image_by' => $loginUser->id, // Replace with the correct user info
                 ]);
             }
 
@@ -376,11 +361,51 @@ class MainController extends Controller
         }
     }
 
-
-    public function deleteuser(Request $request,$id){
-        $user = User::where('id',$id)->delete();
-        if($user){
+    public function deleteuser(Request $request, $id)
+    {
+        $user = User::where('id', $id)->delete();
+        if ($user) {
             return redirect()->back();
         }
+    }
+
+    public function mediaDelete(Request $request, $id)
+    {
+        $imageID = $id;
+        $imageStatus = Image::where('id', $id)->delete();
+        if ($imageStatus) {
+            return redirect()->back();
+        } else {
+            return redirect()->back();
+        }
+    }
+
+    public function EditUserPOST(Request $request)
+    {
+        $name = $request['name'];
+        $email = $request['email'];
+        $role = $request['role'];
+        $FeaturedImage = $request['FeaturedImage'];
+        $userID = $request['userID'];
+        try {
+            $user = User::where('id', $userID)->update([
+                'name' => $name,
+                'email' => $email,
+            ]);
+            if($user){
+                try {
+                    $UserMeta = UserMeta::where('userId', $userID)->update([
+                        "featuredImage" => $FeaturedImage,
+                        'role' => $role,
+                    ]);
+                    return response()->json(['Message' => 'User Updated' , 'Code' => 200], 200);
+                } catch (Exception $d) {
+                    return response()->json(['Message' => 'User Not Updated' . $e, 'Code' => 500], 500);
+                }
+            }
+        } catch (Exception $e) {
+            return response()->json(['Message' => 'User Not Updated' . $e, 'Code' => 500], 500);
+        }
+
     }
 }

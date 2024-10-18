@@ -90,29 +90,30 @@
                         <ul>
                             @if ($Images)
                                 @foreach ($Images as $Image)
-                                <li>
-                                    <div class="work-site-box work-site-box1">
-                                        <div class="work-site-img">
-                                            <img src="{{ asset($Image->image_path) }}" alt="">
+                                    <li>
+                                        <div class="work-site-box work-site-box1">
+                                            <div class="work-site-img">
+                                                <img src="{{ asset($Image->image_path) }}" alt="">
+                                            </div>
+                                            <div class="work-side-content mb-0">
+                                                <h6>{{ $Image->image_title }}</h6>
+                                            </div>
+                                            <ul>
+                                                <li><button class="view-image-btn" data-bs-toggle="modal"
+                                                        data-bs-target="#imageModal"
+                                                        data-image-src="{{ asset($Image->image_path) }}"><i
+                                                            class="fa-solid fa-eye"></i></button></li>
+
+                                                <li><button onclick="deleteMedia('{{ $Image->id }}')"><i
+                                                            class="fa-solid fa-trash"></i></button></li>
+                                            </ul>
                                         </div>
-                                        <div class="work-side-content mb-0">
-                                            <h6>{{ $Image->image_title }}</h6>
-                                        </div>
-                                        <ul>
-                                            <li><button class="view-image-btn" data-bs-toggle="modal"
-                                                    data-bs-target="#imageModal"
-                                                    data-image-src="{{   asset($Image->image_path) }}"><i
-                                                        class="fa-solid fa-eye"></i></button></li>
-    
-                                            <li><button><i class="fa-solid fa-trash"></i></button></li>
-                                        </ul>
-                                    </div>
-    
-                                </li>
+
+                                    </li>
                                 @endforeach
                             @endif
-                            
-                            
+
+
 
 
                         </ul>
@@ -121,7 +122,11 @@
             </div>
         </div>
     </section>
-
+    <script>
+        function deleteMedia(mediaID) {
+            window.location.href = window.location.href+"/delete/"+mediaID;
+        }
+    </script>
 
     <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
         <div class="modal-dialog assing-userss widthsec">
