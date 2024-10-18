@@ -375,4 +375,12 @@ class MainController extends Controller
             return response()->json(['error' => 'No files found!'], 400);
         }
     }
+
+
+    public function deleteuser(Request $request,$id){
+        $user = User::where('id',$id)->delete();
+        if($user){
+            return redirect()->back();
+        }
+    }
 }

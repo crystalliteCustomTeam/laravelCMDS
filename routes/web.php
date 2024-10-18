@@ -11,6 +11,7 @@ Route::get('/', function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [MainController::class, 'dashboard'])->name('dashboard');
     Route::get('/users', [MainController::class, 'GetAllUser'])->name('users');
+    Route::get('/users/delete/{id}', [MainController::class, 'deleteuser'])->name('user.delete');
     Route::get('users/edituser/{id}', [MainController::class, 'EditUser']);
     Route::post('/upload', [MainController::class, 'upload'])->name('image.upload');
     Route::post('/uploadImage', [MainController::class, 'uploadimage'])->name('image.worksite.image');

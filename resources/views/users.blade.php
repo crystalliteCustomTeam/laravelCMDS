@@ -42,7 +42,7 @@
                                             </td>
                                             <td><button onclick="editPage({{ $user->UID }})"
                                                     class="edit mr-2"><i class="fa-solid fa-pen-to-square"></i></button>
-                                                <button class="delete"><i class="fa-solid fa-trash"></i></button>
+                                                <button onclick="deleteuser({{ $user->UID }})" class="delete"><i class="fa-solid fa-trash"></i></button>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -59,6 +59,9 @@
                         <script>
                             function editPage(id){
                                 window.location.href = window.location+'/edituser/'+id;
+                            }
+                            function deleteuser(id){
+                                window.location.href = window.location+'/delete/'+id;
                             }
                         </script>
                         <div class="main_loadmore-btn">
