@@ -179,22 +179,11 @@ class MainController extends Controller
         return redirect()->back();
 
     }
-    public function areaUserAssignUpdate(Request $request)
-    {
-        $users = $request['users'];
-        $loginUser = Auth::user();
-        $AREAID = $request['AreaID'];
+    
 
-        for ($i = 0; $i < Count($users); $i++) {
-            AreaUser::create([
-                "WSID" => $users[$i],
-                "ARID" => $AREAID,
-                "UID" => $loginUser->id,
-            ]);
-        }
-
+    function worksiteDelete(Request $request, $id){
+        WorkSite::where('id',$id)->delete();
         return redirect()->back();
-
     }
 
     public function workarea(Request $request, $id, $area)

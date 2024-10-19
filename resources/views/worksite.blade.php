@@ -61,7 +61,7 @@
                                             <div class="main_editss-options">
                                                 <ul>
                                                   
-                                                    <li><button><i class="fa-solid fa-trash"></i></button></li>
+                                                    <li><button onclick="ondelete({{ $SITE->id }})"><i class="fa-solid fa-trash"></i></button></li>
                                                 </ul>
                                             </div>
                                         </div>
@@ -70,7 +70,12 @@
                                 @endforeach
                             @endif
                         </ul>
+                        <script>
+function ondelete(id){
+    window.location.href = window.location.href +'/delete/'+id;
+}
 
+                        </script>
                     </div>
                 </div>
             </div>
