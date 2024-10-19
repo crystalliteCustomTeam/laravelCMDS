@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Area;
 use App\Models\AreaUser;
 use App\Models\Checkpoints;
+use App\Models\AssignCheckpoint;
 use App\Models\Image;
 use App\Models\Notification;
 use App\Models\Safety;
@@ -353,9 +354,22 @@ class MainController extends Controller
             "CreatedBy" => $loginUser->id,
         ]);
         if ($safety) {
-            return response()->json(["Message" => "Safety Created", "Code" => 200], 200);
+            return response()->json(["Message" => "Safety Created","Safety_ID" => $safety->id ,"Code" => 200], 200);
         }
         return response()->json(["Message" => "Safety Not Created", "Code" => 500], 500);
+    }
+
+    public function guideAssign(Request $request){
+        $checkpoints = $request['checkpoint'];
+        $safetyID = $request['safety_id'];
+        for ($i = 0; $i < Count($checkpoints); $i++) {
+            AssignCheckpoint::create([
+                "SAFID" => $safetyID,
+                "CHKID" => $checkpoints[$i],
+            ]);
+        }
+
+        return redirect()->back();
     }
 
     public function media(Request $request)
@@ -469,6 +483,7 @@ class MainController extends Controller
     public function guideDelete(Request $request, $id)
     {
         Safety::where('id', $id)->delete();
+        
         return redirect()->back();
     }
 
@@ -525,4 +540,7 @@ class MainController extends Controller
         AreaUser::where('id', $id)->delete();
         return redirect()->back();
     }
+
+
+    
 }

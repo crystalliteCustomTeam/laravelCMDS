@@ -14,26 +14,7 @@
                     </div>
                     <div class="mt-5 main-safety-card">
                         <ul>
-                            @if ($Safety)
-                                @foreach ($Safety as $Saf)
-                                    <li>
-                                        <div class="safety-card">
-                                            <div class="icons">
-                                                <img src="{{ asset('assets/images/setting-icon.png') }}" alt="">
-                                            </div>
-                                            <div class="card-content">
-                                                <h5>{{ $Saf->title }}</h5>
-                                            </div>
-                                            <ul>
-                                                <li><button data-bs-toggle="modal" data-bs-target="#exampleModal"
-                                                        type="button"><i class="fa-solid fa-pen-to-square"></i></button>
-                                                </li>
-                                                <li><button onclick="checkDelete({{ $Saf->id }})" ><i class="fa-solid fa-trash"></i></button></li>
-                                            </ul>
-                                        </div>
-                                    </li>
-                                @endforeach
-                            @endif
+                            
 
                         </ul>
 
@@ -273,7 +254,8 @@
                     success: function(response) {
                         if (response.Code === 200) {
                             alert("Guidline Created");
-                            window.location.reload();
+                            
+                            // window.location.reload();
                         }
                     },
                     error: function(response) {

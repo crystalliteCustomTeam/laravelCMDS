@@ -25,10 +25,11 @@
                                                 <h5>{{ $Saf->title }}</h5>
                                             </div>
                                             <ul>
-                                                <li><button data-bs-toggle="modal" data-bs-target="#exampleModal"
+                                                <li><button onclick="edit({{ $Saf->id }})" data-bs-toggle="modal"
                                                         type="button"><i class="fa-solid fa-pen-to-square"></i></button>
                                                 </li>
-                                                <li><button onclick="checkDelete({{ $Saf->id }})" ><i class="fa-solid fa-trash"></i></button></li>
+                                                <li><button onclick="checkDelete({{ $Saf->id }})"><i
+                                                            class="fa-solid fa-trash"></i></button></li>
                                             </ul>
                                         </div>
                                     </li>
@@ -47,11 +48,12 @@
 
     <!-- Button trigger modal -->
     <script>
-        // function edit(id){
-        //     window.location.href = window.location.href +'/edit/'+id
-        // }
-        function checkDelete(id){
-            window.location.href = window.location.href +'/delete/'+id
+        function edit(id) {
+            window.location.href = window.location.href + '/edit/' + id
+        }
+
+        function checkDelete(id) {
+            window.location.href = window.location.href + '/delete/' + id
         }
     </script>
 
@@ -76,8 +78,8 @@
                             <label for="Image">Image:</label>
                             <input type="hidden" name="FeaturedImage" value="" id="FeaturedImage" />
                             <img src="" id="FeaturedImageSRC" width="150px" height="150px" style="display: none" />
-                            <button type="button" data-bs-toggle="modal" id="FeaturedImageBTN" data-bs-target="#exampleModal3"
-                                type="button">Select Images </button>
+                            <button type="button" data-bs-toggle="modal" id="FeaturedImageBTN"
+                                data-bs-target="#exampleModal3" type="button">Select Images </button>
                         </div>
                         <div class="flex-input">
                             <label for="Image">Title: </label>
@@ -115,7 +117,9 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form action="">
+                    <form  action="{{ route('guideline.checkpoint.assign') }}" method="POST">
+                        @csrf
+                        <input type="hidden" value="" name="safety_id" id="safety_id">
                         <div class="main-checkboxx safetly-guide">
                             <ul>
                                 @if ($Checkpoint)
@@ -259,6 +263,7 @@
 
 
 
+            
 
             $('#guideline').on('submit', (e) => {
                 e.preventDefault();
@@ -273,7 +278,12 @@
                     success: function(response) {
                         if (response.Code === 200) {
                             alert("Guidline Created");
-                            window.location.reload();
+
+                            const exampleModal4 = new bootstrap.Modal(document.getElementById(
+                                'exampleModal1'));
+                            exampleModal4.show();
+                            $('#safety_id').val(response.Safety_ID);
+
                         }
                     },
                     error: function(response) {
@@ -282,7 +292,7 @@
                 });
             });
 
-           
+
 
 
         });

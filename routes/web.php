@@ -33,6 +33,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/guideline', [MainController::class, 'guide'])->name('guideline');
     Route::post('/worksite/area/edit', [MainController::class, 'areaEdit'])->name('worksite.area.edit');
     Route::get('/guideline/delete/{id}', [MainController::class, 'guideDelete'])->name('guideline.delete');
+    Route::get('/guideline/edit/{id}', [MainController::class, 'guideEdit'])->name('guideline.edit');
+    Route::post('/guideline/assign', [MainController::class, 'guideAssign'])->name('guideline.checkpoint.assign');
     Route::get('/media', [MainController::class, 'media'])->name('media');
     route::get('/media/delete/{id}',[MainController::class, 'mediaDelete'])->name('media.delete');
     Route::post('/upload-files', [MainController::class, 'Mediaupload'])->name('media.upload');

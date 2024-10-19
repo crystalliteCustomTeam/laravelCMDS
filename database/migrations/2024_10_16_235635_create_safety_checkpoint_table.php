@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('safety_checkpoint', function (Blueprint $table) {
             $table->id();
+            $table->bigInteger('SAFID');
+            $table->bigInteger('CHKID');
             $table->timestamps();
         });
     }
