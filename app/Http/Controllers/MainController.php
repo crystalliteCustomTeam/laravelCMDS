@@ -21,7 +21,10 @@ class MainController extends Controller
     public function dashboard(Request $request)
     {
         $user = Auth::user();
-        return view('dashboard', ["PAGE_TITLE" => "DASHBOARD", "USERNAME" => $user->name]);
+        $userCount = User::count();
+        $ws_count = WorkSite::where('CreateBy', $user->id)->count();
+        $NotificationCount = Notification::count();
+        return view('dashboard', ["PAGE_TITLE" => "DASHBOARD", "USERNAME" => $user->name, "USERCOUNT" => $userCount, 'WORKSITE_COUNT' => $ws_count,"NotificationCount" => $NotificationCount]);
     }
 
     public function GetAllUser(Request $request)
@@ -179,10 +182,10 @@ class MainController extends Controller
         return redirect()->back();
 
     }
-    
 
-    function worksiteDelete(Request $request, $id){
-        WorkSite::where('id',$id)->delete();
+    public function worksiteDelete(Request $request, $id)
+    {
+        WorkSite::where('id', $id)->delete();
         return redirect()->back();
     }
 
@@ -195,8 +198,8 @@ class MainController extends Controller
             ->select('users.name as UName', 'users.id as UID', 'AreaUsers.id as ARUID')
             ->get();
         $Allusers = User::join('usermeta', 'users.id', '=', 'usermeta.userId')->where('usermeta.role', '!=', 0)->where('usermeta.createBy', $loginUser->id)
-        ->select('users.*','users.id as UID','usermeta.id as UMID')
-        ->get();
+            ->select('users.*', 'users.id as UID', 'usermeta.id as UMID')
+            ->get();
         return view('areaedit', ["PAGE_TITLE" => "AREA DETAIL EDIT", "USERNAME" => $loginUser->name, 'Areas' => $areaDetail, 'AreaUsers' => $users, 'ALLUSERS' => $Allusers]);
     }
 

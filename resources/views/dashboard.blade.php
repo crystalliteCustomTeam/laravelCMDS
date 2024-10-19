@@ -57,17 +57,17 @@
                         <li>
                             <img src="{{asset('assets/images/dash-users.png')}}" alt="">
                             <h5>Users</h5>
-                            <p>24</p>
+                            <p>{{ $USERCOUNT }}</p>
                         </li>
                         <li>
                             <img src="{{asset('assets/images/dash-work.png')}}" alt="">
                             <h5>Work Sites</h5>
-                            <p>4</p>
+                            <p>{{ $WORKSITE_COUNT }}</p>
                         </li>
                         <li>
                             <img src="{{asset('assets/images/dash-alarm.png')}}" alt="">
                             <h5>Notifications</h5>
-                            <p>50</p>
+                            <p>{{ $NotificationCount }}</p>
                         </li>
                     </ul>
                 </div>
