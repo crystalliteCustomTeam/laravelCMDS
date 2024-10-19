@@ -16,7 +16,7 @@
                         <ul>
                             @if ($Areas)
                                 @foreach ($Areas as $area)
-                                    <li style="margin-right:15px">
+                                    <li style="margin-right:15px;margin-bottom:15px">
                                         <div class="area">{{ $area->Area_Name }}</div>
                                         <ul>
                                             <li><button type="button" onclick="nextpage({{ $area->id  }})"><i class="fa-solid fa-pen-to-square"> </i></button>

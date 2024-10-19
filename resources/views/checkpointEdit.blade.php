@@ -10,85 +10,73 @@
                 <div class="col-md-12">
                     <div class="first-top-headerrr">
                         <h5>Check Points</h5>
-                        <button data-bs-toggle="modal" data-bs-target="#exampleModal" type="button">Create New</button>
                     </div>
-                    <div class="mt-5 area-boxes">
-                        <ul>
-                            @if ($checkpoint)
-                                @foreach ($checkpoint as $ckp)
-                                    <li class="mt-2 " style="margin-right: 15px">
-                                        <div class="area">{{ $ckp->title }}</div>
-                                        <ul>
-                                            <li><button onclick="edit({{ $ckp->id }})" type="button"><i
-                                                        class="fa-solid fa-pen-to-square"></i></button></li>
-                                            <li><button onclick="checkDelete({{ $ckp->id }})" ><i class="fa-solid fa-trash"></i></button></li>
-                                        </ul>
-                                    </li>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Image
+                                </th>
+                                <th>
+                                    Video
+                                </th>
+                                <th>
+                                    Title
+                                </th>
+                                <th>
+                                    Description
+                                </th>
 
-                                @endforeach
-                            @endif
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <form  method="POST" action="{{ route('checkpoint.edit.post')  }}">
+                                @csrf
+                                <tr>
+                                    <td>
+                                        <input type="hidden" value="{{ $checkpoint->id }}" name="checkpointID">
+                                        <img src="{{ asset($checkpoint->Images) }}" id="FeaturedImageSRC" alt=""
+                                            style="border-radius: 10%" width="100px" height="100px">
+                                        <input type="hidden" name="FeaturedImage" value="{{ asset($checkpoint->Images) }}" id="FeaturedImage" /></br>
+                                        <button type="button" id="FeaturedImageBTN" class="btn btn-dark mt-2" data-bs-toggle="modal"
+                                            data-bs-target="#exampleModal1" type="button">Change Image </button>
 
 
-                        </ul>
-                    </div>
+                                    </td>
+                                    <td>
+                                        @if ($checkpoint->Videos != '')
+                                            <input type="text" class="form-control" name="video"
+                                                value="No Video Added">
+                                        @else
+                                            <video src="{{ $checkpoint->Videos }}" name="video" width="300px" height="300px"></video>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control" name="title"
+                                            value="{{ $checkpoint->title }}">
+                                    </td>
+                                    <td>
+                                        <textarea name="description" class="form-control">{{ $checkpoint->Description }}</textarea>
+                                        <input type="submit" class="btn btn-success mt-2" name="submit" value="Edit">
+                                    </td>
+
+
+
+                                </tr>
+                            </form>
+                        </tbody>
+                    </table>
 
                 </div>
             </div>
         </div>
     </section>
 
-    <script>
-        function edit(id){
-            window.location.href = window.location.href +'/edit/'+id
-        }
-        function checkDelete(id){
-            window.location.href = window.location.href +'/delete/'+id
-        }
-    </script>
     {{-- modal  --}}
 
     <!-- Button trigger modal -->
 
 
-    <!-- Modal -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="exampleModalLabel">Create Check Point</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="checkpointsform">
-                        <div class="flex-input">
-                            <label for="Image">Image:</label>
-                            <input type="hidden" name="FeaturedImage" value="" id="FeaturedImage" />
-                            <img src="" id="FeaturedImageSRC" width="150px" height="150px" style="display: none" />
-                            <button type="button" id="FeaturedImageBTN" data-bs-toggle="modal"
-                                data-bs-target="#exampleModal1" type="button">Select Images </button>
-                        </div>
-                        <div class="flex-input">
-                            <label for="Image">Video:</label>
-                            <input type="text" name="videoURL" placeholder="Video Url" />
-                        </div>
-                        <div class="flex-input">
-                            <label for="Image">Title:</label>
-                            <input type="text" name="title" placeholder="Title">
-                        </div>
-
-                        <div class="flex-input brief">
-                            <label for="Image">Description: </label>
-                            <textarea name="description" placeholder="Description"></textarea>
-                        </div>
-                        <div class="main_creat-btn">
-                            <button type="submit">Create</button>
-                        </div>
-                    </form>
-                </div>
-
-            </div>
-        </div>
-    </div>
 
     {{-- end modal  --}}
 
@@ -110,7 +98,7 @@
                 let formData1 = new FormData(document.getElementById("checkpointsform"));
                 $.ajax({
                     type: 'POST',
-                    url: "{{ route('checkpoint.create') }}",
+                    url: "{{ route('checkpoint.edit.post') }}",
                     data: formData1,
                     contentType: false,
                     processData: false,
@@ -161,8 +149,7 @@
                                 <div class="main-upload">
                                     <h5>Upload an image / Video </h5>
                                     <button type="button" id="uploadButton">Upload</button>
-                                    <input type="file" id="fileInput" accept="image/*" style="display: none;"
-                                        multiple>
+                                    <input type="file" id="fileInput" accept="image/*" style="display: none;" multiple>
                                 </div>
                             </div>
                             <div class="tab-pane fade show active" id="profile-tab-pane" role="tabpanel"

@@ -107,7 +107,7 @@ class MainController extends Controller
         $user = Auth::user();
         $usersData = User::join('usermeta', 'users.id', '=', 'usermeta.userId')
             ->where('users.id', '=', $userID)
-            ->select('users.*', 'users.id as UID' , 'usermeta.*')
+            ->select('users.*', 'users.id as UID', 'usermeta.*')
             ->get();
         $Images = Image::where('save_image_by', $user->id)->get();
         return view('useredit', ["PAGE_TITLE" => "EDIT USER", "USERNAME" => $user->name, "USER_DATA" => $usersData, "Images" => $Images]);
@@ -264,7 +264,20 @@ class MainController extends Controller
         $loginUser = Auth::user();
         $worksites = WorkSite::where('CreateBy', $loginUser->id)->get();
         $Areas = Area::where('CreateBy', $loginUser->id)->get();
-        return view('notifications', ["PAGE_TITLE" => "NOTIFICATION", "USERNAME" => $loginUser->name, "WORKSITE" => $worksites, "AREAS" => $Areas]);
+        $AllNotifications = Notification::all();
+        // $Notifications = [];
+        // foreach ($AllNotifications as $AllNotification) {
+        //     $WSID = $AllNotification->WSID;
+        //     if ($WSID == 0 || $WSID == "") {
+        //         continue;
+        //     } else {
+        //         $jsonIDs = json_decode($WSID);
+        //         foreach($jsonIDs as $JSID){
+        //             echo $JSID;
+        //         }
+        //     }
+        // }
+        return view('notifications', ["PAGE_TITLE" => "NOTIFICATION", "USERNAME" => $loginUser->name, "WORKSITE" => $worksites, "AREAS" => $Areas, "AllNotification" => $AllNotifications]);
     }
 
     public function notificationsCreate(Request $request)
@@ -290,7 +303,8 @@ class MainController extends Controller
         $loginUser = Auth::user();
         $checkpoint = Checkpoints::where('CreatedBy', $loginUser->id)->get();
         $Safety = Safety::where('CreatedBy', $loginUser->id)->get();
-        return view('guidelines', ["PAGE_TITLE" => "SAFETY GUIDELINES ", "USERNAME" => $loginUser->name, "Checkpoint" => $checkpoint, "Safety" => $Safety]);
+        $allImages = Image::where('save_image_by', $loginUser->id)->get();
+        return view('guidelines', ["PAGE_TITLE" => "SAFETY GUIDELINES ", "USERNAME" => $loginUser->name, "Checkpoint" => $checkpoint, "Safety" => $Safety, "Images" => $allImages]);
     }
 
     public function checkpoint(Request $request)
@@ -322,7 +336,7 @@ class MainController extends Controller
         $loginUser = Auth::user();
         $safety = Safety::create([
             "icon" => "car",
-            "Images" => "Car",
+            "Images" => $request['FeaturedImage'],
             "title" => $request['title'],
             "description" => $request['description'],
             "CreatedBy" => $loginUser->id,
@@ -392,13 +406,13 @@ class MainController extends Controller
                 'name' => $name,
                 'email' => $email,
             ]);
-            if($user){
+            if ($user) {
                 try {
                     $UserMeta = UserMeta::where('userId', $userID)->update([
                         "featuredImage" => $FeaturedImage,
                         'role' => $role,
                     ]);
-                    return response()->json(['Message' => 'User Updated' , 'Code' => 200], 200);
+                    return response()->json(['Message' => 'User Updated', 'Code' => 200], 200);
                 } catch (Exception $d) {
                     return response()->json(['Message' => 'User Not Updated' . $e, 'Code' => 500], 500);
                 }
@@ -407,5 +421,65 @@ class MainController extends Controller
             return response()->json(['Message' => 'User Not Updated' . $e, 'Code' => 500], 500);
         }
 
+    }
+
+    public function checkpointEdit(Request $request, $ID)
+    {
+        $loginUser = Auth::user();
+        $allImages = Image::where('save_image_by', $loginUser->id)->get();
+        $checkpoint = Checkpoints::where('CreatedBy', $loginUser->id)->where('id', $ID)->first();
+        return view('checkpointEdit', ["PAGE_TITLE" => "MEDIA", "EDIT CHECKPOINT", "USERNAME" => $loginUser->name, "Images" => $allImages, "checkpoint" => $checkpoint]);
+    }
+
+    public function checkpointEditPOST(Request $request)
+    {
+        $ID = $request['checkpointID'];
+        $Video = $request['video'];
+        $title = $request['title'];
+        $FeaturedImage = $request['FeaturedImage'];
+        $description = $request['description'];
+
+        $Checkpoints = Checkpoints::where('id', $ID)->update([
+            "title" => $title,
+            "Description" => $description,
+            "Images" => $FeaturedImage,
+            "Videos" => $Video,
+        ]);
+        return redirect()->back();
+
+    }
+
+    public function checkpointDelete(Request $request, $id)
+    {
+        Checkpoints::where('id', $id)->delete();
+        return redirect()->back();
+    }
+
+    public function guideDelete(Request $request, $id)
+    {
+        Safety::where('id', $id)->delete();
+        return redirect()->back();
+    }
+
+    public function guideEdit(Request $request, $id)
+    {
+        $loginUser = Auth::user();
+        $allImages = Image::where('save_image_by', $loginUser->id)->get();
+        $checkpoint = Checkpoints::where('CreatedBy', $loginUser->id)->where('id', $id)->first();
+        $Safety = Safety::where('id', $id)->first();
+        return view('guidlineEdit', ["PAGE_TITLE" => "EDIT SAFETY", "USERNAME" => $loginUser->name, "Images" => $allImages, "checkpoint" => $checkpoint]);
+    }
+
+    public function notificationsDelete($ID){
+        Notification::where('id',$ID)->delete();
+        return redirect()->back();
+    }
+
+    public function worksiteDetail($id){
+        $loginUser = Auth::user();
+        $allImages = Image::where('save_image_by', $loginUser->id)->get();
+        $worksites = WorkSite::where('CreateBy', $loginUser->id)->where('id',$id)->first();
+        $Areas = Area::where('CreateBy', $loginUser->id)->where('WSID',$worksites->id)->get();
+        return view('worksiteDetail', ["PAGE_TITLE" => "EDIT SAFETY", "USERNAME" => $loginUser->name, "Images" => $allImages, "worksites" => $worksites , "Areas" => $Areas]);
     }
 }

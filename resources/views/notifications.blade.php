@@ -25,86 +25,65 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>01</td>
-                                    <td>5</td>
-                                    <td>Johar town</td>
-                                    <td>karachi</td>
-                                    <td><button data-bs-toggle="modal" data-bs-target="#exampleModal" type="button"
-                                            class="edit mr-2"><i class="fa-solid fa-pen-to-square"></i></button> <button
-                                            class="delete"><i class="fa-solid fa-trash"></i></button></td>
-                                </tr>
-                                <tr>
-                                    <td>01</td>
-                                    <td>5</td>
-                                    <td>Johar town</td>
-                                    <td>karachi</td>
-                                    <td><button data-bs-toggle="modal" data-bs-target="#exampleModal" type="button"
-                                            class="edit mr-2"><i class="fa-solid fa-pen-to-square"></i></button> <button
-                                            class="delete"><i class="fa-solid fa-trash"></i></button></td>
-                                </tr>
-                                <tr>
-                                    <td>01</td>
-                                    <td>5</td>
-                                    <td>Johar town</td>
-                                    <td>karachi</td>
-                                    <td><button data-bs-toggle="modal" data-bs-target="#exampleModal" type="button"
-                                            class="edit mr-2"><i class="fa-solid fa-pen-to-square"></i></button> <button
-                                            class="delete"><i class="fa-solid fa-trash"></i></button></td>
-                                </tr>
-                                <tr>
-                                    <td>01</td>
-                                    <td>5</td>
-                                    <td>Johar town</td>
-                                    <td>karachi</td>
-                                    <td><button data-bs-toggle="modal" data-bs-target="#exampleModal" type="button"
-                                            class="edit mr-2"><i class="fa-solid fa-pen-to-square"></i></button> <button
-                                            class="delete"><i class="fa-solid fa-trash"></i></button></td>
-                                </tr>
-                                <tr>
-                                    <td>01</td>
-                                    <td>5</td>
-                                    <td>Johar town</td>
-                                    <td>karachi</td>
-                                    <td><button data-bs-toggle="modal" data-bs-target="#exampleModal" type="button"
-                                            class="edit mr-2"><i class="fa-solid fa-pen-to-square"></i></button> <button
-                                            class="delete"><i class="fa-solid fa-trash"></i></button></td>
-                                </tr>
-                                <tr>
-                                    <td>01</td>
-                                    <td>5</td>
-                                    <td>Johar town</td>
-                                    <td>karachi</td>
-                                    <td><button data-bs-toggle="modal" data-bs-target="#exampleModal" type="button"
-                                            class="edit mr-2"><i class="fa-solid fa-pen-to-square"></i></button> <button
-                                            class="delete"><i class="fa-solid fa-trash"></i></button></td>
-                                </tr>
-                                <tr>
-                                    <td>01</td>
-                                    <td>5</td>
-                                    <td>Johar town</td>
-                                    <td>karachi</td>
-                                    <td><button data-bs-toggle="modal" data-bs-target="#exampleModal" type="button"
-                                            class="edit mr-2"><i class="fa-solid fa-pen-to-square"></i></button> <button
-                                            class="delete"><i class="fa-solid fa-trash"></i></button></td>
-                                </tr>
-                                <tr>
-                                    <td>01</td>
-                                    <td>5</td>
-                                    <td>Johar town</td>
-                                    <td>karachi</td>
-                                    <td><button data-bs-toggle="modal" data-bs-target="#exampleModal" type="button"
-                                            class="edit mr-2"><i class="fa-solid fa-pen-to-square"></i></button> <button
-                                            class="delete"><i class="fa-solid fa-trash"></i></button></td>
-                                </tr>
+                                @if ($AllNotification)
+                                    @php
+                                        $index = 1;
+                                    @endphp
+                                    @foreach ($AllNotification as $Notification)
+                                        <tr>
+                                            <td>{{ $index++ }}</td>
+                                            <td>{{ $Notification->title }}</td>
+                                            <td>
+                                                @if ($Notification->WSID != 0)
+                                                    @php
+                                                        $jsonDatas = json_decode($Notification->WSID);
+                                                    @endphp
+                                                    @foreach ($jsonDatas as $JD)
+                                                        @foreach ($WORKSITE as $WK)
+                                                            @if ($WK->id != $JD)
+                                                                @continue
+                                                            @else
+                                                                <button style="width: fit-content;color:white;padding:0px 10px">{{ $WK->Name }}</button>
+                                                            @endif
+                                                        @endforeach
+                                                    @endforeach
+                                                @else
+                                                    @continue
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if ($Notification->ARIDS != 0)
+                                                    @php
+                                                        $jsonDatas = json_decode($Notification->ARIDS);
+                                                    @endphp
+                                                    @foreach ($jsonDatas as $JD)
+                                                        @foreach ($AREAS as $WK)
+                                                            @if ($WK->id != $JD)
+                                                                @continue
+                                                            @else
+                                                                <button style="width: fit-content;color:white;padding:0px 10px">{{ $WK->Area_Name }}</button>
+                                                            @endif
+                                                        @endforeach
+                                                    @endforeach
+                                                @else
+                                                    @continue
+                                                @endif
+                                            </td>
+                                            <td>
+                                                <button class="delete" onclick="deleteNotification({{ $Notification->id }})"><i class="fa-solid fa-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                @endif
+
 
 
                             </tbody>
                         </table>
                         <div class="main_loadmore-btn">
-                            <button class="load-more">
+                            {{-- <button class="load-more">
                                 Load More
-                            </button>
+                            </button> --}}
                         </div>
                     </div>
 
@@ -114,7 +93,11 @@
     </section>
 
     {{-- modal  --}}
-
+    <script>
+        function deleteNotification(ID){
+            window.location.href  = window.location.href+'/delete/'+ID;
+        }
+    </script>
     <!-- Button trigger modal -->
 
 
@@ -197,8 +180,8 @@
                         if (response.Code === 200) {
 
 
-                           alert("NOTIFICATION SEND");
-                           window.location.reload();
+                            alert("NOTIFICATION SEND");
+                            window.location.reload();
                         }
                     },
                     error: function(response) {
@@ -224,26 +207,30 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form action="{{ route('notifications.send')  }}" method="POST">
+                    <form action="{{ route('notifications.send') }}" method="POST">
                         @csrf
                         <input type="hidden" name="notificationID" id="notficationID" value="" />
                         <div class="side-roll">
                             <input type="checkbox">
                             <label for="">Select All</label>
                         </div>
-                        <div class="main-checkboxx child-workside">
+                        <div class="main-checkboxx child-workside"
+                            style="overflow: hidden;height:500px;    overflow-y: scroll;
+">
                             <ul>
                                 @if ($WORKSITE)
                                     @foreach ($WORKSITE as $WS)
                                         <li>
-                                            <input type="checkbox" id="worksite-{{ $WS->id }}" name="worksiteID[]" value="{{ $WS->id }} ">
+                                            <input type="checkbox" id="worksite-{{ $WS->id }}" name="worksiteID[]"
+                                                value="{{ $WS->id }} ">
                                             <label for="">{{ $WS->Name }}</label>
                                             <ul>
                                                 @if ($AREAS)
                                                     @foreach ($AREAS as $AR)
                                                         @if ($AR->WSID == $WS->id)
                                                             <li>
-                                                                <input id="areasite-{{ $WS->id }}"  type="checkbox" name="areas[]" value="{{ $AR->id }}">
+                                                                <input id="areasite-{{ $WS->id }}" type="checkbox"
+                                                                    name="areas[]" value="{{ $AR->id }}">
                                                                 <label for="">{{ $AR->Area_Name }}</label>
                                                             </li>
                                                         @else
@@ -251,7 +238,7 @@
                                                         @endif
                                                     @endforeach
                                                 @endif
-                                                
+
                                             </ul>
                                         </li>
                                     @endforeach
@@ -262,7 +249,7 @@
 
 
                         </div>
-                        <div class="main_creat-btn">
+                        <div class="main_creat-btn mt-3">
                             <button type="submit">Assign</button>
                         </div>
                     </form>

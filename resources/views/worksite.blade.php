@@ -60,10 +60,7 @@
                                             </a>
                                             <div class="main_editss-options">
                                                 <ul>
-                                                    <li><button data-bs-toggle="modal" data-bs-target="#exampleModal"
-                                                            type="button"><i
-                                                                class="fa-solid fa-pen-to-square"></i></button>
-                                                    </li>
+                                                  
                                                     <li><button><i class="fa-solid fa-trash"></i></button></li>
                                                 </ul>
                                             </div>
