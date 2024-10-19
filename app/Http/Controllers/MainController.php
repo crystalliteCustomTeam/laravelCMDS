@@ -179,6 +179,23 @@ class MainController extends Controller
         return redirect()->back();
 
     }
+    public function areaUserAssignUpdate(Request $request)
+    {
+        $users = $request['users'];
+        $loginUser = Auth::user();
+        $AREAID = $request['AreaID'];
+
+        for ($i = 0; $i < Count($users); $i++) {
+            AreaUser::create([
+                "WSID" => $users[$i],
+                "ARID" => $AREAID,
+                "UID" => $loginUser->id,
+            ]);
+        }
+
+        return redirect()->back();
+
+    }
 
     public function workarea(Request $request, $id, $area)
     {
@@ -186,10 +203,12 @@ class MainController extends Controller
         $areaDetail = Area::where('CreateBy', $loginUser->id)->where('id', $area)->first();
         $users = AreaUser::where('ARID', $area)
             ->join('users', 'users.id', '=', 'areausers.WSID')
-            ->select('users.name as UName', 'users.id as UID')
+            ->select('users.name as UName', 'users.id as UID', 'AreaUsers.id as ARUID')
             ->get();
-
-        return view('areaedit', ["PAGE_TITLE" => "AREA DETAIL EDIT", "USERNAME" => $loginUser->name, 'Areas' => $areaDetail, 'AreaUsers' => $users]);
+        $Allusers = User::join('usermeta', 'users.id', '=', 'usermeta.userId')->where('usermeta.role', '!=', 0)->where('usermeta.createBy', $loginUser->id)
+        ->select('users.*','users.id as UID','usermeta.id as UMID')
+        ->get();
+        return view('areaedit', ["PAGE_TITLE" => "AREA DETAIL EDIT", "USERNAME" => $loginUser->name, 'Areas' => $areaDetail, 'AreaUsers' => $users, 'ALLUSERS' => $Allusers]);
     }
 
     public function createWorksite(Request $request)
@@ -470,16 +489,48 @@ class MainController extends Controller
         return view('guidlineEdit', ["PAGE_TITLE" => "EDIT SAFETY", "USERNAME" => $loginUser->name, "Images" => $allImages, "checkpoint" => $checkpoint]);
     }
 
-    public function notificationsDelete($ID){
-        Notification::where('id',$ID)->delete();
+    public function notificationsDelete($ID)
+    {
+        Notification::where('id', $ID)->delete();
         return redirect()->back();
     }
 
-    public function worksiteDetail($id){
+    public function worksiteDetail($id)
+    {
         $loginUser = Auth::user();
         $allImages = Image::where('save_image_by', $loginUser->id)->get();
-        $worksites = WorkSite::where('CreateBy', $loginUser->id)->where('id',$id)->first();
-        $Areas = Area::where('CreateBy', $loginUser->id)->where('WSID',$worksites->id)->get();
-        return view('worksiteDetail', ["PAGE_TITLE" => "EDIT SAFETY", "USERNAME" => $loginUser->name, "Images" => $allImages, "worksites" => $worksites , "Areas" => $Areas]);
+        $worksites = WorkSite::where('CreateBy', $loginUser->id)->where('id', $id)->first();
+        $Areas = Area::where('CreateBy', $loginUser->id)->where('WSID', $worksites->id)->get();
+        return view('worksiteDetail', ["PAGE_TITLE" => "EDIT SAFETY", "USERNAME" => $loginUser->name, "Images" => $allImages, "worksites" => $worksites, "Areas" => $Areas]);
+    }
+
+    public function workareaDelete($id, $areaCode)
+    {
+        Area::where('id', $areaCode)->delete();
+        return redirect()->back();
+    }
+
+    public function areaEdit(Request $request)
+    {
+        $area_name = $request['area_name'];
+        $Orin_Device_ID = $request['Orin_Device_ID'];
+        $Orin_Device_Key = $request['Orin_Device_Key'];
+        $area_id = $request['area_id'];
+
+        $Area = Area::where('id', $area_id)->update([
+            "Area_Name" => $area_name,
+            'Orin_Device_ID' => $Orin_Device_ID,
+            "Orin_Device_Key" => $Orin_Device_Key,
+        ]);
+
+        if ($Area) {
+            return redirect()->back();
+        }
+    }
+
+    public function areaUserRemove(Request $request, $id)
+    {
+        AreaUser::where('id', $id)->delete();
+        return redirect()->back();
     }
 }

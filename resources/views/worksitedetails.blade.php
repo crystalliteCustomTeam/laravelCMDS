@@ -21,7 +21,7 @@
                                         <ul>
                                             <li><button type="button" onclick="nextpage({{ $area->id  }})"><i class="fa-solid fa-pen-to-square"> </i></button>
                                             </li>
-                                            <li><button><i class="fa-solid fa-trash"></i></button></li>
+                                            <li><button type="button" onclick="deletearea({{ $area->id  }})"><i class="fa-solid fa-trash"></i></button></li>
                                         </ul>
                                     </li>
                                 @endforeach
@@ -31,6 +31,10 @@
                         <script>
                             function nextpage(id){
                                 window.location.href = window.location.href+"/"+id
+                            }
+                            function deletearea(id){
+                               
+                                window.location.href = window.location.href+"/delete/"+id
                             }
                         </script>
                     </div>
