@@ -10,14 +10,16 @@
                 <div class="col-md-12">
                     <div class="first-top-headerrr">
                         <h5>Safety Guidelines</h5>
-                        <form action="">
-                        <button type="submit">Save</button>
+                        <form action="{{ route('safety.update') }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="safety_id" value="{{ $Safety->id }}">
+                        <button type="submit">Save</button> 
                     </div>
                     <div class="mt-5 main-safety-card">
-                        
+
                             <div class="row">
                                 <div class="col-2">
-                                    <input type="hidden" value="{{ $Safety->id }}" name="SAFID">
+                                        
                                         <img src="{{ asset($Safety->Images) }}" id="FeaturedImageSRC" alt=""
                                             style="border-radius: 10%" width="100px" height="100px">
                                         <input type="hidden" name="FeaturedImage" value="{{ asset($Safety->Images) }}" id="FeaturedImage" /></br>
@@ -123,7 +125,9 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form action="">
+                    <form action="{{ route('guideline.checkpoint.assign') }}" method="POST">
+                        @csrf
+                        <input type="hidden" value="{{ $Safety->id }}" name="safety_id" id="safety_id">
                         <div class="main-checkboxx safetly-guide">
                             <ul>
                                 @if ($Checkpoint)
@@ -176,9 +180,8 @@
                                 tabindex="0">
                                 <div class="main-upload">
                                     <h5>Upload an image / Video </h5>
-                                    <button type="button" id="uploadButton">Upload</button>
-                                    <input type="file" id="fileInput" accept="image/*" style="display: none;"
-                                        multiple>
+                                    {{-- <button type="button" id="uploadButton">Upload</button> --}}
+                                    <input type="file" id="fileInput" accept="image/*"  class="form-control">
                                 </div>
                             </div>
                             <div class="tab-pane fade show active" id="profile-tab-pane" role="tabpanel"

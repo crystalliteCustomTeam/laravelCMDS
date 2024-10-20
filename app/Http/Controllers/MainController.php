@@ -513,7 +513,7 @@ class MainController extends Controller
         $loginUser = Auth::user();
         $usermetaFM = UserMeta::where('userId',$loginUser->id)->select('featuredImage')->first();
         $allImages = Image::where('save_image_by', $loginUser->id)->get();
-        $checkpoint = Checkpoints::where('CreatedBy', $loginUser->id)->where('id', $id)->get();
+        $checkpoint = Checkpoints::where('CreatedBy', $loginUser->id)->get();
         $Safety = Safety::where('id', $id)->first();
         $checkpointSaf = AssignCheckpoint::where('safety_checkpoint.SAFID', $Safety->id)->join('checkpoints','safety_checkpoint.CHKID','=','checkpoints.id')->get();
         return view('guidlineEdit', ["PAGE_TITLE" => "EDIT SAFETY", "USERNAME" => $loginUser->name, "Images" => $allImages, "Checkpoint" => $checkpoint,"UFM"=>$usermetaFM,'Safety'=>$Safety,"checkpointSaf"=>$checkpointSaf]);
@@ -563,6 +563,27 @@ class MainController extends Controller
     {
         AreaUser::where('id', $id)->delete();
         return redirect()->back();
+    }
+
+    public function safetyUpdate(Request $request){
+        $FeaturedImage = $request['FeaturedImage'];
+        $safety_title = $request['safety_title'];
+        $description = $request['description'];
+        $id = $request['safety_id'];
+        $Safety =  Safety::where('id',$id)->update([
+            'title' => $safety_title,
+            'Images' => $FeaturedImage,
+            'description' => $description
+        ]);
+
+
+        // dd($request);
+
+        // //echo $safety;
+        if($Safety){
+            return redirect()->back();
+        }
+
     }
 
 
