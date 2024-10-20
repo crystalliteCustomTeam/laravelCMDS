@@ -22,15 +22,18 @@ class MainController extends Controller
     public function dashboard(Request $request)
     {
         $user = Auth::user();
+        $usermetaFM = UserMeta::where('userId',$user->id)->select('featuredImage')->first();
+        
         $userCount = User::count();
         $ws_count = WorkSite::where('CreateBy', $user->id)->count();
         $NotificationCount = Notification::count();
-        return view('dashboard', ["PAGE_TITLE" => "DASHBOARD", "USERNAME" => $user->name, "USERCOUNT" => $userCount, 'WORKSITE_COUNT' => $ws_count,"NotificationCount" => $NotificationCount]);
+        return view('dashboard', ["PAGE_TITLE" => "DASHBOARD", "USERNAME" => $user->name, "USERCOUNT" => $userCount, 'WORKSITE_COUNT' => $ws_count,"NotificationCount" => $NotificationCount,"UFM"=>$usermetaFM]);
     }
 
     public function GetAllUser(Request $request)
     {
         $user = Auth::user();
+        $usermetaFM = UserMeta::where('userId',$user->id)->select('featuredImage')->first();
         $usersData = User::join('usermeta', 'users.id', '=', 'usermeta.userId')
             ->where('usermeta.role', '!=', '0')
             ->where('usermeta.createBy', '=', $user->id)
@@ -38,12 +41,13 @@ class MainController extends Controller
             ->get();
         $images = Image::where('save_image_by', $user->id)->get();
 
-        return view('users', ["PAGE_TITLE" => "USERS", "USERNAME" => $user->name, "USER_DATA" => $usersData, "Images" => $images]);
+        return view('users', ["PAGE_TITLE" => "USERS", "USERNAME" => $user->name, "USER_DATA" => $usersData, "Images" => $images,"UFM"=>$usermetaFM]);
     }
 
     public function upload(Request $request)
     {
         $user = Auth::user();
+        $usermetaFM = UserMeta::where('userId',$user->id)->select('featuredImage')->first();
         $name = $request['name'];
         $email = $request['email'];
         $role = $request['role'];
@@ -86,6 +90,7 @@ class MainController extends Controller
     public function uploadImage(Request $request)
     {
         $user = Auth::user();
+        $usermetaFM = UserMeta::where('userId',$user->id)->select('featuredImage')->first();
 
         $request->validate([
             'image' => 'required|mimes:jpeg,jpg,png|max:2048',
@@ -109,12 +114,13 @@ class MainController extends Controller
     {
 
         $user = Auth::user();
+        $usermetaFM = UserMeta::where('userId',$user->id)->select('featuredImage')->first();
         $usersData = User::join('usermeta', 'users.id', '=', 'usermeta.userId')
             ->where('users.id', '=', $userID)
             ->select('users.*', 'users.id as UID', 'usermeta.*')
             ->get();
         $Images = Image::where('save_image_by', $user->id)->get();
-        return view('useredit', ["PAGE_TITLE" => "EDIT USER", "USERNAME" => $user->name, "USER_DATA" => $usersData, "Images" => $Images]);
+        return view('useredit', ["PAGE_TITLE" => "EDIT USER", "USERNAME" => $user->name, "USER_DATA" => $usersData, "Images" => $Images,"UFM"=>$usermetaFM]);
 
     }
 
@@ -122,15 +128,17 @@ class MainController extends Controller
     {
 
         $user = Auth::user();
+        $usermetaFM = UserMeta::where('userId',$user->id)->select('featuredImage')->first();
         $allsites = WorkSite::where('CreateBy', $user->id)->get();
         $allImages = Image::where('save_image_by', $user->id)->get();
-        return view('worksite', ["PAGE_TITLE" => "WORKSITE", "USERNAME" => $user->name, "SITES" => $allsites, "Images" => $allImages]);
+        return view('worksite', ["PAGE_TITLE" => "WORKSITE", "USERNAME" => $user->name, "SITES" => $allsites, "Images" => $allImages,"UFM"=>$usermetaFM]);
 
     }
 
     public function singleworksite(Request $request, $worksiteID)
     {
         $user = Auth::user();
+        $usermetaFM = UserMeta::where('userId',$user->id)->select('featuredImage')->first();
         $worksite = WorkSite::where('CreateBy', $user->id)->where('id', $worksiteID)->first();
         $usersData = User::join('usermeta', 'users.id', '=', 'usermeta.userId')
             ->where('usermeta.role', '!=', '0')
@@ -140,7 +148,7 @@ class MainController extends Controller
 
         $Areas = Area::where('CreateBy', $user->id)->where('WSID', $worksiteID)->get();
 
-        return view('worksitedetails', ["PAGE_TITLE" => "WORKSITE DETAIL", "USERNAME" => $user->name, 'WORKSITE' => $worksite, 'USERS' => $usersData, 'Areas' => $Areas]);
+        return view('worksitedetails', ["PAGE_TITLE" => "WORKSITE DETAIL", "USERNAME" => $user->name, 'WORKSITE' => $worksite, 'USERS' => $usersData, 'Areas' => $Areas,"UFM"=>$usermetaFM]);
     }
 
     public function area(Request $request)
@@ -154,6 +162,7 @@ class MainController extends Controller
         }
 
         $user = Auth::user();
+        $usermetaFM = UserMeta::where('userId',$user->id)->select('featuredImage')->first();
         $area = Area::create([
             "WSID" => $request['WSID'],
             "CreateBy" => $user->id,
@@ -170,6 +179,8 @@ class MainController extends Controller
     {
         $users = $request['users'];
         $loginUser = Auth::user();
+        $usermetaFM = UserMeta::where('userId',$loginUser->id)->select('featuredImage')->first();
+
         $AREAID = $request['AreaID'];
 
         for ($i = 0; $i < Count($users); $i++) {
@@ -193,6 +204,7 @@ class MainController extends Controller
     public function workarea(Request $request, $id, $area)
     {
         $loginUser = Auth::user();
+        $usermetaFM = UserMeta::where('userId',$loginUser->id)->select('featuredImage')->first();
         $areaDetail = Area::where('CreateBy', $loginUser->id)->where('id', $area)->first();
         $users = AreaUser::where('ARID', $area)
             ->join('users', 'users.id', '=', 'areausers.WSID')
@@ -201,12 +213,13 @@ class MainController extends Controller
         $Allusers = User::join('usermeta', 'users.id', '=', 'usermeta.userId')->where('usermeta.role', '!=', 0)->where('usermeta.createBy', $loginUser->id)
             ->select('users.*', 'users.id as UID', 'usermeta.id as UMID')
             ->get();
-        return view('areaedit', ["PAGE_TITLE" => "AREA DETAIL EDIT", "USERNAME" => $loginUser->name, 'Areas' => $areaDetail, 'AreaUsers' => $users, 'ALLUSERS' => $Allusers]);
+        return view('areaedit', ["PAGE_TITLE" => "AREA DETAIL EDIT", "USERNAME" => $loginUser->name, 'Areas' => $areaDetail, 'AreaUsers' => $users, 'ALLUSERS' => $Allusers,"UFM"=>$usermetaFM]);
     }
 
     public function createWorksite(Request $request)
     {
         $user = Auth::user();
+        $usermetaFM = UserMeta::where('userId',$user->id)->select('featuredImage')->first();
         $Name = $request['site_name'];
         $start_date = $request['start_date'];
         $end_date = $request['end_date'];
@@ -274,6 +287,7 @@ class MainController extends Controller
     public function notifications(Request $request)
     {
         $loginUser = Auth::user();
+        $usermetaFM = UserMeta::where('userId',$loginUser->id)->select('featuredImage')->first();
         $worksites = WorkSite::where('CreateBy', $loginUser->id)->get();
         $Areas = Area::where('CreateBy', $loginUser->id)->get();
         $AllNotifications = Notification::all();
@@ -289,7 +303,7 @@ class MainController extends Controller
         //         }
         //     }
         // }
-        return view('notifications', ["PAGE_TITLE" => "NOTIFICATION", "USERNAME" => $loginUser->name, "WORKSITE" => $worksites, "AREAS" => $Areas, "AllNotification" => $AllNotifications]);
+        return view('notifications', ["PAGE_TITLE" => "NOTIFICATION", "USERNAME" => $loginUser->name, "WORKSITE" => $worksites, "AREAS" => $Areas, "AllNotification" => $AllNotifications,"UFM"=>$usermetaFM]);
     }
 
     public function notificationsCreate(Request $request)
@@ -313,23 +327,26 @@ class MainController extends Controller
     public function guide(Request $request)
     {
         $loginUser = Auth::user();
+        $usermetaFM = UserMeta::where('userId',$loginUser->id)->select('featuredImage')->first();
         $checkpoint = Checkpoints::where('CreatedBy', $loginUser->id)->get();
         $Safety = Safety::where('CreatedBy', $loginUser->id)->get();
         $allImages = Image::where('save_image_by', $loginUser->id)->get();
-        return view('guidelines', ["PAGE_TITLE" => "SAFETY GUIDELINES ", "USERNAME" => $loginUser->name, "Checkpoint" => $checkpoint, "Safety" => $Safety, "Images" => $allImages]);
+        return view('guidelines', ["PAGE_TITLE" => "SAFETY GUIDELINES ", "USERNAME" => $loginUser->name, "Checkpoint" => $checkpoint, "Safety" => $Safety, "Images" => $allImages,"UFM"=>$usermetaFM]);
     }
 
     public function checkpoint(Request $request)
     {
         $loginUser = Auth::user();
+        $usermetaFM = UserMeta::where('userId',$loginUser->id)->select('featuredImage')->first();
         $checkpoint = Checkpoints::where('CreatedBy', $loginUser->id)->get();
         $allImages = Image::where('save_image_by', $loginUser->id)->get();
-        return view('checkpoints', ["PAGE_TITLE" => "CHECKPOINTS", "USERNAME" => $loginUser->name, "checkpoint" => $checkpoint, "Images" => $allImages]);
+        return view('checkpoints', ["PAGE_TITLE" => "CHECKPOINTS", "USERNAME" => $loginUser->name, "checkpoint" => $checkpoint, "Images" => $allImages,"UFM"=>$usermetaFM]);
     }
 
     public function checkpointCreate(Request $request)
     {
         $loginUser = Auth::user();
+        $usermetaFM = UserMeta::where('userId',$loginUser->id)->select('featuredImage')->first();
         $checkpoint = Checkpoints::create([
             "title" => $request['title'],
             "Description" => $request['description'],
@@ -346,6 +363,7 @@ class MainController extends Controller
     public function guideCreate(Request $request)
     {
         $loginUser = Auth::user();
+        $usermetaFM = UserMeta::where('userId',$loginUser->id)->select('featuredImage')->first();
         $safety = Safety::create([
             "icon" => "car",
             "Images" => $request['FeaturedImage'],
@@ -375,14 +393,16 @@ class MainController extends Controller
     public function media(Request $request)
     {
         $loginUser = Auth::user();
+        $usermetaFM = UserMeta::where('userId',$loginUser->id)->select('featuredImage')->first();
         $allImages = Image::where('save_image_by', $loginUser->id)->get();
-        return view('media', ["PAGE_TITLE" => "MEDIA", "USERNAME" => $loginUser->name, "Images" => $allImages]);
+        return view('media', ["PAGE_TITLE" => "MEDIA", "USERNAME" => $loginUser->name, "Images" => $allImages,"UFM"=>$usermetaFM]);
     }
 
     public function Mediaupload(Request $request)
     {
         $files = $request->file('files');
         $loginUser = Auth::user();
+        $usermetaFM = UserMeta::where('userId',$loginUser->id)->select('featuredImage')->first();
         if ($request->hasFile('files')) {
             foreach ($files as $file) {
                 $filename = time() . '-' . $file->getClientOriginalName();
@@ -451,9 +471,10 @@ class MainController extends Controller
     public function checkpointEdit(Request $request, $ID)
     {
         $loginUser = Auth::user();
+        $usermetaFM = UserMeta::where('userId',$loginUser->id)->select('featuredImage')->first();
         $allImages = Image::where('save_image_by', $loginUser->id)->get();
         $checkpoint = Checkpoints::where('CreatedBy', $loginUser->id)->where('id', $ID)->first();
-        return view('checkpointEdit', ["PAGE_TITLE" => "MEDIA", "EDIT CHECKPOINT", "USERNAME" => $loginUser->name, "Images" => $allImages, "checkpoint" => $checkpoint]);
+        return view('checkpointEdit', ["PAGE_TITLE" => "MEDIA EDIT CHECKPOINT", "USERNAME" => $loginUser->name, "Images" => $allImages, "checkpoint" => $checkpoint,"UFM"=>$usermetaFM]);
     }
 
     public function checkpointEditPOST(Request $request)
@@ -490,10 +511,11 @@ class MainController extends Controller
     public function guideEdit(Request $request, $id)
     {
         $loginUser = Auth::user();
+        $usermetaFM = UserMeta::where('userId',$loginUser->id)->select('featuredImage')->first();
         $allImages = Image::where('save_image_by', $loginUser->id)->get();
         $checkpoint = Checkpoints::where('CreatedBy', $loginUser->id)->where('id', $id)->first();
         $Safety = Safety::where('id', $id)->first();
-        return view('guidlineEdit', ["PAGE_TITLE" => "EDIT SAFETY", "USERNAME" => $loginUser->name, "Images" => $allImages, "checkpoint" => $checkpoint]);
+        return view('guidlineEdit', ["PAGE_TITLE" => "EDIT SAFETY", "USERNAME" => $loginUser->name, "Images" => $allImages, "checkpoint" => $checkpoint,"UFM"=>$usermetaFM]);
     }
 
     public function notificationsDelete($ID)
@@ -505,10 +527,11 @@ class MainController extends Controller
     public function worksiteDetail($id)
     {
         $loginUser = Auth::user();
+        $usermetaFM = UserMeta::where('userId',$loginUser->id)->select('featuredImage')->first();
         $allImages = Image::where('save_image_by', $loginUser->id)->get();
         $worksites = WorkSite::where('CreateBy', $loginUser->id)->where('id', $id)->first();
         $Areas = Area::where('CreateBy', $loginUser->id)->where('WSID', $worksites->id)->get();
-        return view('worksiteDetail', ["PAGE_TITLE" => "EDIT SAFETY", "USERNAME" => $loginUser->name, "Images" => $allImages, "worksites" => $worksites, "Areas" => $Areas]);
+        return view('worksiteDetail', ["PAGE_TITLE" => "EDIT SAFETY", "USERNAME" => $loginUser->name, "Images" => $allImages, "worksites" => $worksites, "Areas" => $Areas,"UFM"=>$usermetaFM]);
     }
 
     public function workareaDelete($id, $areaCode)

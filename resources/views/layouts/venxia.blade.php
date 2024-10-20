@@ -80,11 +80,21 @@
                             <li>
                                 <div class="main_users_card-header">
                                     <div class="user-name">
-                                        <h4>@yield('UserName')</h4>
+                                        <h4>@yield('USERNAME')</h4>
                                         <p>Safety Manager</p>
                                     </div>
                                     <div class="user-img">
-                                        <img src="{{ asset('assets/images/user-img.png') }}" alt="">
+                                        @if ($UFM != null && $UFM->featuredImage != null)
+                                            @if ($UFM->featuredImage == '')
+                                                <img src="{{ asset('assets/images/user-img.png') }}" alt="">
+                                            @else
+                                                <img src="{{ asset($UFM->featuredImage) }}" alt="">
+                                            @endif
+                                        @else
+                                            <img src="{{ asset('assets/images/user-img.png') }}" alt="">
+                                        @endif
+
+
                                     </div>
                                 </div>
                             </li>
@@ -338,7 +348,7 @@
 
 
 
-   
+
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -359,7 +369,7 @@
         });
     </script>
 
-    
+
 
 </body>
 
