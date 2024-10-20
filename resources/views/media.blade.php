@@ -1,6 +1,6 @@
 @extends('layouts.venxia')
 @section('title', $PAGE_TITLE)
-@section('USERNAME', $USERNAME) @section('UFM', $UFM)
+@section('USERNAME', $USERNAME) 
 
 @section('contents')
     <style>

@@ -513,9 +513,10 @@ class MainController extends Controller
         $loginUser = Auth::user();
         $usermetaFM = UserMeta::where('userId',$loginUser->id)->select('featuredImage')->first();
         $allImages = Image::where('save_image_by', $loginUser->id)->get();
-        $checkpoint = Checkpoints::where('CreatedBy', $loginUser->id)->where('id', $id)->first();
+        $checkpoint = Checkpoints::where('CreatedBy', $loginUser->id)->where('id', $id)->get();
         $Safety = Safety::where('id', $id)->first();
-        return view('guidlineEdit', ["PAGE_TITLE" => "EDIT SAFETY", "USERNAME" => $loginUser->name, "Images" => $allImages, "checkpoint" => $checkpoint,"UFM"=>$usermetaFM]);
+        $checkpointSaf = AssignCheckpoint::where('safety_checkpoint.SAFID', $Safety->id)->join('checkpoints','safety_checkpoint.CHKID','=','checkpoints.id')->get();
+        return view('guidlineEdit', ["PAGE_TITLE" => "EDIT SAFETY", "USERNAME" => $loginUser->name, "Images" => $allImages, "Checkpoint" => $checkpoint,"UFM"=>$usermetaFM,'Safety'=>$Safety,"checkpointSaf"=>$checkpointSaf]);
     }
 
     public function notificationsDelete($ID)

@@ -1,6 +1,6 @@
 @extends('layouts.venxia')
 @section('title', $PAGE_TITLE)
-@section('USERNAME', $USERNAME) @section('UFM', $UFM)
+@section('USERNAME', $USERNAME) 
 
 @section('contents')
 
@@ -10,14 +10,41 @@
                 <div class="col-md-12">
                     <div class="first-top-headerrr">
                         <h5>Safety Guidelines</h5>
-                        <button data-bs-toggle="modal" data-bs-target="#exampleModal" type="button">Create New</button>
+                        <form action="">
+                        <button type="submit">Save</button>
                     </div>
                     <div class="mt-5 main-safety-card">
-                        <ul>
-                            
-
-                        </ul>
-
+                        
+                            <div class="row">
+                                <div class="col-2">
+                                    <input type="hidden" value="{{ $Safety->id }}" name="SAFID">
+                                        <img src="{{ asset($Safety->Images) }}" id="FeaturedImageSRC" alt=""
+                                            style="border-radius: 10%" width="100px" height="100px">
+                                        <input type="hidden" name="FeaturedImage" value="{{ asset($Safety->Images) }}" id="FeaturedImage" /></br>
+                                        <button type="button" id="FeaturedImageBTN" class="btn btn-dark mt-2" data-bs-toggle="modal"
+                                            data-bs-target="#exampleModal3" type="button">Change Image </button>
+                                </div>
+                                <div class="col-3">
+                                    <label for="">Name</label>
+                                    <input type="text" name="safety_title" class="form-control" value="{{ $Safety->title }}">
+                                </div>
+                                <div class="col-4">
+                                    <label for="">description</label>
+                                   
+                                     <textarea name="description" class="form-control" >{{ $Safety->description }}</textarea>
+                                </div>
+                                <div class="col-2">
+                                    
+                                        @if ($checkpointSaf)
+                                            @foreach ($checkpointSaf as $CSA)
+                                                <a class="btn btn-danger btn-sm" style="width: fit-content">{{ $CSA->title }}</a>
+                                            @endforeach
+                                        @endif
+                                        <button class="btn btn-success mt-3" type="button" data-bs-toggle="modal"  data-bs-target="#exampleModal1"
+                                        type="button">Assign More </button>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -200,10 +227,7 @@
             $('.modal-backdrop').hide();
             const exampleModal1 = bootstrap.Modal.getInstance(document.getElementById('exampleModal3'));
             exampleModal1.hide();
-            const exampleModal = document.getElementById('exampleModal');
-            exampleModal.classList.add('show');
-            exampleModal.style.display = 'block';
-            $('.modal-backdrop').show();
+           
         }
     </script>
 
@@ -230,46 +254,7 @@
     </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script>
-        $(document).ready(function(e) {
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                }
-            });
-
-
-
-
-            $('#guideline').on('submit', (e) => {
-                e.preventDefault();
-
-                let formData1 = new FormData(document.getElementById("guideline"));
-                $.ajax({
-                    type: 'POST',
-                    url: "{{ route('guideline.create') }}",
-                    data: formData1,
-                    contentType: false,
-                    processData: false,
-                    success: function(response) {
-                        if (response.Code === 200) {
-                            alert("Guidline Created");
-                            
-                            // window.location.reload();
-                        }
-                    },
-                    error: function(response) {
-                        alert("Error ! : " + response.Message);
-                    }
-                });
-            });
-
-           
-
-
-        });
-    </script>
-
+    
 
 
 
