@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Alerts;
+use App\Models\Area;
 use App\Models\User;
 use App\Models\UserMeta;
-use App\Models\Area;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -70,48 +71,136 @@ class MainAPIController extends Controller
             ];
             return response()->json($data, 500);
         }
-        $Area = Area::where('Orin_Device_ID',$device_id)->where('Orin_Device_Key',$device_key)->select('id','Area_Name')->first();
-        if($Area){
+        $Area = Area::where('Orin_Device_ID', $device_id)->where('Orin_Device_Key', $device_key)->select('id', 'Area_Name')->first();
+        if ($Area) {
             $data = [
                 "Message" => "Device connected and validated",
                 "Status" => "Success",
                 "Device_id" => $device_id,
                 "area_id" => $Area->id,
-                "Area_Name" => $Area->Area_Name
+                "Area_Name" => $Area->Area_Name,
             ];
             return response()->json($data, 200);
-        }
-        else{
+        } else {
             $data = [
                 "Message" => "Device key mismatch or device not registered",
                 "status" => "unfound",
             ];
             return response()->json($data, 404);
         }
-    }   
+    }
 
-
-    public function livefeed(Request $request,$area_id){
-        if($area_id == ""){
+    public function livefeed(Request $request, $area_id)
+    {
+        if ($area_id == "") {
             $data = [
                 "Message" => "Area ID is Required",
                 "status" => "fail",
             ];
             return response()->json($data, 500);
         }
-        $Area = Area::where('id',$area_id)->first();
-        if($Area){
+        $Area = Area::where('id', $area_id)->first();
+        if ($Area) {
             $data = [
                 "area_id" => $Area,
                 "live_feed_url" => "https://livefeed.example.com/DEVICE123",
                 "status" => 'success',
             ];
             return response()->json($data, 200);
-        }
-        else{
+        } else {
             $data = [
                 "status" => 'unfound',
                 "message" => "url not found",
+            ];
+            return response()->json($data, 404);
+        }
+    }
+
+    public function areaalerts(Request $request, $area_id)
+    {
+        if ($area_id == "") {
+            $data = [
+                "Message" => "Area ID is Required",
+                "status" => "fail",
+            ];
+            return response()->json($data, 500);
+        }
+        $alert_code = $request['alert_code'];
+        $risk_level = $request['risk_level'];
+        $description = $request['description'];
+        $captured_image_url = $request['captured_image_url'];
+        if ($alert_code == "" || $risk_level == "" || $description == "" || $captured_image_url == "") {
+            $data = [
+                "Message" => "alert_code, risk_level, description, captured_image_url is Required",
+                "status" => "fail",
+            ];
+            return response()->json($data, 500);
+        }
+
+        $Area = Area::where('id', $area_id)->count();
+
+        if ($Area === 0) {
+            $data = [
+                "Message" => "area not found",
+                "status" => "fail",
+            ];
+            return response()->json($data, 404);
+        }
+
+        $Alerts = Alerts::create([
+            "alert_code" => $alert_code,
+            "area_code" => $area_id,
+            "risk_level" => $risk_level,
+            "description" => $description,
+            "captured_image_url" => $captured_image_url,
+        ]);
+
+        if ($Alerts) {
+            $data = [
+                "Message" => "Alert Created",
+                "status" => "success",
+            ];
+            return response()->json($data, 200);
+        }
+    }
+
+    public function worksitealerts(Request $request, $worksite)
+    {
+
+        $Area = Area::where('WSID', $worksite)
+            ->join('alerts', 'alerts.area_code', '=', 'areas.id')
+            ->select('alerts.*', 'areas.id as AID')
+            ->get();
+
+        if (count($Area) > 0) {
+            $data = [
+                "alerts" => $Area,
+                "status" => "success",
+            ];
+            return response()->json($data, 200);
+        } else {
+            $data = [
+                "Message" => "area not found",
+                "status" => "fail",
+            ];
+            return response()->json($data, 404);
+        }
+    }
+
+    public function areadevice(Request $request, $area_id)
+    {
+        $Area = Area::where('id', $area_id)
+            ->get();
+        if (count($Area) > 0) {
+            $data = [
+                "alerts" => $Area,
+                "status" => "success",
+            ];
+            return response()->json($data, 200);
+        } else {
+            $data = [
+                "Message" => "area not found",
+                "status" => "fail",
             ];
             return response()->json($data, 404);
         }

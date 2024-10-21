@@ -11,14 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('usermeta', function (Blueprint $table) {
-            $table->id();
-            $table->bigInteger('userId');
-            $table->text('featuredImage');
-            $table->bigInteger('role');
-            $table->bigInteger('createBy');
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('usermeta')) {
+            Schema::create('usermeta', function (Blueprint $table) {
+                $table->id();
+                $table->bigInteger('userId');
+                $table->text('featuredImage');
+                $table->bigInteger('role');
+                $table->bigInteger('createBy');
+                $table->timestamps();
+            });
+        }
+
     }
 
     /**
