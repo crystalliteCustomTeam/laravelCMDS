@@ -1,6 +1,6 @@
 @extends('layouts.venxia')
 @section('title', $PAGE_TITLE)
-@section('USERNAME', $USERNAME) 
+@section('USERNAME', $USERNAME)
 
 @section('contents')
 
@@ -40,9 +40,10 @@
                                                     Worker
                                                 @endif
                                             </td>
-                                            <td><button onclick="editPage({{ $user->UID }})"
-                                                    class="edit mr-2"><i class="fa-solid fa-pen-to-square"></i></button>
-                                                <button onclick="deleteuser({{ $user->UID }})" class="delete"><i class="fa-solid fa-trash"></i></button>
+                                            <td><button onclick="editPage({{ $user->UID }})" class="edit mr-2"><i
+                                                        class="fa-solid fa-pen-to-square"></i></button>
+                                                <button onclick="deleteuser({{ $user->UID }})" class="delete"><i
+                                                        class="fa-solid fa-trash"></i></button>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -53,15 +54,16 @@
 
                                 @endif
 
-                            
+
                             </tbody>
                         </table>
                         <script>
-                            function editPage(id){
-                                window.location.href = window.location+'/edituser/'+id;
+                            function editPage(id) {
+                                window.location.href = window.location + '/edituser/' + id;
                             }
-                            function deleteuser(id){
-                                window.location.href = window.location+'/delete/'+id;
+
+                            function deleteuser(id) {
+                                window.location.href = window.location + '/delete/' + id;
                             }
                         </script>
                         <div class="main_loadmore-btn">
@@ -143,7 +145,7 @@
 
     {{-- user Gallary  --}}
 
-   
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
     <script>
@@ -157,37 +159,20 @@
             $('#imageUploadForm').on('submit', function(e) {
                 e.preventDefault();
                 let formData = new FormData(this);
-
-                // Show the uploading status
-                $('#uploadingStatus').show();
-                $('#progressBarContainer').show();
-
                 $.ajax({
                     type: 'POST',
                     url: "{{ route('image.upload') }}",
                     data: formData,
                     contentType: false,
                     processData: false,
-                    xhr: function() {
-                        var xhr = new XMLHttpRequest();
-                        xhr.upload.addEventListener('progress', function(e) {
-                            if (e.lengthComputable) {
-                                var percentComplete = (e.loaded / e.total) * 100;
-                                $('#progressBar').css('width', percentComplete + '%');
-                            }
-                        }, false);
-                        return xhr;
-                    },
                     success: function(response) {
-                        if (response.Code == 200) {
-                            window.location.reload;
-                        }
+
+                        window.location.href = window.location.href;
+
                     },
                     error: function(response) {
                         console.log(response);
                         alert('Image upload failed.');
-                        $('#uploadingStatus').hide();
-                        $('#progressBarContainer').hide();
                     }
                 });
             });
@@ -198,7 +183,7 @@
     {{-- end of Gallary modal  --}}
 
 
-    
+
     <div class="modal fade" id="exampleModal1" tabindex="-1" aria-labelledby="exampleModalLabel1" aria-hidden="true">
         <div class="modal-dialog assing-userss">
             <div class="modal-content assing-userss">
@@ -226,9 +211,59 @@
                                 tabindex="0">
                                 <div class="main-upload">
                                     <h5>Upload an image / Video </h5>
-                                    <button type="button" id="uploadButton">Upload</button>
-                                    <input type="file" id="fileInput" accept="image/*" style="display: none;"
-                                        multiple>
+                                    <form id="imageuploadtab">
+                                        <input type="file" id="fileInput" accept="image/*" multiple>
+                                        <button type="submit">Upload Files</button>
+                                    </form>
+                                    <script>
+                                        document.getElementById('imageuploadtab').addEventListener('submit', function(event) {
+                                            event.preventDefault();
+                                            let formData = new FormData();
+                                            let files = document.getElementById('fileInput').files;
+
+                                            for (let i = 0; i < files.length; i++) {
+                                                formData.append('files[]', files[i]);
+                                            }
+
+                                            fetch('/upload/tab/image', {
+                                                    method: 'POST',
+                                                    body: formData,
+                                                    headers: {
+                                                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                                                            'content')
+                                                    }
+                                                })
+                                                .then(response => response.json())
+                                                .then(data => {
+                                                    let workSiteList = document.getElementById('work-site-list');
+
+                                                    // Loop through each uploaded image and append it to the list
+                                                    data.uploadedImages.forEach(image => {
+                                                        let newListItem = document.createElement('li');
+                                                        newListItem.className = 'work-site-item';
+                                                        newListItem.style.width = '28.33%';
+                                                        newListItem.setAttribute('onclick', `selectImage('${image.image_path}')`);
+
+                                                        newListItem.innerHTML = `
+                                                            <div class="work-site-box work-site-box-${image.id}">
+                                                                <div class="work-site-img">
+                                                                    <img src="${image.image_path}" alt="">
+                                                                </div>
+                                                            </div>
+                                                        `;
+
+                                                        workSiteList.appendChild(newListItem);
+                                                    });
+
+                                                    // After successful file upload, open the Media tab
+                                                    document.getElementById('profile-tab').click();
+                                                })
+                                                .catch(error => {
+                                                    console.error(error);
+                                                    // Handle error
+                                                });
+                                        });
+                                    </script>
                                 </div>
                             </div>
                             <div class="tab-pane fade show active" id="profile-tab-pane" role="tabpanel"
@@ -239,16 +274,14 @@
                                             <ul id="work-site-list">
                                                 @if ($Images)
                                                     @foreach ($Images as $Image)
-                                                        <li class="work-site-item"
+                                                        <li class="work-site-item" style="width:28.33%"
                                                             onclick="selectImage('{{ $Image->image_path }}')">
                                                             <div class="work-site-box work-site-box-{{ $Image->id }}">
                                                                 <div class="work-site-img">
                                                                     <img src="{{ asset($Image->image_path) }}"
                                                                         alt="">
                                                                 </div>
-                                                                <div class="work-side-content mb-0">
-                                                                    <h6>{{ $Image->image_title }}</h6>
-                                                                </div>
+
                                                             </div>
                                                         </li>
                                                     @endforeach

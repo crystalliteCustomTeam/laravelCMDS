@@ -157,14 +157,64 @@
                         </ul>
                         <div class="tab-content" id="myTabContent">
                             <div class="tab-pane fade " id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab"
-                                tabindex="0">
-                                <div class="main-upload">
-                                    <h5>Upload an image / Video </h5>
-                                    <button type="button" id="uploadButton">Upload</button>
-                                    <input type="file" id="fileInput" accept="image/*" style="display: none;"
-                                        multiple>
-                                </div>
+                            tabindex="0">
+                            <div class="main-upload">
+                                <h5>Upload an image / Video </h5>
+                                <form id="imageuploadtab">
+                                    <input type="file" id="fileInput" accept="image/*" multiple>
+                                    <button type="submit">Upload Files</button>
+                                </form>
+                                <script>
+                                    document.getElementById('imageuploadtab').addEventListener('submit', function(event) {
+                                        event.preventDefault();
+                                        let formData = new FormData();
+                                        let files = document.getElementById('fileInput').files;
+
+                                        for (let i = 0; i < files.length; i++) {
+                                            formData.append('files[]', files[i]);
+                                        }
+
+                                        fetch('/upload/tab/image', {
+                                                method: 'POST',
+                                                body: formData,
+                                                headers: {
+                                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                                                        'content')
+                                                }
+                                            })
+                                            .then(response => response.json())
+                                            .then(data => {
+                                                let workSiteList = document.getElementById('work-site-list');
+
+                                                // Loop through each uploaded image and append it to the list
+                                                data.uploadedImages.forEach(image => {
+                                                    let newListItem = document.createElement('li');
+                                                    newListItem.className = 'work-site-item';
+                                                    newListItem.style.width = '28.33%';
+                                                    newListItem.setAttribute('onclick', `selectImage('${image.image_path}')`);
+
+                                                    newListItem.innerHTML = `
+                                                        <div class="work-site-box work-site-box-${image.id}">
+                                                            <div class="work-site-img">
+                                                                <img src="${image.image_path}" alt="">
+                                                            </div>
+                                                        </div>
+                                                    `;
+
+                                                    workSiteList.appendChild(newListItem);
+                                                });
+
+                                                // After successful file upload, open the Media tab
+                                                document.getElementById('profile-tab').click();
+                                            })
+                                            .catch(error => {
+                                                console.error(error);
+                                                // Handle error
+                                            });
+                                    });
+                                </script>
                             </div>
+                        </div>
                             <div class="tab-pane fade show active" id="profile-tab-pane" role="tabpanel"
                                 aria-labelledby="profile-tab" tabindex="0">
                                 <div class="mediaaa">

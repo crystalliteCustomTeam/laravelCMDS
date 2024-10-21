@@ -45,7 +45,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/guideline/create', [MainController::class, 'guideCreate'])->name('guideline.create');
     Route::get('/guideline/checkpoint/delete/{id}', [MainController::class, 'checkpointDelete'])->name('checkpoint.delete');
     Route::post('/guideline/update', [MainController::class, 'safetyUpdate'])->name('safety.update');
-
+    Route::post('/upload/tab/image', [MainController::class, 'uploadtab']);
 });
 
 
