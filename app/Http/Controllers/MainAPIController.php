@@ -86,7 +86,34 @@ class MainAPIController extends Controller
                 "Message" => "Device key mismatch or device not registered",
                 "status" => "unfound",
             ];
-            return response()->json($data, 500);
+            return response()->json($data, 404);
         }
     }   
+
+
+    public function livefeed(Request $request,$area_id){
+        if($area_id == ""){
+            $data = [
+                "Message" => "Area ID is Required",
+                "status" => "fail",
+            ];
+            return response()->json($data, 500);
+        }
+        $Area = Area::where('id',$area_id)->first();
+        if($Area){
+            $data = [
+                "area_id" => $Area,
+                "live_feed_url" => "https://livefeed.example.com/DEVICE123",
+                "status" => 'success',
+            ];
+            return response()->json($data, 200);
+        }
+        else{
+            $data = [
+                "status" => 'unfound',
+                "message" => "url not found",
+            ];
+            return response()->json($data, 404);
+        }
+    }
 }
