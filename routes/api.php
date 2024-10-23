@@ -19,6 +19,7 @@ Route::get('/communication',[MainAPIController::class,'allcommunication']);
 Route::get('/safety/guidelines/{email}',[MainAPIController::class,'safetyguideline']);
 Route::get('/safety/guidelines/details/{id}',[MainAPIController::class,'safetyguidelineDetails']);
 Route::get('/checkout/details/{email}',[MainAPIController::class,'checkoutMobile']);
-
+Route::post('/login', [MainAPIController::class, 'login']);
+Route::post('/logout', [MainAPIController::class, 'logout'])->middleware('auth:sanctum');
 
 

@@ -14,6 +14,8 @@ use App\Models\WorkSite;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
+
 
 class MainAPIController extends Controller
 {
@@ -350,5 +352,42 @@ class MainAPIController extends Controller
             ];
             return response()->json($data, 404);
         }
+    }
+
+    public function login(Request $request)
+    {
+        // Validate the request
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
+
+        // Check user credentials
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return response()->json([
+                'message' => 'Invalid credentials'
+            ], 401);
+        }
+
+        // Generate a token for the user
+        $token = $user->createToken('mobile-app-token')->plainTextToken;
+
+        // Return a success response with the token and user information
+        return response()->json([
+            'token' => $token,
+            'user' => $user,
+        ]);
+    }
+
+    // Optional: Add a method for logout
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json([
+            'message' => 'Logged out successfully'
+        ]);
     }
 }
