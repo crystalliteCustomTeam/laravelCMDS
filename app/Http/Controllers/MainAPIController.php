@@ -305,14 +305,15 @@ class MainAPIController extends Controller
 
     public function safetyguidelineDetails(Request $request, $id)
     {
-        if ($id == "") {
+        $Safety = Safety::where('id', $id)->first();
+        if ($Safety == "") {
             $data = [
-                "Message" => "id is required",
+                "Message" => "Not Found",
                 "status" => "fail",
             ];
-            return response()->json($data, 500);
+            return response()->json($data, 404);
         }
-        $Safety = Safety::where('id', $id)->first();
+       
         $AssignCheckpoint = AssignCheckpoint::where('SAFID', $Safety->id)->select('CHKID')->get();
         $SafetyArray = [
             "Safety" => $Safety,
