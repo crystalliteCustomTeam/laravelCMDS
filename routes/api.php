@@ -13,4 +13,12 @@ Route::get('/worksites/{worksite_id}/alerts', [MainAPIController::class,'worksit
 Route::get('/areas/{area_id}/device', [MainAPIController::class,'areadevice']);
 
 
+Route::get('/worksite/{email}',[MainAPIController::class,'worksiteMobile']);
+Route::get('/worksite/{id}/details',[MainAPIController::class,'worksiteMobiledetails']);
+
+Route::get('/communication',[MainAPIController::class,'allcommunication']);
+
+Route::get('/safety/guidelines/{email}',[MainAPIController::class,'safetyguideline']);
+
+
 

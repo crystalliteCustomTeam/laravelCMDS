@@ -4,8 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Alerts;
 use App\Models\Area;
+use App\Models\Notification;
 use App\Models\User;
 use App\Models\UserMeta;
+use App\Models\WorkSite;
+use App\Models\Checkpoints;
+use App\Models\Image;
+use App\Models\Safety;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -200,6 +205,98 @@ class MainAPIController extends Controller
         } else {
             $data = [
                 "Message" => "area not found",
+                "status" => "fail",
+            ];
+            return response()->json($data, 404);
+        }
+    }
+
+    public function worksiteMobile(Request $request, $email)
+    {
+        if ($email == "") {
+            $data = [
+                "Message" => "Email is required",
+                "status" => "fail",
+            ];
+            return response()->json($data, 500);
+        }
+        $User = User::where('email', $email)->first();
+
+        if ($User) {
+            $WorkSite = WorkSite::where('CreateBy', $User->id)->get();
+            $data = [
+                "data" => $WorkSite,
+                "status" => "success",
+            ];
+            return response()->json($data, 200);
+        } else {
+            $data = [
+                "Message" => "Email Not Found",
+                "status" => "fail",
+            ];
+            return response()->json($data, 404);
+        }
+
+    }
+
+    public function worksiteMobiledetails(Request $request, $id)
+    {
+        $WorkSite = WorkSite::where('id', $id)->first();
+        if ($WorkSite == "") {
+            $data = [
+                "Message" => "Worksite not found",
+                "status" => "fail",
+            ];
+            return response()->json($data, 404);
+        }
+
+        $Area = Area::where('WSID', $WorkSite->id)->get();
+
+        $WorksiteDetail = [
+            "Worksite" => $WorkSite,
+            "Area" => $Area,
+        ];
+
+        $data = [
+            "data" => $WorksiteDetail,
+            "status" => "success",
+        ];
+        return response()->json($data, 200);
+
+    }
+
+    public function allcommunication(Request $request)
+    {
+        $Notification = Notification::all();
+        if ($Notification != "") {
+            $data = [
+                "data" => $Notification,
+                "status" => "success",
+            ];
+            return response()->json($data, 200);
+        }
+    }
+
+    public function safetyguideline(Request $request, $email)
+    {
+        if ($email == "") {
+            $data = [
+                "Message" => "Email is required",
+                "status" => "fail",
+            ];
+            return response()->json($data, 500);
+        }
+        $User = User::where('email', $email)->first();
+        if ($User) {
+            $Safety = Safety::where('CreatedBy', $User->id)->get();
+            $data = [
+                "data" => $Safety,
+                "status" => "success",
+            ];
+            return response()->json($data, 200);
+        } else {
+            $data = [
+                "Message" => "Email Not Found",
                 "status" => "fail",
             ];
             return response()->json($data, 404);
