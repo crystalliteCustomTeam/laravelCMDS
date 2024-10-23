@@ -223,7 +223,7 @@ class MainAPIController extends Controller
         $User = User::where('email', $email)->first();
 
         if ($User) {
-            $WorkSite = WorkSite::where('CreateBy', $User->id)->get();
+            $WorkSite = WorkSite::all();
             $data = [
                 "data" => $WorkSite,
                 "status" => "success",
