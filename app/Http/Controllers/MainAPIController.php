@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Alerts;
 use App\Models\Area;
 use App\Models\AssignCheckpoint;
-use App\Models\Notification;
 use App\Models\Checkpoints;
+use App\Models\Notification;
 use App\Models\Safety;
 use App\Models\User;
 use App\Models\UserMeta;
@@ -248,20 +248,20 @@ class MainAPIController extends Controller
                 "status" => "fail",
             ];
             return response()->json($data, 404);
+        } else {
+            $Area = Area::where('WSID', $WorkSite->id)->get();
+
+            $WorksiteDetail = [
+                "Worksite" => $WorkSite,
+                "Area" => $Area,
+            ];
+
+            $data = [
+                "data" => $WorksiteDetail,
+                "status" => "success",
+            ];
+            return response()->json($data, 200);
         }
-
-        $Area = Area::where('WSID', $WorkSite->id)->get();
-
-        $WorksiteDetail = [
-            "Worksite" => $WorkSite,
-            "Area" => $Area,
-        ];
-
-        $data = [
-            "data" => $WorksiteDetail,
-            "status" => "success",
-        ];
-        return response()->json($data, 200);
 
     }
 
@@ -318,7 +318,7 @@ class MainAPIController extends Controller
             "Safety" => $Safety,
         ];
         foreach ($AssignCheckpoint as $AC) {
-            $Checkpoints = Checkpoints::where('id',$AC->CHKID)->first();
+            $Checkpoints = Checkpoints::where('id', $AC->CHKID)->first();
             array_push($SafetyArray, ["Checkpoints" => $Checkpoints]);
         }
 
