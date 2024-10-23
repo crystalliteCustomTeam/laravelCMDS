@@ -242,7 +242,7 @@ class MainAPIController extends Controller
     public function worksiteMobiledetails(Request $request, $id)
     {
         $WorkSite = WorkSite::where('id', $id)->first();
-        if ($WorkSite == "") {
+        if ($WorkSite) {
             $data = [
                 "Message" => "Worksite not found",
                 "status" => "fail",
