@@ -15,10 +15,9 @@ Route::get('/areas/{area_id}/device', [MainAPIController::class,'areadevice']);
 
 Route::get('/worksite/{email}',[MainAPIController::class,'worksiteMobile']);
 Route::get('/worksite/{id}/details',[MainAPIController::class,'worksiteMobiledetails']);
-
 Route::get('/communication',[MainAPIController::class,'allcommunication']);
-
 Route::get('/safety/guidelines/{email}',[MainAPIController::class,'safetyguideline']);
+Route::get('/safety/guidelines/details/{id}',[MainAPIController::class,'safetyguidelineDetails']);
 
 
 

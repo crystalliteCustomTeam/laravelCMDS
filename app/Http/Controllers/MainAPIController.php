@@ -4,13 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Alerts;
 use App\Models\Area;
+use App\Models\AssignCheckpoint;
 use App\Models\Notification;
+use App\Models\Checkpoints;
+use App\Models\Safety;
 use App\Models\User;
 use App\Models\UserMeta;
 use App\Models\WorkSite;
-use App\Models\Checkpoints;
-use App\Models\Image;
-use App\Models\Safety;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -301,5 +301,27 @@ class MainAPIController extends Controller
             ];
             return response()->json($data, 404);
         }
+    }
+
+    public function safetyguidelineDetails(Request $request, $id)
+    {
+        if ($id == "") {
+            $data = [
+                "Message" => "id is required",
+                "status" => "fail",
+            ];
+            return response()->json($data, 500);
+        }
+        $Safety = Safety::where('id', $id)->first();
+        $AssignCheckpoint = AssignCheckpoint::where('SAFID', $Safety->id)->select('CHKID')->get();
+        $SafetyArray = [
+            "Safety" => $Safety,
+        ];
+        foreach ($AssignCheckpoint as $AC) {
+            $Checkpoints = Checkpoints::where('id',$AC->CHKID)->first();
+            array_push($SafetyArray, ["Checkpoints" => $Checkpoints]);
+        }
+
+        return response()->json($SafetyArray, 200);
     }
 }
