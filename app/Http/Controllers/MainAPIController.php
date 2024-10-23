@@ -372,11 +372,12 @@ class MainAPIController extends Controller
         }
 
         // Generate a token for the user
-        $token = $user->createToken('mobile-app-token')->plainTextToken;
+        // $token = $user->createToken('mobile-app-token')->plainTextToken;
+        $token = $user->createToken('mobile-app-token');
 
         // Return a success response with the token and user information
         return response()->json([
-            'token' => $token,
+            'token' => $token->plainTextToken,
             'user' => $user,
         ]);
     }
