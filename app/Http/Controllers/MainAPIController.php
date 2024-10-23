@@ -288,7 +288,7 @@ class MainAPIController extends Controller
         }
         $User = User::where('email', $email)->first();
         if ($User) {
-            $Safety = Safety::where('CreatedBy', $User->id)->get();
+            $Safety = Safety::all();
             $data = [
                 "data" => $Safety,
                 "status" => "success",
