@@ -11,6 +11,7 @@ use App\Models\Safety;
 use App\Models\User;
 use App\Models\UserMeta;
 use App\Models\WorkSite;
+use App\Models\Image;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -390,5 +391,30 @@ class MainAPIController extends Controller
         return response()->json([
             'message' => 'Logged out successfully'
         ]);
+    }
+
+    public function mediaMobile(Request $request,$email){
+        if ($email == "") {
+            $data = [
+                "Message" => "Email is required",
+                "status" => "fail",
+            ];
+            return response()->json($data, 500);
+        }
+        $User = User::where('email', $email)->first();
+        if ($User) {
+            $Safety = Image::all();
+            $data = [
+                "data" => $Safety,
+                "status" => "success",
+            ];
+            return response()->json($data, 200);
+        } else {
+            $data = [
+                "Message" => "Email Not Found",
+                "status" => "fail",
+            ];
+            return response()->json($data, 404);
+        }
     }
 }

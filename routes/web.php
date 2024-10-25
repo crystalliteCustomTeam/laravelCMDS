@@ -19,6 +19,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/create/worksite', [MainController::class, 'createWorksite'])->name('create.worksite');
     Route::get('/worksite', [MainController::class, 'worksite'])->name('worksite');
     Route::get('/worksite/delete/{id}', [MainController::class, 'worksiteDelete'])->name('worksite.delete');
+    Route::post('/worksite/edit', [MainController::class, 'worksiteEdit'])->name('worksite.edit');
     Route::get('/worksite/detail/{id}', [MainController::class, 'worksiteDetail'])->name('worksite.detail');
     Route::post('/worksite/area', [MainController::class, 'area'])->name('worksite.area');
     Route::post('/worksite/area/user/assgin', [MainController::class, 'areaUserAssign'])->name('worksite.area.user');

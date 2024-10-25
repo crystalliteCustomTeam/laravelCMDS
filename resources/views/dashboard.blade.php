@@ -27,26 +27,15 @@
                               </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>Work site 02</td>
-                                    <td>5</td>
-                                  </tr>
-                                  <tr>
-                                    <td>Work site 02</td>
-                                    <td>5</td>
-                                  </tr>
-                                  <tr>
-                                    <td>Work site 02</td>
-                                    <td>5</td>
-                                  </tr>
-                                  <tr>
-                                    <td>Work site 02</td>
-                                    <td>5</td>
-                                  </tr>
-                                  <tr>
-                                    <td>Work site 02</td>
-                                    <td>5</td>
-                                  </tr>
+                                @if ($RISKS)
+                                    @foreach ($RISKS as $RISK)
+                                    <tr>
+                                        <td>{{$RISK->Name}}</td>
+                                        <td>{{ $RISK->alerts_count }}</td>
+                                    </tr>
+                                    @endforeach
+                                @endif
+                                
                             </tbody>
                           </table>
                           

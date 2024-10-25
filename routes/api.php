@@ -22,4 +22,6 @@ Route::get('/checkout/details/{email}',[MainAPIController::class,'checkoutMobile
 Route::post('/login', [MainAPIController::class, 'login']);
 Route::post('/logout', [MainAPIController::class, 'logout'])->middleware('auth:sanctum');
 
+Route::get('/media/{email}',[MainAPIController::class,'mediaMobile']);
+
 

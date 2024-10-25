@@ -12,10 +12,12 @@ use App\Models\Safety;
 use App\Models\User;
 use App\Models\UserMeta;
 use App\Models\WorkSite;
+use App\Models\Alerts;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\DB;
 
 class MainController extends Controller
 {
@@ -27,7 +29,12 @@ class MainController extends Controller
         $userCount = User::count();
         $ws_count = WorkSite::where('CreateBy', $user->id)->count();
         $NotificationCount = Notification::count();
-        return view('dashboard', ["PAGE_TITLE" => "DASHBOARD", "USERNAME" => $user->name, "USERCOUNT" => $userCount, 'WORKSITE_COUNT' => $ws_count, "NotificationCount" => $NotificationCount, "UFM" => $usermetaFM]);
+        $alerts = WorkSite::select('worksite.Name', DB::raw('COUNT(alerts.id) as alerts_count'))
+        ->join('areas', 'areas.WSID', '=', 'worksite.id')
+        ->join('alerts', 'alerts.area_code', '=', 'areas.id')
+        ->groupBy('worksite.Name')
+        ->get();
+        return view('dashboard', ["PAGE_TITLE" => "DASHBOARD", "USERNAME" => $user->name, "USERCOUNT" => $userCount, 'WORKSITE_COUNT' => $ws_count, "NotificationCount" => $NotificationCount, "UFM" => $usermetaFM, 'RISKS' => $alerts]);
     }
 
     public function GetAllUser(Request $request)
@@ -131,6 +138,16 @@ class MainController extends Controller
         $usermetaFM = UserMeta::where('userId', $user->id)->select('featuredImage')->first();
         $allsites = WorkSite::where('CreateBy', $user->id)->get();
         $allImages = Image::where('save_image_by', $user->id)->get();
+        
+        
+
+        // $usersCount = AreaUser::select('areas.*', 'areausers.id as AreaID', DB::raw('COUNT(areausers.id) as USERSCOUNT'))
+        // ->join('areausers', 'areausers.ARID', '=', 'areas.id')
+        // ->get();
+        // echo "<pre>";
+        // print_r($usersCount);
+        // die();
+       
         return view('worksite', ["PAGE_TITLE" => "WORKSITE", "USERNAME" => $user->name, "SITES" => $allsites, "Images" => $allImages, "UFM" => $usermetaFM]);
 
     }
@@ -147,8 +164,24 @@ class MainController extends Controller
             ->get();
 
         $Areas = Area::where('CreateBy', $user->id)->where('WSID', $worksiteID)->get();
+        $allImages = Image::where('save_image_by', $user->id)->get();
 
-        return view('worksitedetails', ["PAGE_TITLE" => "WORKSITE DETAIL", "USERNAME" => $user->name, 'WORKSITE' => $worksite, 'USERS' => $usersData, 'Areas' => $Areas, "UFM" => $usermetaFM]);
+        return view('worksitedetails', ["PAGE_TITLE" => "WORKSITE DETAIL", "USERNAME" => $user->name, 'WORKSITE' => $worksite, 'USERS' => $usersData, 'Areas' => $Areas, "UFM" => $usermetaFM, "Images" => $allImages]);
+    }
+
+
+    public function worksiteEdit(Request $request){
+        $siteID = $request['siteId'];
+        $enddate = WorkSite::where('id',$siteID)->select('End_Date')->first();
+        WorkSite::where('id',$siteID)->update([
+            "Name" => $request['name'],
+            "Description" => $request['description'],
+            "FeaturedImage" => $request['FeaturedImage'],
+            "Start_Date" => $request['startDate'],
+            "End_Date" => ($request['enddate'] == "") ? $enddate->End_Date : $request['enddate']
+        ]);
+
+        return redirect()->back();
     }
 
     public function area(Request $request)
