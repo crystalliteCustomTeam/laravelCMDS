@@ -6,17 +6,15 @@ use App\Models\Alerts;
 use App\Models\Area;
 use App\Models\AssignCheckpoint;
 use App\Models\Checkpoints;
+use App\Models\Image;
 use App\Models\Notification;
 use App\Models\Safety;
 use App\Models\User;
 use App\Models\UserMeta;
 use App\Models\WorkSite;
-use App\Models\Image;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Auth;
-
 
 class MainAPIController extends Controller
 {
@@ -368,7 +366,7 @@ class MainAPIController extends Controller
 
         if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json([
-                'message' => 'Invalid credentials'
+                'message' => 'Invalid credentials',
             ], 401);
         }
 
@@ -389,11 +387,12 @@ class MainAPIController extends Controller
         $request->user()->currentAccessToken()->delete();
 
         return response()->json([
-            'message' => 'Logged out successfully'
+            'message' => 'Logged out successfully',
         ]);
     }
 
-    public function mediaMobile(Request $request,$email){
+    public function mediaMobile(Request $request, $email)
+    {
         if ($email == "") {
             $data = [
                 "Message" => "Email is required",
@@ -406,6 +405,31 @@ class MainAPIController extends Controller
             $Safety = Image::all();
             $data = [
                 "data" => $Safety,
+                "status" => "success",
+            ];
+            return response()->json($data, 200);
+        } else {
+            $data = [
+                "Message" => "Email Not Found",
+                "status" => "fail",
+            ];
+            return response()->json($data, 404);
+        }
+    }
+
+    public function profileMobile(Request $request, $email)
+    {
+        if ($email == "") {
+            $data = [
+                "Message" => "Email is required",
+                "status" => "fail",
+            ];
+            return response()->json($data, 500);
+        }
+        $User = User::where('email', $email)->join('usermeta','usermeta.userId','=','user.id')->first();
+        if ($User) {
+            $data = [
+                "data" => $User,
                 "status" => "success",
             ];
             return response()->json($data, 200);
