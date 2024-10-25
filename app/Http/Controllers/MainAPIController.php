@@ -426,7 +426,7 @@ class MainAPIController extends Controller
             ];
             return response()->json($data, 500);
         }
-        $User = User::where('email', $email)->join('usermeta','usermeta.userId','=','user.id')->first();
+        $User = User::where('email', $email)->join('usermeta','usermeta.userId','=','users.id')->first();
         if ($User) {
             $data = [
                 "data" => $User,
