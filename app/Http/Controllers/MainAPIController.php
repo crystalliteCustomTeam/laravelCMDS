@@ -426,7 +426,7 @@ class MainAPIController extends Controller
             ];
             return response()->json($data, 500);
         }
-        $User = User::where('email', $email)->join('usermeta','usermeta.userId','=','users.id')->first();
+        $User = User::where('email', $email)->join('usermeta', 'usermeta.userId', '=', 'users.id')->first();
         if ($User) {
             $data = [
                 "data" => $User,
@@ -442,7 +442,8 @@ class MainAPIController extends Controller
         }
     }
 
-    public function alerts(Request $request,$email){
+    public function alerts(Request $request, $email)
+    {
         if ($email == "") {
             $data = [
                 "Message" => "Email is required",
@@ -458,6 +459,63 @@ class MainAPIController extends Controller
                 "status" => "success",
             ];
             return response()->json($data, 200);
+        } else {
+            $data = [
+                "Message" => "Email Not Found",
+                "status" => "fail",
+            ];
+            return response()->json($data, 404);
+        }
+    }
+
+    public function createcommunication(Request $request)
+    {
+        $useremail = $request['email'];
+        if ($useremail == "") {
+            $data = [
+                "Message" => "Email is required",
+                "status" => "fail",
+            ];
+            return response()->json($data, 500);
+        }
+        $User = User::where('email', $useremail)->first();
+        if ($User) {
+            if ($request['title'] == "" || $request['message'] == "" || $request['WorksiteID'] == "" || $request['AreaID'] == "") {
+                $data = [
+                    "Message" => "Title, Message, WorksiteID, AreaID is required",
+                    "status" => "fail",
+                ];
+                return response()->json($data, 500);
+            }
+            if (!is_array($request['WorksiteID']) || !is_array($request['AreaID'])) {
+                $data = [
+                    "Message" => "WorksiteID, AreaID Need Type Array",
+                    "status" => "fail",
+                ];
+                return response()->json($data, 500);
+            }
+
+            $Notification = Notification::create([
+                "title" => $request['title'],
+                "message" => $request['message'],
+                "WSID" => json_encode($request['WorksiteID']),
+                "ARIDS" => json_encode($request['AreaID']),
+            ]);
+
+            if ($Notification) {
+                $data = [
+                    "Message" => "Notfication Created",
+                    "status" => "success",
+                ];
+                return response()->json($data, 200);
+            } else {
+                $data = [
+                    "Message" => "Notfication Is Not Created Please Contact Developer",
+                    "status" => "fail",
+                ];
+                return response()->json($data, 500);
+            }
+
         } else {
             $data = [
                 "Message" => "Email Not Found",
