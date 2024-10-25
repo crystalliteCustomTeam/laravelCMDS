@@ -441,4 +441,29 @@ class MainAPIController extends Controller
             return response()->json($data, 404);
         }
     }
+
+    public function alerts(Request $request,$email){
+        if ($email == "") {
+            $data = [
+                "Message" => "Email is required",
+                "status" => "fail",
+            ];
+            return response()->json($data, 500);
+        }
+        $User = User::where('email', $email)->first();
+        if ($User) {
+            $alerts = Alerts::all();
+            $data = [
+                "data" => $alerts,
+                "status" => "success",
+            ];
+            return response()->json($data, 200);
+        } else {
+            $data = [
+                "Message" => "Email Not Found",
+                "status" => "fail",
+            ];
+            return response()->json($data, 404);
+        }
+    }
 }

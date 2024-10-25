@@ -17,6 +17,7 @@ Route::get('/worksite/{email}',[MainAPIController::class,'worksiteMobile']);
 Route::get('/profile/{email}',[MainAPIController::class,'profileMobile']);
 Route::get('/worksite/{id}/details',[MainAPIController::class,'worksiteMobiledetails']);
 Route::get('/communication',[MainAPIController::class,'allcommunication']);
+Route::get('/notifications/{email}',[MainAPIController::class,'alerts']);
 Route::get('/safety/guidelines/{email}',[MainAPIController::class,'safetyguideline']);
 Route::get('/safety/guidelines/details/{id}',[MainAPIController::class,'safetyguidelineDetails']);
 Route::get('/checkout/details/{email}',[MainAPIController::class,'checkoutMobile']);
