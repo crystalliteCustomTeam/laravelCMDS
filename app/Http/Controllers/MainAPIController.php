@@ -9,9 +9,9 @@ use App\Models\Checkpoints;
 use App\Models\Image;
 use App\Models\Notification;
 use App\Models\Safety;
+use App\Models\Settings;
 use App\Models\User;
 use App\Models\UserMeta;
-use App\Models\Settings;
 use App\Models\WorkSite;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -537,7 +537,7 @@ class MainAPIController extends Controller
         }
         $User = User::where('email', $email)->first();
         if ($User) {
-            $alerts = Settings::where('userId',$User->id)->get();
+            $alerts = Settings::where('userId', $User->id)->get();
             $data = [
                 "data" => $alerts,
                 "status" => "success",
@@ -550,5 +550,48 @@ class MainAPIController extends Controller
             ];
             return response()->json($data, 404);
         }
+    }
+
+    public function settingsUpdate(Request $request)
+    {
+        $email = $request['email'];
+        if ($email == "") {
+            $data = [
+                "Message" => "Email is required",
+                "status" => "fail",
+            ];
+            return response()->json($data, 500);
+        }
+        $User = User::where('email', $email)->first();
+        if ($User) {
+           $setting = Settings::where('userId', $User->id)->first();
+            if($setting){
+                $alerts = Settings::where('id', $setting->id)->update([
+                    "pushNotification" => $request['pushNotification'],
+                    "emailNotfication" => $request['emailNotfication'],
+                    "locationServices" => $request['locationServices'],
+                ]);
+                $data = [
+                    "data" => $alerts,
+                    "status" => "success",
+                ];
+                return response()->json($data, 200);
+            }
+            else{
+                $data = [
+                    "Message" => "Email Not Found",
+                    "status" => "fail",
+                ];
+                return response()->json($data, 404);
+            }
+            
+        } else {
+            $data = [
+                "Message" => "Email Not Found",
+                "status" => "fail",
+            ];
+            return response()->json($data, 404);
+        }
+
     }
 }

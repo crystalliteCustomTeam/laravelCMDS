@@ -21,6 +21,7 @@ Route::post('/communication/create/',[MainAPIController::class,'createcommunicat
 Route::get('/notifications/{email}',[MainAPIController::class,'alerts']);
 
 Route::get('/settings/{email}',[MainAPIController::class,'settings']);
+Route::post('/settings/update',[MainAPIController::class,'settingsUpdate']);
 
 Route::get('/safety/guidelines/{email}',[MainAPIController::class,'safetyguideline']);
 Route::get('/safety/guidelines/details/{id}',[MainAPIController::class,'safetyguidelineDetails']);
