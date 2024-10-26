@@ -12,6 +12,7 @@ use App\Models\Safety;
 use App\Models\User;
 use App\Models\UserMeta;
 use App\Models\WorkSite;
+use App\Models\Settings;
 use App\Models\Alerts;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -86,6 +87,14 @@ class MainController extends Controller
             "role" => $role,
             "createBy" => $user->id,
         ]);
+        $Settings = Settings::create([
+            "userId" => $UserID->id,
+            "pushNotification" => 0,
+            "emailNotfication" => 0,
+            "locationServices" => 0
+        ]);
+
+
         $data = [
             "Message" => "User Created",
             "UserID" => $userMeta->id,

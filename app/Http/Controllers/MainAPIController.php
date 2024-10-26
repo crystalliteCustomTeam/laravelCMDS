@@ -11,6 +11,7 @@ use App\Models\Notification;
 use App\Models\Safety;
 use App\Models\User;
 use App\Models\UserMeta;
+use App\Models\Settings;
 use App\Models\WorkSite;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -381,7 +382,6 @@ class MainAPIController extends Controller
         ]);
     }
 
-    // Optional: Add a method for logout
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
@@ -503,6 +503,7 @@ class MainAPIController extends Controller
             ]);
 
             if ($Notification) {
+
                 $data = [
                     "Message" => "Notfication Created",
                     "status" => "success",
@@ -516,6 +517,32 @@ class MainAPIController extends Controller
                 return response()->json($data, 500);
             }
 
+        } else {
+            $data = [
+                "Message" => "Email Not Found",
+                "status" => "fail",
+            ];
+            return response()->json($data, 404);
+        }
+    }
+
+    public function settings(Request $request, $email)
+    {
+        if ($email == "") {
+            $data = [
+                "Message" => "Email is required",
+                "status" => "fail",
+            ];
+            return response()->json($data, 500);
+        }
+        $User = User::where('email', $email)->first();
+        if ($User) {
+            $alerts = Settings::where('userId',$User->id)->get();
+            $data = [
+                "data" => $alerts,
+                "status" => "success",
+            ];
+            return response()->json($data, 200);
         } else {
             $data = [
                 "Message" => "Email Not Found",

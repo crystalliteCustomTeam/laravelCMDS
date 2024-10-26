@@ -20,6 +20,8 @@ Route::get('/communication',[MainAPIController::class,'allcommunication']);
 Route::post('/communication/create/',[MainAPIController::class,'createcommunication']);
 Route::get('/notifications/{email}',[MainAPIController::class,'alerts']);
 
+Route::get('/settings/{email}',[MainAPIController::class,'settings']);
+
 Route::get('/safety/guidelines/{email}',[MainAPIController::class,'safetyguideline']);
 Route::get('/safety/guidelines/details/{id}',[MainAPIController::class,'safetyguidelineDetails']);
 Route::get('/checkout/details/{email}',[MainAPIController::class,'checkoutMobile']);
