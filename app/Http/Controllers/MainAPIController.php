@@ -596,6 +596,36 @@ class MainAPIController extends Controller
     }
 
     public function profileupdate(Request $request){
-        
+        $email = $request['email'];
+        if ($email == "") {
+            $data = [
+                "Message" => "Email is required",
+                "status" => "fail",
+            ];
+            return response()->json($data, 500);
+        }
+        $User = User::where('email', $email)->first();
+        if ($User) {
+            $hashed = Hash::make($request['password']);
+
+            $User = User::where('email', $email)->update([
+                "email" => $email,
+                "name" => $request['name'],
+                "password" => $hashed
+            ]);
+            
+            $data = [
+                "Message" => $User,
+                "status" => "success",
+            ];
+            return response()->json($data, 200);
+            
+        } else {
+            $data = [
+                "Message" => "Email Not Found",
+                "status" => "fail",
+            ];
+            return response()->json($data, 404);
+        }
     }
 }
