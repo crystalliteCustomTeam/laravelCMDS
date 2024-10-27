@@ -594,4 +594,8 @@ class MainAPIController extends Controller
         }
 
     }
+
+    public function profileupdate(Request $request){
+        
+    }
 }
