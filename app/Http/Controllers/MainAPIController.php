@@ -538,11 +538,19 @@ class MainAPIController extends Controller
         $User = User::where('email', $email)->first();
         if ($User) {
             $alerts = Settings::where('userId', $User->id)->get();
+            if ($alerts) {
+                $data = [
+                    "data" => $alerts,
+                    "status" => "success",
+                ];
+                return response()->json($data, 200);
+            }
             $data = [
-                "data" => $alerts,
-                "status" => "success",
+                "Message" => "Email Not Found",
+                "status" => "fail",
             ];
-            return response()->json($data, 200);
+            return response()->json($data, 404);
+
         } else {
             $data = [
                 "Message" => "Email Not Found",
@@ -564,8 +572,8 @@ class MainAPIController extends Controller
         }
         $User = User::where('email', $email)->first();
         if ($User) {
-           $setting = Settings::where('userId', $User->id)->first();
-            if($setting){
+            $setting = Settings::where('userId', $User->id)->first();
+            if ($setting) {
                 $alerts = Settings::where('id', $setting->id)->update([
                     "pushNotification" => $request['pushNotification'],
                     "emailNotfication" => $request['emailNotfication'],
@@ -576,15 +584,14 @@ class MainAPIController extends Controller
                     "status" => "success",
                 ];
                 return response()->json($data, 200);
-            }
-            else{
+            } else {
                 $data = [
                     "Message" => "Email Not Found",
                     "status" => "fail",
                 ];
                 return response()->json($data, 404);
             }
-            
+
         } else {
             $data = [
                 "Message" => "Email Not Found",
@@ -595,7 +602,8 @@ class MainAPIController extends Controller
 
     }
 
-    public function profileupdate(Request $request){
+    public function profileupdate(Request $request)
+    {
         $email = $request['email'];
         if ($email == "") {
             $data = [
@@ -611,15 +619,15 @@ class MainAPIController extends Controller
             $User = User::where('email', $email)->update([
                 "email" => $email,
                 "name" => $request['name'],
-                "password" => $hashed
+                "password" => $hashed,
             ]);
-            
+
             $data = [
                 "Message" => $User,
                 "status" => "success",
             ];
             return response()->json($data, 200);
-            
+
         } else {
             $data = [
                 "Message" => "Email Not Found",
