@@ -513,6 +513,25 @@ class MainAPIController extends Controller
 
             if ($Notification) {
 
+                $setusers = [];
+                foreach ($areas as $arId) {
+                    $allusers = AreaUser::where('ARID', $request['AreaID'])->get();
+                    foreach ($allusers as $user) {
+                        array_push($setusers, $user->UID);
+                    }
+                }
+
+                $request = [
+                    "title" => $request['title'],
+                    "MESSAGE" => $request['message'],
+                    "WSIDS" => json_encode($request['WorksiteID']),
+                    "ARIDS" => json_encode($request['AreaID']),
+                    "USERS" => json_encode($setusers),
+                ];
+                $data = $request; // Example data
+                $url = '/' . date('i:h:s') . '-alerts/';
+                $response = $this->firebaseService->setData($url, $data);
+
                 $data = [
                     "Message" => "Notfication Created",
                     "status" => "success",
@@ -662,10 +681,10 @@ class MainAPIController extends Controller
             "MESSAGE" => $request['MESSAGE'],
             "WSIDS" => $request['WSIDS'],
             "ARIDS" => $request['ARIDS'],
-            "USERS" => $request['USERS']
+            "USERS" => $request['USERS'],
         ];
         $data = $request; // Example data
-        $url = '/'.date('i:h:s').'-alerts/';
+        $url = '/' . date('i:h:s') . '-alerts/';
         $response = $this->firebaseService->setData($url, $data);
         return response()->json($response);
     }
