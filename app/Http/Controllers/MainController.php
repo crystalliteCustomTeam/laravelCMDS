@@ -326,7 +326,7 @@ class MainController extends Controller
                     'User-Agent' => 'Thunder Client (https://www.thunderclient.com)',
                     'Content-Type' => 'application/json',
                 ])
-                ->post('http://127.0.0.1:8000/api/sendnotification');
+                ->post('https://dashboard.vnexia.com/api/sendnotification');
 
             echo $response->body();
 
