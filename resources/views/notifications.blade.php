@@ -1,6 +1,6 @@
 @extends('layouts.venxia')
 @section('title', $PAGE_TITLE)
-@section('USERNAME', $USERNAME) 
+@section('USERNAME', $USERNAME)
 
 @section('contents')
 
@@ -38,15 +38,18 @@
                                                     @php
                                                         $jsonDatas = json_decode($Notification->WSID);
                                                     @endphp
-                                                    @foreach ($jsonDatas as $JD)
-                                                        @foreach ($WORKSITE as $WK)
-                                                            @if ($WK->id != $JD)
-                                                                @continue
-                                                            @else
-                                                                <button style="width: fit-content;color:white;padding:0px 10px">{{ $WK->Name }}</button>
-                                                            @endif
+                                                    @if ($jsonDatas)
+                                                        @foreach ($jsonDatas as $JD)
+                                                            @foreach ($WORKSITE as $WK)
+                                                                @if ($WK->id != $JD)
+                                                                    @continue
+                                                                @else
+                                                                    <button
+                                                                        style="width: fit-content;color:white;padding:0px 10px">{{ $WK->Name }}</button>
+                                                                @endif
+                                                            @endforeach
                                                         @endforeach
-                                                    @endforeach
+                                                    @endif
                                                 @else
                                                     @continue
                                                 @endif
@@ -56,21 +59,26 @@
                                                     @php
                                                         $jsonDatas = json_decode($Notification->ARIDS);
                                                     @endphp
-                                                    @foreach ($jsonDatas as $JD)
-                                                        @foreach ($AREAS as $WK)
-                                                            @if ($WK->id != $JD)
-                                                                @continue
-                                                            @else
-                                                                <button style="width: fit-content;color:white;padding:0px 10px">{{ $WK->Area_Name }}</button>
-                                                            @endif
+                                                    @if ($jsonDatas)
+                                                        @foreach ($jsonDatas as $JD)
+                                                            @foreach ($AREAS as $WK)
+                                                                @if ($WK->id != $JD)
+                                                                    @continue
+                                                                @else
+                                                                    <button
+                                                                        style="width: fit-content;color:white;padding:0px 10px">{{ $WK->Area_Name }}</button>
+                                                                @endif
+                                                            @endforeach
                                                         @endforeach
-                                                    @endforeach
+                                                    @endif
                                                 @else
                                                     @continue
                                                 @endif
                                             </td>
                                             <td>
-                                                <button class="delete" onclick="deleteNotification({{ $Notification->id }})"><i class="fa-solid fa-trash"></i></button>
+                                                <button class="delete"
+                                                    onclick="deleteNotification({{ $Notification->id }})"><i
+                                                        class="fa-solid fa-trash"></i></button>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -94,8 +102,8 @@
 
     {{-- modal  --}}
     <script>
-        function deleteNotification(ID){
-            window.location.href  = window.location.href+'/delete/'+ID;
+        function deleteNotification(ID) {
+            window.location.href = window.location.href + '/delete/' + ID;
         }
     </script>
     <!-- Button trigger modal -->
@@ -230,7 +238,7 @@
                                                         @if ($AR->WSID == $WS->id)
                                                             <li>
                                                                 <input id="areasite-{{ $WS->id }}" type="checkbox"
-                                                                    name="areas[]" value="{{ $AR->id }}">
+                                                                    name="areas[]"  value="{{ $AR->id }}">
                                                                 <label for="">{{ $AR->Area_Name }}</label>
                                                             </li>
                                                         @else

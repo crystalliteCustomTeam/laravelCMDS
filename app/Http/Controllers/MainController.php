@@ -9,16 +9,15 @@ use App\Models\Checkpoints;
 use App\Models\Image;
 use App\Models\Notification;
 use App\Models\Safety;
+use App\Models\Settings;
 use App\Models\User;
 use App\Models\UserMeta;
 use App\Models\WorkSite;
-use App\Models\Settings;
-use App\Models\Alerts;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\DB;
 
 class MainController extends Controller
 {
@@ -31,10 +30,10 @@ class MainController extends Controller
         $ws_count = WorkSite::where('CreateBy', $user->id)->count();
         $NotificationCount = Notification::count();
         $alerts = WorkSite::select('worksite.Name', DB::raw('COUNT(alerts.id) as alerts_count'))
-        ->join('areas', 'areas.WSID', '=', 'worksite.id')
-        ->join('alerts', 'alerts.area_code', '=', 'areas.id')
-        ->groupBy('worksite.Name')
-        ->get();
+            ->join('areas', 'areas.WSID', '=', 'worksite.id')
+            ->join('alerts', 'alerts.area_code', '=', 'areas.id')
+            ->groupBy('worksite.Name')
+            ->get();
         return view('dashboard', ["PAGE_TITLE" => "DASHBOARD", "USERNAME" => $user->name, "USERCOUNT" => $userCount, 'WORKSITE_COUNT' => $ws_count, "NotificationCount" => $NotificationCount, "UFM" => $usermetaFM, 'RISKS' => $alerts]);
     }
 
@@ -91,9 +90,8 @@ class MainController extends Controller
             "userId" => $UserID->id,
             "pushNotification" => 0,
             "emailNotfication" => 0,
-            "locationServices" => 0
+            "locationServices" => 0,
         ]);
-
 
         $data = [
             "Message" => "User Created",
@@ -147,8 +145,6 @@ class MainController extends Controller
         $usermetaFM = UserMeta::where('userId', $user->id)->select('featuredImage')->first();
         $allsites = WorkSite::where('CreateBy', $user->id)->get();
         $allImages = Image::where('save_image_by', $user->id)->get();
-        
-        
 
         // $usersCount = AreaUser::select('areas.*', 'areausers.id as AreaID', DB::raw('COUNT(areausers.id) as USERSCOUNT'))
         // ->join('areausers', 'areausers.ARID', '=', 'areas.id')
@@ -156,7 +152,7 @@ class MainController extends Controller
         // echo "<pre>";
         // print_r($usersCount);
         // die();
-       
+
         return view('worksite', ["PAGE_TITLE" => "WORKSITE", "USERNAME" => $user->name, "SITES" => $allsites, "Images" => $allImages, "UFM" => $usermetaFM]);
 
     }
@@ -178,16 +174,16 @@ class MainController extends Controller
         return view('worksitedetails', ["PAGE_TITLE" => "WORKSITE DETAIL", "USERNAME" => $user->name, 'WORKSITE' => $worksite, 'USERS' => $usersData, 'Areas' => $Areas, "UFM" => $usermetaFM, "Images" => $allImages]);
     }
 
-
-    public function worksiteEdit(Request $request){
+    public function worksiteEdit(Request $request)
+    {
         $siteID = $request['siteId'];
-        $enddate = WorkSite::where('id',$siteID)->select('End_Date')->first();
-        WorkSite::where('id',$siteID)->update([
+        $enddate = WorkSite::where('id', $siteID)->select('End_Date')->first();
+        WorkSite::where('id', $siteID)->update([
             "Name" => $request['name'],
             "Description" => $request['description'],
             "FeaturedImage" => $request['FeaturedImage'],
             "Start_Date" => $request['startDate'],
-            "End_Date" => ($request['enddate'] == "") ? $enddate->End_Date : $request['enddate']
+            "End_Date" => ($request['enddate'] == "") ? $enddate->End_Date : $request['enddate'],
         ]);
 
         return redirect()->back();
@@ -305,22 +301,36 @@ class MainController extends Controller
         if ($Notfication) {
 
             $resp = Notification::where('id', $notificationID)->first();
-            $response = Http::withBody(
-                '{
-          "title": "' . $resp->title . '",
-          "MESSAGE" : "' . $resp->message . '",
-          "WSIDS" : "' . json_encode($worksites) . '",
-          "ARIDS": "' . json_encode($areas) . '"
-        }', 'json'
-            )
-                ->withHeaders([
-                    'Accept' => '*/*',
-                    'User-Agent' => 'Thunder Client (https://www.thunderclient.com)',
-                    'Content-Type' => 'application/json',
-                ])
-                ->post('https://webhook.site/2aa264a2-87ce-4b16-b338-5ffa423d806a');
+            $setusers = [];
+            foreach ($areas as $arId) {
+                $allusers = AreaUser::where('ARID', $arId)->get();
+                foreach ($allusers as $user) {
+                    array_push($setusers, $user->UID);
+                }
+            }
 
-            return redirect()->back();
+            // Your data array
+            $firebaseData = [
+                "title" => $resp->title,
+                "MESSAGE" => $resp->message,
+                "WSIDS" => json_encode($worksites),
+                "ARIDS" => json_encode($areas),
+                "USERS" => json_encode($setusers),
+            ];
+
+
+            $response = Http::post('http://127.0.0.1:8000/api/registerUser', $firebaseData);
+
+            if ($response->successful()) {
+                echo "Data sent successfully!";
+            } else {
+                echo "Failed to send data. Status Code: " . $response->status() . ". Error: " . $response->body();
+            }
+
+           
+            
+
+            // return redirect()->back();
         } else {
             return response()->json(["Message" => "Notification Not Send"], 500);
         }
@@ -361,6 +371,7 @@ class MainController extends Controller
         ]);
 
         if ($notification) {
+
             return response()->json(["Message" => "Area Created", "NID" => $notification->id, "Code" => 200], 200);
         }
 
@@ -635,7 +646,6 @@ class MainController extends Controller
         $uploadedImages = [];
         $loginUser = Auth::user();
 
-
         foreach ($files as $file) {
             $filename = time() . '-' . $file->getClientOriginalName();
             $file->move(public_path('uploads'), $filename);
@@ -646,13 +656,11 @@ class MainController extends Controller
             ]);
 
             $uploadedImages[] = [
-                'image_path' => 'uploads/'.$filename,
+                'image_path' => 'uploads/' . $filename,
                 'image_title' => $image->image_title,
             ];
         }
 
-
-       
         return response()->json(['uploadedImages' => $uploadedImages]);
     }
 

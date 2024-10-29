@@ -27,6 +27,7 @@ Route::post('/settings/update',[MainAPIController::class,'settingsUpdate']);
 Route::get('/safety/guidelines/{email}',[MainAPIController::class,'safetyguideline']);
 Route::get('/safety/guidelines/details/{id}',[MainAPIController::class,'safetyguidelineDetails']);
 Route::get('/checkout/details/{email}',[MainAPIController::class,'checkoutMobile']);
+Route::post('/registerUser',[MainAPIController::class,'writeUserData']);
 Route::post('/login', [MainAPIController::class, 'login']);
 Route::post('/logout', [MainAPIController::class, 'logout'])->middleware('auth:sanctum');
 

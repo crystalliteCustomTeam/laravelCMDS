@@ -13,12 +13,21 @@ use App\Models\Settings;
 use App\Models\User;
 use App\Models\UserMeta;
 use App\Models\WorkSite;
+use App\Services\FirebaseService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class MainAPIController extends Controller
 {
+
+    protected $firebaseService;
+
+    public function __construct(FirebaseService $firebaseService)
+    {
+        $this->firebaseService = $firebaseService;
+    }
+
     public function GetUsers(Request $request)
     {
         $users = DB::table('users')->where('role', '!=', '0')->get();
@@ -538,6 +547,7 @@ class MainAPIController extends Controller
         $User = User::where('email', $email)->first();
         if ($User) {
             $alerts = Settings::where('userId', $User->id)->get();
+
             if ($alerts) {
                 $data = [
                     "data" => $alerts,
@@ -635,5 +645,29 @@ class MainAPIController extends Controller
             ];
             return response()->json($data, 404);
         }
+    }
+
+    public function registerUser(Request $request)
+    {
+
+        $data = $this->firebaseService->getData('/');
+        return response()->json($data);
+
+    }
+
+    public function writeUserData(Request $request)
+    {
+        $request = [
+            "alertID" => date('d:m:s'),
+            "title" => $request['title'],
+            "MESSAGE" => $request['MESSAGE'],
+            "WSIDS" => $request['WSIDS'],
+            "ARIDS" => $request['ARIDS'],
+            "USERS" => $request['USERS']
+        ];
+        $data = $request; // Example data
+        $url = '/'.date('i:h:s').'-alerts/';
+        $response = $this->firebaseService->setData($url, $data);
+        return response()->json($response);
     }
 }
