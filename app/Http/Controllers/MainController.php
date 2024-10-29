@@ -17,7 +17,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Http;
 
 class MainController extends Controller
 {
@@ -309,28 +308,40 @@ class MainController extends Controller
                 }
             }
 
-          
-        
-            // Initialize cURL
-            $response = Http::withBody(
-                '{
-          "title": "'.$resp->title.'",
-          "MESSAGE": "'.$resp->message.'",
-          "WSIDS": "'.json_encode($worksites).'",
-          "ARIDS": "'.json_encode($areas).'",
-          "USERS": "'.json_encode($setusers).'"
-        }', 'json'
-            )
-                ->withHeaders([
-                    'Accept' => '*/*',
-                    'User-Agent' => 'Thunder Client (https://www.thunderclient.com)',
-                    'Content-Type' => 'application/json',
-                ])
-                ->post('https://dashboard.vnexia.com/api/sendnotification');
 
-            echo $response->body();
+            $firebaseData = [
+                "title" => $resp->title,
+                "MESSAGE" => $resp->message,
+                "WSIDS" => json_encode($worksites),
+                "ARIDS" => json_encode($areas),
+                "USERS" => json_encode($setusers),
+            ];
 
-            return redirect()->back();
+
+            $ch = curl_init('https://dashboard.vnexia.com/api/sendnotification');
+
+
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); // Return the response as a string
+            curl_setopt($ch, CURLOPT_POST, true); // Set the request method to POST
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($firebaseData)); // Send the data
+
+            $response = curl_exec($ch);
+
+            if (curl_errno($ch)) {
+                echo 'cURL error: ' . curl_error($ch);
+            } else {
+                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE); // Get HTTP status code
+                if ($httpCode == 200) {
+                    echo "Data sent successfully!";
+                    // Optionally redirect or return
+                    return redirect()->back();
+                } else {
+                    echo "Failed to send data. Status Code: " . $httpCode . ". Response: " . $response;
+                }
+            }
+
+
+            curl_close($ch);
 
         } else {
             return response()->json(["Message" => "Notification Not Send"], 500);
