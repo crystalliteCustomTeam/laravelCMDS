@@ -512,10 +512,10 @@ class MainAPIController extends Controller
             ]);
 
             if ($Notification) {
-
+                $areas = $request['AreaID'];
                 $setusers = [];
                 foreach ($areas as $arId) {
-                    $allusers = AreaUser::where('ARID', $request['AreaID'])->get();
+                    $allusers = AreaUser::where('ARID', $arId)->get();
                     foreach ($allusers as $user) {
                         array_push($setusers, $user->UID);
                     }
