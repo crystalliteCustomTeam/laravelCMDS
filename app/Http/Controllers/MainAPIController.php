@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Alerts;
 use App\Models\Area;
+use App\Models\AreaUser;
 use App\Models\AssignCheckpoint;
 use App\Models\Checkpoints;
 use App\Models\Image;
