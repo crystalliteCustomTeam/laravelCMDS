@@ -330,6 +330,8 @@ class MainController extends Controller
 
             echo $response->body();
 
+            return redirect()->back();
+
         } else {
             return response()->json(["Message" => "Notification Not Send"], 500);
         }
