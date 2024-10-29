@@ -309,29 +309,27 @@ class MainController extends Controller
                 }
             }
 
-            // Your data array
-            $firebaseData = [
-                "title" => $resp->title,
-                "MESSAGE" => $resp->message,
-                "WSIDS" => json_encode($worksites),
-                "ARIDS" => json_encode($areas),
-                "USERS" => json_encode($setusers),
-            ];
-
-            
-            $response = Http::post('https://dashboard.vnexia.com/api/registerUser', $firebaseData);
-
-            if ($response->successful()) {
-                echo "Data sent successfully!";
-                return redirect()->back();
-            } else {
-                echo "Failed to send data. Status Code: " . $response->status() . ". Error: " . $response->body();
-            }
-
-           
-            
-
           
+        
+            // Initialize cURL
+            $response = Http::withBody(
+                '{
+          "title": "'.$resp->title.'",
+          "MESSAGE": "'.$resp->message.'",
+          "WSIDS": "'.json_encode($worksites).'",
+          "ARIDS": "'.json_encode($areas).'",
+          "USERS": "'.json_encode($setusers).'"
+        }', 'json'
+            )
+                ->withHeaders([
+                    'Accept' => '*/*',
+                    'User-Agent' => 'Thunder Client (https://www.thunderclient.com)',
+                    'Content-Type' => 'application/json',
+                ])
+                ->post('http://127.0.0.1:8000/api/sendnotification');
+
+            echo $response->body();
+
         } else {
             return response()->json(["Message" => "Notification Not Send"], 500);
         }

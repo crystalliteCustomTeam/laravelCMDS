@@ -658,7 +658,6 @@ class MainAPIController extends Controller
     public function writeUserData(Request $request)
     {
         $request = [
-            "alertID" => date('d:m:s'),
             "title" => $request['title'],
             "MESSAGE" => $request['MESSAGE'],
             "WSIDS" => $request['WSIDS'],
