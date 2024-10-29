@@ -318,11 +318,12 @@ class MainController extends Controller
                 "USERS" => json_encode($setusers),
             ];
 
-
-            $response = Http::post('http://127.0.0.1:8000/api/registerUser', $firebaseData);
+            
+            $response = Http::post('https://dashboard.vnexia.com/api/registerUser', $firebaseData);
 
             if ($response->successful()) {
                 echo "Data sent successfully!";
+                return redirect()->back();
             } else {
                 echo "Failed to send data. Status Code: " . $response->status() . ". Error: " . $response->body();
             }
@@ -330,7 +331,7 @@ class MainController extends Controller
            
             
 
-            // return redirect()->back();
+          
         } else {
             return response()->json(["Message" => "Notification Not Send"], 500);
         }
