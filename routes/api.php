@@ -20,6 +20,8 @@ Route::get('/worksite/{id}/details',[MainAPIController::class,'worksiteMobiledet
 Route::get('/communication',[MainAPIController::class,'allcommunication']);
 Route::post('/communication/create/',[MainAPIController::class,'createcommunication']);
 Route::get('/notifications/{email}',[MainAPIController::class,'alerts']);
+Route::post('/password/forgot', [MainAPIController::class, 'forgotPassword']);
+Route::post('/password/reset', [MainAPIController::class, 'resetPassword']);
 
 Route::get('/settings/{email}',[MainAPIController::class,'settings']);
 Route::post('/settings/update',[MainAPIController::class,'settingsUpdate']);

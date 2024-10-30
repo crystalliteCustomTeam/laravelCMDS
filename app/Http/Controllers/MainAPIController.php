@@ -18,6 +18,8 @@ use App\Services\FirebaseService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 
 class MainAPIController extends Controller
 {
@@ -27,6 +29,44 @@ class MainAPIController extends Controller
     public function __construct(FirebaseService $firebaseService)
     {
         $this->firebaseService = $firebaseService;
+    }
+
+    public function forgotPassword(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+
+        // Attempt to send the reset link
+        $status = Password::sendResetLink(
+            $request->only('email')
+        );
+
+        return $status === Password::RESET_LINK_SENT
+        ? response()->json(['message' => __($status)], 200)
+        : response()->json(['message' => __($status)], 400);
+    }
+
+    // Method to handle password reset
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'token' => 'required',
+            'password' => 'required|min:8|confirmed',
+        ]);
+
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->forceFill([
+                    'password' => Hash::make($password),
+                    'remember_token' => Str::random(60),
+                ])->save();
+            }
+        );
+
+        return $status === Password::PASSWORD_RESET
+        ? response()->json(['message' => __($status)], 200)
+        : response()->json(['message' => __($status)], 400);
     }
 
     public function GetUsers(Request $request)
@@ -131,6 +171,28 @@ class MainAPIController extends Controller
             ];
             return response()->json($data, 404);
         }
+    }
+
+    public function forget(Request $request, $email)
+    {
+        if ($email == "") {
+            $data = [
+                "Message" => "Email is required",
+                "status" => "fail",
+            ];
+            return response()->json($data, 500);
+        }
+        $User = User::where('email', $email)->first();
+        if ($User) {
+
+        } else {
+            $data = [
+                "Message" => "Email Not Found",
+                "status" => "fail",
+            ];
+            return response()->json($data, 404);
+        }
+
     }
 
     public function areaalerts(Request $request, $area_id)
