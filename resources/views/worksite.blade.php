@@ -165,7 +165,12 @@
                                     <h5>Upload an image / Video </h5>
                                     <form id="imageuploadtab">
                                         <input type="file" id="fileInput" accept="image/*" multiple>
-                                        <button type="submit">Upload Files</button>
+                                        <button type="submit" style="background: #14173A;
+                                        border-radius: 10px 10px 0 0;
+                                        color: white;
+                                        padding: 7px 20px 7px 20px;
+                                        border: 0;
+                                        margin: 0 15px 0 0;">Upload Files</button>
                                     </form>
                                     <script>
                                         document.getElementById('imageuploadtab').addEventListener('submit', function(event) {
