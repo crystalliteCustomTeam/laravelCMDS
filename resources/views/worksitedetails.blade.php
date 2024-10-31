@@ -21,10 +21,12 @@
                             <div class="row">
                                 <div class="col">
                                     <input type="hidden" name="siteId" value="{{ $WORKSITE->id }}">
-                                    <input type="hidden" name="FeaturedImage" value="{{ asset($WORKSITE->FeaturedImage) }}" id="FeaturedImage"  /> 
-                                    <img src="{{ asset($WORKSITE->FeaturedImage) }}" id="FeaturedImageSRC" width="100px" height="100px" style="width: 100px; height:100px; border-radius:50%" />
+                                    <input type="hidden" name="FeaturedImage" value="{{ asset($WORKSITE->FeaturedImage) }}"
+                                        id="FeaturedImage" />
+                                    <img src="{{ asset($WORKSITE->FeaturedImage) }}" id="FeaturedImageSRC" width="100px"
+                                        height="100px" style="width: 100px; height:100px; border-radius:50%" />
                                     <button type="button" id="FeaturedImageBTN" data-bs-toggle="modal"
-                                    data-bs-target="#exampleModal3" type="button">Select Images </button>
+                                        data-bs-target="#exampleModal3" type="button">Select Images </button>
                                 </div>
                                 <div class="col">
                                     <label for="">Site Name</label>
@@ -32,21 +34,26 @@
                                 </div>
                                 <div class="col">
                                     <label for="">Site Description</label>
-                                    <input type="text" class="form-control" name="description" value="{{ $WORKSITE->Description }}">
+                                    <input type="text" class="form-control" name="description"
+                                        value="{{ $WORKSITE->Description }}">
                                 </div>
                                 <div class="col">
                                     <label for="">Start Date</label>
-                                    <input type="date" class="form-control" name="startDate" value="{{ $WORKSITE->Start_Date }}">
-            
+                                    <input type="date" class="form-control" name="startDate"
+                                        value="{{ $WORKSITE->Start_Date }}">
+
                                 </div>
                                 <div class="col">
                                     <label for="">End Date</label>
-                                    <input type="date" class="form-control" name="enddate" value="{{ $WORKSITE->End_Date }}">
-                   
+                                    <input type="date" class="form-control" name="enddate"
+                                        value="{{ $WORKSITE->End_Date }}">
+
                                 </div>
                                 <div class="col-12 mt-3" style="display: flex;justify-content: flex-end;">
-                                    <input type="submit" value="Edit"  style="background: #14173A;border-radius: 10px;color: white;padding: 7px 20px 7px 20px;border: 0;margin-right:5px">
-                                    <button data-bs-toggle="modal" data-bs-target="#exampleModal" type="button">Create Areas</button>
+                                    <input type="submit" value="Edit"
+                                        style="background: #14173A;border-radius: 10px;color: white;padding: 7px 20px 7px 20px;border: 0;margin-right:5px">
+                                    <button data-bs-toggle="modal" data-bs-target="#exampleModal" type="button">Create
+                                        Areas</button>
                                 </div>
                             </div>
                         </form>
@@ -97,21 +104,30 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @for ($i = 0; $i < 6; $i++)
-                                    <tr>
-                                        <td>01/24/2024</td>
-                                        <td>No Helmet</td>
-                                        <td>Low</td>
-                                        <td>Area {{ $i + 1 }}</td>
-                                        <td><button><i class="fa-solid fa-eye"></i></button></td>
-                                    </tr>
-                                @endfor
+
+                                @if ($frontalert)
+                                    @foreach ($frontalert as $fal)
+                                        @foreach ($fal as $fa)
+                                        <tr>
+                                            <td>{{ $fa->created_at }}</td>
+                                            <td>{{ $fa->description }}</td>
+                                            <td>{{ $fa->risk_level }}</td>
+                                            <td>Area {{ $fa->area_code}}</td>
+                                            <td><button onclick="viewpage({{ $fa->captured_image_url }})" ><i class="fa-solid fa-eye"></i></button></td>
+                                        </tr>
+                                        @endforeach
+                                    @endforeach
+                                @endif
+                                
                             </tbody>
                         </table>
+                        <script>
+                            function viewpage(src){
+                                window.location.href = src;
+                            }
+                        </script>
                         <div class="main_loadmore-btn">
-                            <button class="load-more">
-                                Load More
-                            </button>
+
                         </div>
                     </div>
                 </div>

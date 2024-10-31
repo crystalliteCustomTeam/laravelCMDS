@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Alerts;
 use App\Models\Area;
 use App\Models\AreaUser;
 use App\Models\AssignCheckpoint;
@@ -168,9 +169,17 @@ class MainController extends Controller
             ->get();
 
         $Areas = Area::where('CreateBy', $user->id)->where('WSID', $worksiteID)->get();
+        $frontalert = [];
+        foreach($Areas as $area){
+            $Alerts = Alerts::where('area_code',$area->id)->get();
+            array_push($frontalert,$Alerts);
+        }
+
+      
+
         $allImages = Image::where('save_image_by', $user->id)->get();
 
-        return view('worksitedetails', ["PAGE_TITLE" => "WORKSITE DETAIL", "USERNAME" => $user->name, 'WORKSITE' => $worksite, 'USERS' => $usersData, 'Areas' => $Areas, "UFM" => $usermetaFM, "Images" => $allImages]);
+        return view('worksitedetails', ["PAGE_TITLE" => "WORKSITE DETAIL", "USERNAME" => $user->name, 'WORKSITE' => $worksite, 'USERS' => $usersData, 'Areas' => $Areas, "UFM" => $usermetaFM, "Images" => $allImages ,"frontalert" => $frontalert]);
     }
 
     public function worksiteEdit(Request $request)
