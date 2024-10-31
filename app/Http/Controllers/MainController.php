@@ -254,7 +254,7 @@ class MainController extends Controller
         $areaDetail = Area::where('CreateBy', $loginUser->id)->where('id', $area)->first();
         $users = AreaUser::where('ARID', $area)
             ->join('users', 'users.id', '=', 'areausers.WSID')
-            ->select('users.name as UName', 'users.id as UID', 'AreaUsers.id as ARUID')
+            ->select('users.name as UName', 'users.id as UID', 'areausers.id as ARUID')
             ->get();
         $Allusers = User::join('usermeta', 'users.id', '=', 'usermeta.userId')->where('usermeta.role', '!=', 0)->where('usermeta.createBy', $loginUser->id)
             ->select('users.*', 'users.id as UID', 'usermeta.id as UMID')
