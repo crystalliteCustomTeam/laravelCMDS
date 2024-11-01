@@ -37,12 +37,12 @@
                                                         <li>
                                                             <span><img src="{{ asset('assets/images/black-user.png') }}"
                                                                     alt=""></span>
-                                                            <span>50</span>
+                                                            <span>{{ $SITE->area_users_count }}</span>
                                                         </li>
                                                         <li>
                                                             <span><img src="{{ asset('assets/images/black-alarm.png') }}"
                                                                     alt=""></span>
-                                                            <span>10</span>
+                                                            <span> {{ count_notifications($SITE->id) }}</span>
                                                         </li>
                                                         <li>
                                                             <span><img src="{{ asset('assets/images/near-mises.png') }}"
@@ -52,7 +52,7 @@
                                                         <li>
                                                             <span><img src="{{ asset('assets/images/accidents.png') }}"
                                                                     alt=""></span>
-                                                            <span>10</span>
+                                                            <span>{{ countalert($SITE->id) }}</span>
                                                         </li>
                                                     </ul>
                                                 </div>

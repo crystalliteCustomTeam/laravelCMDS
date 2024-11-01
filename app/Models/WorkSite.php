@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\AreaUser;
+use App\Models\Notification;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -16,6 +18,17 @@ class WorkSite extends Model
         'End_Date',
         'Description',
         'FeaturedImage',
-        'CreateBy'
+        'CreateBy',
     ];
+
+    public function areaUsers()
+    {
+        return $this->hasMany(AreaUser::class, 'WSID', 'id');
+    }
+
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class, 'WSID', 'id')
+            ->whereJsonContains('WSID', $this->id);
+    }
 }

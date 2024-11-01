@@ -143,7 +143,9 @@ class MainController extends Controller
 
         $user = Auth::user();
         $usermetaFM = UserMeta::where('userId', $user->id)->select('featuredImage')->first();
-        $allsites = WorkSite::where('CreateBy', $user->id)->get();
+        $allsites = WorkSite::where('CreateBy', $user->id)
+            ->withCount('areaUsers') // Count of AreaUsers
+            ->get();
         $allImages = Image::where('save_image_by', $user->id)->get();
 
         // $usersCount = AreaUser::select('areas.*', 'areausers.id as AreaID', DB::raw('COUNT(areausers.id) as USERSCOUNT'))
@@ -155,6 +157,22 @@ class MainController extends Controller
 
         return view('worksite', ["PAGE_TITLE" => "WORKSITE", "USERNAME" => $user->name, "SITES" => $allsites, "Images" => $allImages, "UFM" => $usermetaFM]);
 
+    }
+
+    public function countNotification($id){
+        $count = Notification::whereJsonContains('WSID', (string) $id)->count();
+        return $count;
+    }
+
+    public function countalert($id){
+
+        $count = Area::where('WSID', $id)->first();
+        if($count != null){
+            $alertCount = Alerts::where('area_code',$count->id)->count();
+            return $alertCount;
+        }
+        return 0;
+        
     }
 
     public function singleworksite(Request $request, $worksiteID)
@@ -170,16 +188,14 @@ class MainController extends Controller
 
         $Areas = Area::where('CreateBy', $user->id)->where('WSID', $worksiteID)->get();
         $frontalert = [];
-        foreach($Areas as $area){
-            $Alerts = Alerts::where('area_code',$area->id)->get();
-            array_push($frontalert,$Alerts);
+        foreach ($Areas as $area) {
+            $Alerts = Alerts::where('area_code', $area->id)->get();
+            array_push($frontalert, $Alerts);
         }
-
-      
 
         $allImages = Image::where('save_image_by', $user->id)->get();
 
-        return view('worksitedetails', ["PAGE_TITLE" => "WORKSITE DETAIL", "USERNAME" => $user->name, 'WORKSITE' => $worksite, 'USERS' => $usersData, 'Areas' => $Areas, "UFM" => $usermetaFM, "Images" => $allImages ,"frontalert" => $frontalert]);
+        return view('worksitedetails', ["PAGE_TITLE" => "WORKSITE DETAIL", "USERNAME" => $user->name, 'WORKSITE' => $worksite, 'USERS' => $usersData, 'Areas' => $Areas, "UFM" => $usermetaFM, "Images" => $allImages, "frontalert" => $frontalert]);
     }
 
     public function worksiteEdit(Request $request)
@@ -259,6 +275,7 @@ class MainController extends Controller
         $Allusers = User::join('usermeta', 'users.id', '=', 'usermeta.userId')->where('usermeta.role', '!=', 0)->where('usermeta.createBy', $loginUser->id)
             ->select('users.*', 'users.id as UID', 'usermeta.id as UMID')
             ->get();
+
         return view('areaedit', ["PAGE_TITLE" => "AREA DETAIL EDIT", "USERNAME" => $loginUser->name, 'Areas' => $areaDetail, 'AreaUsers' => $users, 'ALLUSERS' => $Allusers, "UFM" => $usermetaFM]);
     }
 
@@ -317,7 +334,6 @@ class MainController extends Controller
                 }
             }
 
-
             $firebaseData = [
                 "title" => $resp->title,
                 "MESSAGE" => $resp->message,
@@ -326,9 +342,7 @@ class MainController extends Controller
                 "USERS" => json_encode($setusers),
             ];
 
-
             $ch = curl_init('https://dashboard.vnexia.com/api/sendnotification');
-
 
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); // Return the response as a string
             curl_setopt($ch, CURLOPT_POST, true); // Set the request method to POST
@@ -348,7 +362,6 @@ class MainController extends Controller
                     echo "Failed to send data. Status Code: " . $httpCode . ". Response: " . $response;
                 }
             }
-
 
             curl_close($ch);
 
