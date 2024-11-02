@@ -10,6 +10,7 @@ use App\Models\Checkpoints;
 use App\Models\Image;
 use App\Models\Notification;
 use App\Models\Safety;
+use App\Models\SafetyView;
 use App\Models\Settings;
 use App\Models\User;
 use App\Models\UserMeta;
@@ -362,7 +363,7 @@ class MainAPIController extends Controller
         }
         $User = User::where('email', $email)->first();
         if ($User) {
-            $Safety = Safety::all();
+            $Safety = Safety::join('safetyview', 'safetyview.safetyID', '=', 'safety.id')->get();
             $data = [
                 "data" => $Safety,
                 "status" => "success",
@@ -750,5 +751,62 @@ class MainAPIController extends Controller
         $url = '/' . date('i:h:s') . '-alerts/';
         $response = $this->firebaseService->setData($url, $data);
         return response()->json($response);
+    }
+
+    public function safetyview(Request $request)
+    {
+        $email = $request['email'];
+        if ($email == "") {
+            $data = [
+                "Message" => "Email is required",
+                "status" => "fail",
+            ];
+            return response()->json($data, 500);
+        }
+        $User = User::where('email', $email)->first();
+        if ($User) {
+            $safetyID = $request['safetyID'];
+            $userId = $request['userId'];
+            $SafetyView = SafetyView::create([
+                "safetyID" => $safetyID,
+                "userId" => $userId,
+            ]);
+            if ($SafetyView == "") {
+                $data = [
+                    "Message" => "View Added",
+                    "status" => "success",
+                ];
+                return response()->json($data, 200);
+            }
+        } else {
+            $data = [
+                "Message" => "Email Not Found",
+                "status" => "fail",
+            ];
+            return response()->json($data, 404);
+        }
+    }
+
+    public function safetyuserCount(Request $request, $id)
+    {
+
+        $User = SafetyView::where('safetyID', $id)->first();
+        if ($User) {
+            $usersMeta = $request['safetyID'];
+            $SafetyView = UserMeta::where('userId',$id)->get();
+
+            $data = [
+                "Message" => $SafetyView,
+                "status" => "success",
+            ];
+            return response()->json($data, 200);
+
+        } else {
+            $data = [
+                "Message" => "Id Not Found",
+                "status" => "fail",
+            ];
+            return response()->json($data, 404);
+        }
     }
 }

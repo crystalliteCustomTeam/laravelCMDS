@@ -26,6 +26,9 @@ Route::post('/password/reset', [MainAPIController::class, 'resetPassword']);
 Route::get('/settings/{email}',[MainAPIController::class,'settings']);
 Route::post('/settings/update',[MainAPIController::class,'settingsUpdate']);
 
+Route::post('/safety/views',[MainAPIController::class,'safetyview']);
+Route::get('/safety/views/{id}',[MainAPIController::class,'safetyuserCount']);
+
 Route::get('/safety/guidelines/{email}',[MainAPIController::class,'safetyguideline']);
 Route::get('/safety/guidelines/details/{id}',[MainAPIController::class,'safetyguidelineDetails']);
 Route::get('/checkout/details/{email}',[MainAPIController::class,'checkoutMobile']);
