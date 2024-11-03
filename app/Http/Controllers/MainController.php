@@ -35,8 +35,27 @@ class MainController extends Controller
             ->groupBy('worksite.Name')
             ->get();
 
-        
         return view('dashboard', ["PAGE_TITLE" => "DASHBOARD", "USERNAME" => $user->name, "USERCOUNT" => $userCount, 'WORKSITE_COUNT' => $ws_count, "NotificationCount" => $NotificationCount, "UFM" => $usermetaFM, 'RISKS' => $alerts]);
+    }
+
+    public function getAlertsData()
+    {
+        // Count alerts grouped by the day of the week
+        $alerts = DB::table('alerts')
+            ->select(DB::raw('DAYNAME(created_at) as day'), DB::raw('COUNT(*) as count'))
+            ->groupBy('day')
+            ->pluck('count', 'day')
+            ->toArray();
+
+// Set default values for each day of the week
+        $daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+        $data = [];
+
+        foreach ($daysOfWeek as $day) {
+            $data[$day] = $alerts[$day] ?? 0; // Use 0 if there are no alerts for a day
+        }
+
+        return response()->json($data);
     }
 
     public function GetAllUser(Request $request)
@@ -161,20 +180,22 @@ class MainController extends Controller
 
     }
 
-    public function countNotification($id){
+    public function countNotification($id)
+    {
         $count = Notification::whereJsonContains('WSID', (string) $id)->count();
         return $count;
     }
 
-    public function countalert($id){
+    public function countalert($id)
+    {
 
         $count = Area::where('WSID', $id)->first();
-        if($count != null){
-            $alertCount = Alerts::where('area_code',$count->id)->count();
+        if ($count != null) {
+            $alertCount = Alerts::where('area_code', $count->id)->count();
             return $alertCount;
         }
         return 0;
-        
+
     }
 
     public function singleworksite(Request $request, $worksiteID)

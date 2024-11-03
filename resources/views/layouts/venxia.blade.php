@@ -153,8 +153,32 @@
 
 
     <script>
-        var xValues = ["Mon", "Tue", "Wed", "Thu", "Fri"];
-        var yValues = [0, 15, 1, 5, 8];
+        var xValuesJS = ["Mon", "Tue", "Wed", "Thu", "Fri"];
+        var yValuesJS = [];
+
+        fetch('{{ route("alertchart") }}')
+            .then(response => response.json())
+            .then(data => {
+                xValuesJS.forEach(day => {
+                    // Convert abbreviated day names to full day names
+                    let fullDayName = {
+                        "Mon": "Monday",
+                        "Tue": "Tuesday",
+                        "Wed": "Wednesday",
+                        "Thu": "Thursday",
+                        "Fri": "Friday"
+                    } [day];
+
+                    // Push the count for each day (0 if no alerts for that day)
+                    yValues.push(data[fullDayName] || 0);
+                });
+
+                
+            })
+            .catch(error => console.error('Error fetching data:', error));
+        console.log(yValuesJS);
+        var xValues = xValuesJS;
+        var yValues = yValuesJS;
         var barColors = ["#004FFF", "#004FFF", "#004FFF", "#004FFF", "#004FFF"];
 
         new Chart("myChart", {
