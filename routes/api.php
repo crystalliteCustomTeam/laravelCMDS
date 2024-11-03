@@ -35,6 +35,7 @@ Route::get('/checkout/details/{email}',[MainAPIController::class,'checkoutMobile
 Route::post('/sendnotification',[MainAPIController::class,'writeUserData']);
 Route::post('/login', [MainAPIController::class, 'login']);
 Route::post('/logout', [MainAPIController::class, 'logout'])->middleware('auth:sanctum');
+Route::post('/user/delete', [MainAPIController::class, 'deleteuser']);
 
 Route::get('/media/{email}',[MainAPIController::class,'mediaMobile']);
 

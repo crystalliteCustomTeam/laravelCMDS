@@ -1,5 +1,6 @@
 <?php
 
+
 namespace App\Http\Controllers;
 
 use App\Models\Alerts;
@@ -793,7 +794,7 @@ class MainAPIController extends Controller
         $User = SafetyView::where('safetyID', $id)->first();
         if ($User) {
             $usersMeta = $request['safetyID'];
-            $SafetyView = UserMeta::where('userId',$id)->get();
+            $SafetyView = UserMeta::where('userId', $id)->get();
 
             $data = [
                 "Message" => $SafetyView,
@@ -805,6 +806,26 @@ class MainAPIController extends Controller
             $data = [
                 "Message" => "Id Not Found",
                 "status" => "fail",
+            ];
+            return response()->json($data, 404);
+        }
+    }
+
+    public function deleteuser(Request $request)
+    {
+        $id = $request['userID'];
+        $user = User::where('id',$id)->first();
+        if($user){
+            User::where('id',$id)->delete();
+            $data = [
+                "message" => "User Delete",
+                "status" => "success"
+            ];
+            return response()->json($data, 200);
+        }else{
+            $data = [
+                "message" => "User Not Found",
+                "status" => "fail"
             ];
             return response()->json($data, 404);
         }
