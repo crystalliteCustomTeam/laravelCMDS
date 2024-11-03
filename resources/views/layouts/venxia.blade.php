@@ -154,7 +154,7 @@
 
     <script>
         var xValues = ["Mon", "Tue", "Wed", "Thu", "Fri"];
-        var yValues = [450, 100, 350, 410, 480];
+        var yValues = [0, 15, 1, 5, 8];
         var barColors = ["#004FFF", "#004FFF", "#004FFF", "#004FFF", "#004FFF"];
 
         new Chart("myChart", {

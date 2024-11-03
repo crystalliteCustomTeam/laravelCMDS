@@ -34,6 +34,8 @@ class MainController extends Controller
             ->join('alerts', 'alerts.area_code', '=', 'areas.id')
             ->groupBy('worksite.Name')
             ->get();
+
+        
         return view('dashboard', ["PAGE_TITLE" => "DASHBOARD", "USERNAME" => $user->name, "USERCOUNT" => $userCount, 'WORKSITE_COUNT' => $ws_count, "NotificationCount" => $NotificationCount, "UFM" => $usermetaFM, 'RISKS' => $alerts]);
     }
 
