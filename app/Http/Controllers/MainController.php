@@ -437,6 +437,10 @@ class MainController extends Controller
     public function guide(Request $request)
     {
         $loginUser = Auth::user();
+        $checkuser = UserMeta::where('userId', $loginUser->id)->first();
+        if($checkuser == 1){
+            return redirect('dashboard');
+        }
         $usermetaFM = UserMeta::where('userId', $loginUser->id)->select('featuredImage')->first();
         $checkpoint = Checkpoints::where('CreatedBy', $loginUser->id)->get();
         $Safety = Safety::where('CreatedBy', $loginUser->id)->get();
