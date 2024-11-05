@@ -451,6 +451,10 @@ class MainController extends Controller
     public function checkpoint(Request $request)
     {
         $loginUser = Auth::user();
+        $checkuser = UserMeta::where('userId', $loginUser->id)->first();
+        if($checkuser->role == 1 || $checkuser->role == 2){
+            return redirect('dashboard');
+        }
         $usermetaFM = UserMeta::where('userId', $loginUser->id)->select('featuredImage')->first();
         $checkpoint = Checkpoints::where('CreatedBy', $loginUser->id)->get();
         $allImages = Image::where('save_image_by', $loginUser->id)->get();
