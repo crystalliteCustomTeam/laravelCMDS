@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
+use Illuminate\Support\Carbon;
 
 class MainAPIController extends Controller
 {
@@ -299,9 +300,13 @@ class MainAPIController extends Controller
         $User = User::where('email', $email)->first();
 
         if ($User) {
-            $WorkSite = WorkSite::all();
+            $WorkSite = WorkSite::whereDate('created_at', Carbon::today())->get();
+            $upcomming = WorkSite::where('created_at', '>', Carbon::today())->get();
             $data = [
-                "data" => $WorkSite,
+                "data" => [
+                    "today" => $WorkSite,
+                    "upcomming" => $upcomming
+                ],
                 "status" => "success",
             ];
             return response()->json($data, 200);
