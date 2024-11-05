@@ -438,7 +438,7 @@ class MainController extends Controller
     {
         $loginUser = Auth::user();
         $checkuser = UserMeta::where('userId', $loginUser->id)->first();
-        if($checkuser == 1){
+        if($checkuser->role == 1){
             return redirect('dashboard');
         }
         $usermetaFM = UserMeta::where('userId', $loginUser->id)->select('featuredImage')->first();
