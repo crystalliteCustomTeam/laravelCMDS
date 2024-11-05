@@ -445,6 +445,8 @@ class MainAPIController extends Controller
             ], 401);
         }
 
+        $USERMETA = UserMeta::where('userId',$user->id)->first();
+
         // Generate a token for the user
         // $token = $user->createToken('mobile-app-token')->plainTextToken;
         $token = $user->createToken('mobile-app-token');
@@ -453,6 +455,7 @@ class MainAPIController extends Controller
         return response()->json([
             'token' => $token->plainTextToken,
             'user' => $user,
+            'meta' =>$USERMETA
         ]);
     }
 
