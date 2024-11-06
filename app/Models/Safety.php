@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Models;
-
+use App\Models\SafetyView;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -14,6 +14,11 @@ class Safety extends Model
         'Images',
         'title',
         'description',
-        'CreatedBy'
+        'CreatedBy',
     ];
+
+    public function safetyView()
+    {
+        return $this->hasOne(SafetyView::class, 'safetyID', 'id');
+    }
 }
