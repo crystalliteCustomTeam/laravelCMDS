@@ -345,7 +345,7 @@ class MainAPIController extends Controller
 
     }
 
-    public function worksiteMobilewitharea()
+    public function worksiteMobilewitharea(Request $request,$email)
     {
         if ($email == "") {
             $data = [
