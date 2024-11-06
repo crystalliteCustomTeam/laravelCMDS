@@ -394,10 +394,19 @@ class MainAPIController extends Controller
         $User = User::where('email', $email)->first();
         if ($User) {
             $Safety = Safety::join('safetyview', 'safetyview.safetyID', '=', 'safety.id')->get();
-            $data = [
-                "data" => $Safety,
-                "status" => "success",
-            ];
+            if(Count($Safety) > 0 ){
+                $data = [
+                    "data" => $Safety,
+                    "status" => "success",
+                ];
+            }else{
+                $Safety = Safety::all();
+                $data = [
+                    "data" => $Safety,
+                    "status" => "success",
+                ];
+            }
+           
             return response()->json($data, 200);
         } else {
             $data = [
