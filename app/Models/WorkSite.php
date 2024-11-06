@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\AreaUser;
+use App\Models\Area;
 use App\Models\Notification;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -30,5 +31,10 @@ class WorkSite extends Model
     {
         return $this->hasMany(Notification::class, 'WSID', 'id')
             ->whereJsonContains('WSID', $this->id);
+    }
+
+    public function areas()
+    {
+        return $this->hasMany(Area::class, 'WSID', 'id');
     }
 }

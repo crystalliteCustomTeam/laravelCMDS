@@ -14,6 +14,7 @@ Route::get('/areas/{area_id}/device', [MainAPIController::class,'areadevice']);
 
 
 Route::get('/worksite/{email}',[MainAPIController::class,'worksiteMobile']);
+Route::get('/worksite/with/area/{email}',[MainAPIController::class,'worksiteMobilewitharea']);
 Route::get('/profile/{email}',[MainAPIController::class,'profileMobile']);
 Route::post('/profile/update',[MainAPIController::class,'profileupdate']);
 Route::get('/worksite/{id}/details',[MainAPIController::class,'worksiteMobiledetails']);

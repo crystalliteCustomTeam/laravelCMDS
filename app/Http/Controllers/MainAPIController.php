@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Http\Controllers;
 
 use App\Models\Alerts;
@@ -18,11 +17,11 @@ use App\Models\UserMeta;
 use App\Models\WorkSite;
 use App\Services\FirebaseService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
-use Illuminate\Support\Carbon;
 
 class MainAPIController extends Controller
 {
@@ -305,7 +304,7 @@ class MainAPIController extends Controller
             $data = [
                 "data" => [
                     "today" => $WorkSite,
-                    "upcomming" => $upcomming
+                    "upcomming" => $upcomming,
                 ],
                 "status" => "success",
             ];
@@ -344,6 +343,30 @@ class MainAPIController extends Controller
             return response()->json($data, 200);
         }
 
+    }
+
+    public function worksiteMobilewitharea()
+    {
+        if ($email == "") {
+            $data = [
+                "Message" => "Email is required",
+                "status" => "fail",
+            ];
+            return response()->json($data, 500);
+        }
+        $User = User::where('email', $email)->first();
+
+        if ($User) {
+            $workSites = WorkSite::with('areas')->get();
+            $data = WorkSiteResource::collection($workSites);
+            return response()->json($data, 200);
+        } else {
+            $data = [
+                "Message" => "Email Not Found",
+                "status" => "fail",
+            ];
+            return response()->json($data, 404);
+        }
     }
 
     public function allcommunication(Request $request)
@@ -450,7 +473,7 @@ class MainAPIController extends Controller
             ], 401);
         }
 
-        $USERMETA = UserMeta::where('userId',$user->id)->first();
+        $USERMETA = UserMeta::where('userId', $user->id)->first();
 
         // Generate a token for the user
         // $token = $user->createToken('mobile-app-token')->plainTextToken;
@@ -460,7 +483,7 @@ class MainAPIController extends Controller
         return response()->json([
             'token' => $token->plainTextToken,
             'user' => $user,
-            'meta' =>$USERMETA
+            'meta' => $USERMETA,
         ]);
     }
 
@@ -822,24 +845,20 @@ class MainAPIController extends Controller
     public function deleteuser(Request $request)
     {
         $id = $request['userID'];
-        $user = User::where('id',$id)->first();
-        if($user){
-            User::where('id',$id)->delete();
+        $user = User::where('id', $id)->first();
+        if ($user) {
+            User::where('id', $id)->delete();
             $data = [
                 "message" => "User Delete",
-                "status" => "success"
+                "status" => "success",
             ];
             return response()->json($data, 200);
-        }else{
+        } else {
             $data = [
                 "message" => "User Not Found",
-                "status" => "fail"
+                "status" => "fail",
             ];
             return response()->json($data, 404);
         }
     }
 }
-
-
-
-
