@@ -438,7 +438,8 @@ class MainController extends Controller
     {
         $loginUser = Auth::user();
         $checkuser = UserMeta::where('userId', $loginUser->id)->first();
-        if($checkuser->role == 1 || $checkuser->role == 2){
+        $role =  $checkuser->role ?? 0;
+        if($role == 1 || $role == 2){
             return redirect('dashboard')->with('error', 'No access');
         }
         $usermetaFM = UserMeta::where('userId', $loginUser->id)->select('featuredImage')->first();
@@ -452,13 +453,17 @@ class MainController extends Controller
     {
         $loginUser = Auth::user();
         $checkuser = UserMeta::where('userId', $loginUser->id)->first();
-        if($checkuser->role == 1 || $checkuser->role == 2){
+        $role =  $checkuser->role ?? 0;
+        if($role == 1 || $role == 2){
             return redirect('dashboard')->with('error', 'No access');
         }
-        $usermetaFM = UserMeta::where('userId', $loginUser->id)->select('featuredImage')->first();
-        $checkpoint = Checkpoints::where('CreatedBy', $loginUser->id)->get();
-        $allImages = Image::where('save_image_by', $loginUser->id)->get();
-        return view('checkpoints', ["PAGE_TITLE" => "CHECKPOINTS", "USERNAME" => $loginUser->name, "checkpoint" => $checkpoint, "Images" => $allImages, "UFM" => $usermetaFM]);
+ 
+            $usermetaFM = UserMeta::where('userId', $loginUser->id)->select('featuredImage')->first();
+            $checkpoint = Checkpoints::where('CreatedBy', $loginUser->id)->get();
+            $allImages = Image::where('save_image_by', $loginUser->id)->get();
+            return view('checkpoints', ["PAGE_TITLE" => "CHECKPOINTS", "USERNAME" => $loginUser->name, "checkpoint" => $checkpoint, "Images" => $allImages, "UFM" => $usermetaFM]);
+        
+       
     }
 
     public function checkpointCreate(Request $request)
