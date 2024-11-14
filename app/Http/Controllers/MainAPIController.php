@@ -198,6 +198,33 @@ class MainAPIController extends Controller
 
     }
 
+    public function getCodeWiseAlert(Request $request)
+    {
+        if ($request->alert_code == "") {
+            $data = [
+                "Message" => "Alert Code is Required",
+                "status" => "fail",
+            ];
+            return response()->json($data, 500);
+        }
+
+        $alerts = Alerts::where('alert_code', $request->alert_code)->get();
+
+        if ($alerts->isEmpty()) {
+            $data = [
+                "Message" => "No alerts found for the provided alert code",
+                "status" => "not_found",
+            ];
+            return response()->json($data, 404);
+        }
+
+        $data = [
+            "data" => $alerts,
+            "status" => "success",
+        ];
+        return response()->json($data, 200);
+    }
+
     public function areaalerts(Request $request, $area_id)
     {
         if ($area_id == "") {
@@ -382,6 +409,37 @@ class MainAPIController extends Controller
         }
     }
 
+    public function readCommunication(Request $request)
+    {
+        if ($request->notification_id == "") {
+            $data = [
+                "Message" => "Notification ID is Required",
+                "status" => "fail",
+            ];
+            return response()->json($data, 500);
+        }
+
+        $notification = Notification::find($request->notification_id);
+
+        if ($notification) {
+            $notification->is_read = 1;
+            $notification->save();
+
+            $data = [
+                "data" => $notification,
+                "status" => "success",
+                "Message" => "Notification marked as read",
+            ];
+            return response()->json($data, 200);
+        } else {
+            $data = [
+                "Message" => "Notification not found",
+                "status" => "not_found",
+            ];
+            return response()->json($data, 404);
+        }
+    }
+
     public function safetyguideline(Request $request, $email)
     {
         if ($email == "") {
@@ -406,7 +464,7 @@ class MainAPIController extends Controller
                     "status" => "success",
                 ];
             }
-           
+
             return response()->json($data, 200);
         } else {
             $data = [

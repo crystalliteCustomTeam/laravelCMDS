@@ -8,6 +8,7 @@ use App\Http\Controllers\MainAPIController;
 
 Route::post('/devices/validate', [MainAPIController::class,"validate"]);
 Route::get('/areas/{area_id}/live-feed', [MainAPIController::class,'livefeed']);
+Route::get('/areas_code/alerts', [MainAPIController::class,'getCodeWiseAlert']);
 Route::post('/areas/{area_id}/alerts', [MainAPIController::class,'areaalerts']);
 Route::get('/worksites/{worksite_id}/alerts', [MainAPIController::class,'worksitealerts']);
 Route::get('/areas/{area_id}/device', [MainAPIController::class,'areadevice']);
@@ -19,6 +20,7 @@ Route::get('/profile/{email}',[MainAPIController::class,'profileMobile']);
 Route::post('/profile/update',[MainAPIController::class,'profileupdate']);
 Route::get('/worksite/{id}/details',[MainAPIController::class,'worksiteMobiledetails']);
 Route::get('/communication',[MainAPIController::class,'allcommunication']);
+Route::get('/communication/status',[MainAPIController::class,'readCommunication']);
 Route::post('/communication/create/',[MainAPIController::class,'createcommunication']);
 Route::get('/notifications/{email}',[MainAPIController::class,'alerts']);
 Route::post('/password/forgot', [MainAPIController::class, 'forgotPassword']);
