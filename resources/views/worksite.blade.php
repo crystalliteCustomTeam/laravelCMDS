@@ -260,7 +260,7 @@
     </div>
 
     {{-- end of Gallary modal  --}}
-    <script>
+    {{--<script>
         function selectImage(imagePath) {
             $("#FeaturedImage").val(imagePath);
             let ImageURL = window.location.origin + "/" + imagePath;
@@ -274,6 +274,54 @@
             exampleModal.style.display = 'block';
             $('.modal-backdrop').show();
         }
+    </script>--}}
+
+    <script>
+        function selectImage(imagePath) {
+            // Set the selected image value
+            $("#FeaturedImage").val(imagePath);
+            let ImageURL = window.location.origin + "/" + imagePath;
+            $("#FeaturedImageSRC").attr('src', ImageURL).show();
+
+            // Close exampleModal3 (Gallery Modal)
+            const exampleModal3 = bootstrap.Modal.getInstance(document.getElementById('exampleModal3'));
+            if (exampleModal3) {
+                exampleModal3.hide();
+            }
+
+            // Remove any lingering backdrop after hiding exampleModal3
+            $('.modal-backdrop').remove();
+
+            // Open exampleModal (Work Site Modal) with a static backdrop to prevent outside clicks from closing it
+            const exampleModal = new bootstrap.Modal(document.getElementById('exampleModal'), {
+                backdrop: 'static', // Prevent closing by clicking outside
+                keyboard: false // Prevent closing by pressing ESC
+            });
+
+            exampleModal.show();
+
+            // Ensure the backdrop is removed after exampleModal is closed
+            $('#exampleModal').on('hidden.bs.modal', function () {
+                $('.modal-backdrop').remove(); // Manually remove any lingering backdrop
+            });
+        }
+
+        // Prevent modal close when clicking on the backdrop (for exampleModal)
+        $(document).on('click', '.modal-backdrop', function (e) {
+            // If the target clicked is not inside a modal content, prevent the modal close
+            if ($(e.target).closest('.modal-content').length === 0) {
+                e.stopPropagation(); // Prevent backdrop click from closing the modal
+            }
+        });
+
+        // When the user clicks outside the modal, we need to manually hide the backdrop
+        $(document).on('click', function (event) {
+            const modalElement = $('.modal.show');
+            if (!modalElement.is(event.target) && modalElement.has(event.target).length === 0) {
+                // Close any modal and remove the backdrop when clicked outside
+                $('.modal-backdrop').remove();
+            }
+        });
     </script>
 
     {{-- user Gallary  --}}

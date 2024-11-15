@@ -275,15 +275,19 @@ class MainAPIController extends Controller
 
     public function worksitealerts(Request $request, $worksite)
     {
+        $worksiteString = (string)$worksite;
 
         $Area = Area::where('WSID', $worksite)
             ->join('alerts', 'alerts.area_code', '=', 'areas.id')
             ->select('alerts.*', 'areas.id as AID')
             ->get();
 
-        if (count($Area) > 0) {
+        $notifications = Notification::whereRaw('JSON_CONTAINS(WSID, ?)', ["\"$worksiteString\""])->get();
+
+        if ($Area->isNotEmpty() || $notifications->isNotEmpty()) {
             $data = [
                 "alerts" => $Area,
+                "notifications" => $notifications,
                 "status" => "success",
             ];
             return response()->json($data, 200);
