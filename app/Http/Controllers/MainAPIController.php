@@ -698,7 +698,7 @@ class MainAPIController extends Controller
                 ];
                 $data = $request; // Example data
                 $url = '/' . date('i:h:s') . '-alerts/';
-                $response = $this->firebaseService->setData($url, $data);
+                $response = $this->firebaseService->setData($data);
 
                 $data = [
                     "Message" => "Notfication Created",

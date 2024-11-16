@@ -54,6 +54,8 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
+    'FIREBASE_PROJECT_ID' => env('FIREBASE_PROJECT_ID', ''),
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone
