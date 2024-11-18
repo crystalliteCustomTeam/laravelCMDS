@@ -534,6 +534,7 @@ class MainAPIController extends Controller
         $request->validate([
             'email' => 'required|email',
             'password' => 'required',
+            'fcm_token' => 'required'
         ]);
 
         // Check user credentials
@@ -544,6 +545,10 @@ class MainAPIController extends Controller
                 'message' => 'Invalid credentials',
             ], 401);
         }
+
+        // Update the user's FCM token
+        $user->fcm_token = $request->fcm_token;
+        $user->save();
 
         $USERMETA = UserMeta::where('userId', $user->id)->first();
 
@@ -698,11 +703,12 @@ class MainAPIController extends Controller
                 ];
                 $data = $request; // Example data
                 $url = '/' . date('i:h:s') . '-alerts/';
-                $response = $this->firebaseService->setData($data);
+                $response = $this->firebaseService->setData($data, $User);
 
                 $data = [
                     "Message" => "Notfication Created",
                     "status" => "success",
+                    "response" => $response
                 ];
                 return response()->json($data, 200);
             } else {
