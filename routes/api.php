@@ -6,10 +6,10 @@ use App\Http\Controllers\MainAPIController;
 
 
 
-Route::post('/devices/validate', [MainAPIController::class,"validate"]);
+Route::get('/devices/validate', [MainAPIController::class,"validate"]);
 Route::get('/areas/{area_id}/live-feed', [MainAPIController::class,'livefeed']);
 Route::get('/areas_code/alerts', [MainAPIController::class,'getCodeWiseAlert']);
-Route::post('/areas/{area_id}/alerts', [MainAPIController::class,'areaalerts']);
+Route::post('/areas/{area_id}/alerts', [MainAPIController::class,'areaalerts']); //Store data coming from device.
 Route::get('/worksites/{worksite_id}/alerts', [MainAPIController::class,'worksitealerts']);
 Route::get('/areas/{area_id}/device', [MainAPIController::class,'areadevice']);
 
