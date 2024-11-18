@@ -237,8 +237,9 @@ class MainAPIController extends Controller
         $alert_code = $request['alert_code'];
         $risk_level = $request['risk_level'];
         $description = $request['description'];
+        $worksite_id = $request['worksite_id'];
         $captured_image_url = $request['captured_image_url'];
-        if ($alert_code == "" || $risk_level == "" || $description == "" || $captured_image_url == "") {
+        if ($alert_code == "" || $risk_level == "" || $description == "" || $captured_image_url == "" || $worksite_id == "") {
             $data = [
                 "Message" => "alert_code, risk_level, description, captured_image_url is Required",
                 "status" => "fail",
@@ -261,14 +262,30 @@ class MainAPIController extends Controller
             "area_code" => $area_id,
             "risk_level" => $risk_level,
             "description" => $description,
+            "worksite_id" => $worksite_id ? $worksite_id : null,
             "captured_image_url" => $captured_image_url,
         ]);
 
+       $userData =  AreaUser::where('ARID', $area_id)
+            ->join('users', 'users.id', '=', 'areausers.UID')
+            ->select('users.fcm_token', 'users.id as UID', 'areausers.id as ARUID')
+            ->get();
+
         if ($Alerts) {
+            $resArr = [
+                'title' => $alert_code,
+                'MESSAGE' => 'Alert Code: ' . $alert_code . ' Area Code: ' . $area_id . ' '.$description,
+            ];
+
             $data = [
                 "Message" => "Alert Created",
                 "status" => "success",
             ];
+
+            foreach ($userData as $user) {
+                $this->firebaseService->setData($resArr, $user);
+            }
+
             return response()->json($data, 200);
         }
     }
