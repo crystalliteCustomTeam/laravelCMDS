@@ -266,12 +266,13 @@ class MainAPIController extends Controller
             "captured_image_url" => $captured_image_url,
         ]);
 
-       $userData =  AreaUser::where('ARID', $area_id)
-            ->join('users', 'users.id', '=', 'areausers.UID')
-            ->select('users.fcm_token', 'users.id as UID', 'areausers.id as ARUID')
-            ->get();
-
         if ($Alerts) {
+
+            $userData =  AreaUser::where('ARID', $area_id)
+                ->join('users', 'users.id', '=', 'areausers.UID')
+                ->select('users.fcm_token', 'users.id as UID', 'areausers.id as ARUID')
+                ->get();
+
             $resArr = [
                 'title' => $alert_code,
                 'MESSAGE' => 'Alert Code: ' . $alert_code . ' Area Code: ' . $area_id . ' '.$description,
