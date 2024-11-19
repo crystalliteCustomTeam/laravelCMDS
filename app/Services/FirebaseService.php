@@ -79,7 +79,7 @@ class FirebaseService
         return json_decode($response->getBody(), true);
     }*/
 
-    public function setData($data, $User='')
+    public function setData($data, $User='', $type='')
     {
         $url = "https://fcm.googleapis.com/v1/projects/{$this->firebaseProjectId}/messages:send";
         $accessToken = $this->getAccessToken();
@@ -90,6 +90,9 @@ class FirebaseService
                 "notification" => [
                     "title" => $data['title'],
                     "body" => $data['MESSAGE'],
+                ],
+                "data" => [
+                    "type" => $type
                 ],
             ],
         ];

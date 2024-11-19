@@ -283,7 +283,7 @@ class MainAPIController extends Controller
             ];
 
             foreach ($userData as $user) {
-                $this->firebaseService->setData($resArr, $user);
+                $this->firebaseService->setData($resArr, $user, 'sos');
             }
 
             return response()->json($data, 200);
@@ -720,7 +720,7 @@ class MainAPIController extends Controller
                 ];
                 $data = $request; // Example data
                 $url = '/' . date('i:h:s') . '-alerts/';
-                $response = $this->firebaseService->setData($data, $User);
+                $response = $this->firebaseService->setData($data, $User, 'normal');
 
                 $data = [
                     "Message" => "Notfication Created",
