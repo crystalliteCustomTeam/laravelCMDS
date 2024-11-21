@@ -725,19 +725,30 @@ class MainAPIController extends Controller
 
                 $users = json_decode($request['USERS'], true);
 
-                $response = [];
+                $successCount = 0;
+                $failureCount = 0;
+                $failedUsers = [];
+
                 if (is_array($users)) {
                     $userTokens = User::whereIn('id', $users)->whereNotNull('fcm_token')->get();
 
                     foreach ($userTokens as $userToken) {
                         $response = $this->firebaseService->setData($data, $userToken, 'normal'); //Send Firebase Cloud Messaging
+                        if (isset($response['name'])) {
+                            $successCount++;
+                        } else {
+                            $failureCount++;
+                            $failedUsers[] = $userToken->id;
+                        }
                     }
                 }
 
                 $data = [
                     "Message" => "Notification Created",
                     "status" => "success",
-                    "response" => $response
+                    "SuccessCount" => $successCount,
+                    "FailureCount" => $failureCount,
+                    "FailedUsers" => $failedUsers,
                 ];
                 return response()->json($data, 200);
             } else {
