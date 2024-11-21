@@ -24,9 +24,9 @@ class MainController extends Controller
 {
     protected $firebaseService;
 
-    public function __construct(FirebaseService $firebaseService)
+    public function __construct(FirebaseService $firebaseService = null)
     {
-        $this->firebaseService = $firebaseService;
+        $this->firebaseService = $firebaseService ?? new FirebaseService();
     }
 
     public function dashboard(Request $request)
@@ -276,11 +276,13 @@ class MainController extends Controller
 
         $AREAID = $request['AreaID'];
 
+        $workSiteId = Area::where('id', $AREAID)->select('WSID')->first();
+
         for ($i = 0; $i < Count($users); $i++) {
             AreaUser::create([
-                "WSID" => $users[$i],
+                "WSID" => $workSiteId->WSID,
                 "ARID" => $AREAID,
-                "UID" => $loginUser->id,
+                "UID" => $users[$i],
             ]);
         }
 
@@ -383,9 +385,9 @@ class MainController extends Controller
                 $userTokens = User::whereIn('id', $users)->whereNotNull('fcm_token')->get();
 
                 foreach ($userTokens as $userToken) {
-                    $response = $this->firebaseService->setData($firebaseData, $userToken, 'normal');
+                    $response = $this->firebaseService->setData($firebaseData, $userToken, 'normal'); //Send Firebase Cloud Messaging
 
-                    if ($response['status'] === 'success') {
+                    if (isset($response['name'])) {
                         $successCount++;
                     } else {
                         $failureCount++;
