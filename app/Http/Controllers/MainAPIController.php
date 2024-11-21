@@ -720,18 +720,29 @@ class MainAPIController extends Controller
                     "USERS" => json_encode($setusers),
                 ];
                 $data = $request; // Example data
-                $url = '/' . date('i:h:s') . '-alerts/';
-                $response = $this->firebaseService->setData($data, $User, 'normal');
+                /*$url = '/' . date('i:h:s') . '-alerts/';
+                $response = $this->firebaseService->setData($data, $User, 'normal');*/
+
+                $users = json_decode($request['USERS'], true);
+
+                $response = [];
+                if (is_array($users)) {
+                    $userTokens = User::whereIn('id', $users)->whereNotNull('fcm_token')->get();
+
+                    foreach ($userTokens as $userToken) {
+                        $response = $this->firebaseService->setData($data, $userToken, 'normal'); //Send Firebase Cloud Messaging
+                    }
+                }
 
                 $data = [
-                    "Message" => "Notfication Created",
+                    "Message" => "Notification Created",
                     "status" => "success",
                     "response" => $response
                 ];
                 return response()->json($data, 200);
             } else {
                 $data = [
-                    "Message" => "Notfication Is Not Created Please Contact Developer",
+                    "Message" => "Notification Is Not Created Please Contact Developer",
                     "status" => "fail",
                 ];
                 return response()->json($data, 500);
