@@ -14,6 +14,7 @@ use App\Models\Settings;
 use App\Models\User;
 use App\Models\UserMeta;
 use App\Models\WorkSite;
+use App\Services\FirebaseService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -21,6 +22,13 @@ use Illuminate\Support\Facades\Hash;
 
 class MainController extends Controller
 {
+    protected $firebaseService;
+
+    public function __construct(FirebaseService $firebaseService)
+    {
+        $this->firebaseService = $firebaseService;
+    }
+
     public function dashboard(Request $request)
     {
         $user = Auth::user();
@@ -365,7 +373,45 @@ class MainController extends Controller
                 "USERS" => json_encode($setusers),
             ];
 
-            $ch = curl_init('https://dashboard.vnexia.com/api/sendnotification');
+            $users = json_decode($firebaseData['USERS'], true);
+
+            $successCount = 0;
+            $failureCount = 0;
+            $failedUsers = [];
+
+            if (is_array($users)) {
+                $userTokens = User::whereIn('id', $users)->whereNotNull('fcm_token')->get();
+
+                foreach ($userTokens as $userToken) {
+                    $response = $this->firebaseService->setData($firebaseData, $userToken, 'normal');
+
+                    if ($response['status'] === 'success') {
+                        $successCount++;
+                    } else {
+                        $failureCount++;
+                        $failedUsers[] = $userToken->id;
+                    }
+                }
+            }
+
+            if ($failureCount > 0) {
+                return response()->json([
+                    "Message" => "Notification partially sent",
+                    "SuccessCount" => $successCount,
+                    "FailureCount" => $failureCount,
+                    "FailedUsers" => $failedUsers,
+                ], 206);
+            } else {
+                return response()->json([
+                    "Message" => "Notification sent successfully to all users",
+                    "SuccessCount" => $successCount,
+                ], 200);
+            }
+        } else {
+            return response()->json(["Message" => "Notification Not Sent"], 500);
+        }
+
+            /*$ch = curl_init('https://dashboard.vnexia.com/api/sendnotification');
 
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); // Return the response as a string
             curl_setopt($ch, CURLOPT_POST, true); // Set the request method to POST
@@ -390,7 +436,7 @@ class MainController extends Controller
 
         } else {
             return response()->json(["Message" => "Notification Not Send"], 500);
-        }
+        }*/
     }
 
     public function notifications(Request $request)
@@ -457,13 +503,13 @@ class MainController extends Controller
         if($role == 1 || $role == 2){
             return redirect('dashboard')->with('error', 'No access');
         }
- 
+
             $usermetaFM = UserMeta::where('userId', $loginUser->id)->select('featuredImage')->first();
             $checkpoint = Checkpoints::where('CreatedBy', $loginUser->id)->get();
             $allImages = Image::where('save_image_by', $loginUser->id)->get();
             return view('checkpoints', ["PAGE_TITLE" => "CHECKPOINTS", "USERNAME" => $loginUser->name, "checkpoint" => $checkpoint, "Images" => $allImages, "UFM" => $usermetaFM]);
-        
-       
+
+
     }
 
     public function checkpointCreate(Request $request)
