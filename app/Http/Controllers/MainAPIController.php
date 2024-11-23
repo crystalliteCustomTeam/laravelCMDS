@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Alerts;
 use App\Models\Area;
+use App\Models\AreaAccident;
 use App\Models\AreaUser;
 use App\Models\AssignCheckpoint;
 use App\Models\Checkpoints;
 use App\Models\Image;
+use App\Models\LiveFeed;
 use App\Models\Notification;
 use App\Models\Safety;
 use App\Models\SafetyView;
@@ -119,7 +121,7 @@ class MainAPIController extends Controller
         return response()->json($data, 200);
     }
 
-    public function validate(Request $request)
+    public function validateDevice(Request $request)
     {
         $device_id = $request['device_id'];
         $device_key = $request['device_key'];
@@ -152,6 +154,13 @@ class MainAPIController extends Controller
 
     public function livefeed(Request $request, $area_id)
     {
+        $request->validate([
+            'device_id' => 'required|string',
+            'live_feed_url' => 'required|url',
+            'timestamp' => 'required|date',
+            'status' => 'required',
+        ]);
+
         if ($area_id == "") {
             $data = [
                 "Message" => "Area ID is Required",
@@ -159,21 +168,35 @@ class MainAPIController extends Controller
             ];
             return response()->json($data, 500);
         }
-        $Area = Area::where('id', $area_id)->first();
-        if ($Area) {
-            $data = [
-                "area_id" => $Area,
-                "live_feed_url" => "https://livefeed.example.com/DEVICE123",
-                "status" => 'success',
-            ];
-            return response()->json($data, 200);
-        } else {
-            $data = [
-                "status" => 'unfound',
-                "message" => "url not found",
-            ];
-            return response()->json($data, 404);
+
+        $areaExists = Area::find($area_id);
+
+        if (!$areaExists) {
+            return response()->json([
+                'message' => 'Area not found.',
+            ], 404);
         }
+
+        $existingLiveFeed = LiveFeed::where('area_id', $area_id)->first();
+
+        if ($existingLiveFeed) {
+            return response()->json([
+                'message' => 'Live feed already exists for this area.',
+            ], 409);
+        }
+
+        $liveFeed = LiveFeed::create([
+            'area_id' => $area_id,
+            'device_id' => $request->device_id,
+            'live_feed_url' => $request->live_feed_url,
+            'timestamp' => $request->timestamp,
+            'status' => $request->status,
+        ]);
+
+        return response()->json([
+            'message' => 'LiveFeed stored successfully.',
+            'data' => $liveFeed,
+        ], 201);
     }
 
     public function forget(Request $request, $email)
@@ -978,5 +1001,24 @@ class MainAPIController extends Controller
             ];
             return response()->json($data, 404);
         }
+    }
+
+    public function storeAreaAccidents(Request $request)
+    {
+        $request->validate([
+            'accident_code' => 'required|string',
+            'description' => 'required|string',
+            'severity_level' => 'required|string', // Allow specific values
+            'timestamp' => 'required|date',
+            'captured_image_url' => 'required|url',
+            'reported_by' => 'required|string',
+        ]);
+
+        $accident = AreaAccident::create($request->all());
+
+        return response()->json([
+            'message' => 'Accident report saved successfully.',
+            'data' => $accident,
+        ], 201);
     }
 }
