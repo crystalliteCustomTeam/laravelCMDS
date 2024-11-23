@@ -41,7 +41,7 @@
                                 <img src="{{ asset('assets/images/alarm-nav.png') }}" alt="">
                                 <span class="nav-item">Communication</span>
                             </a></li>
-                        <li><a href="{{ route('guideline') }}" class="navigat-items">
+                        {{--<li><a href="{{ route('guideline') }}" class="navigat-items">
                                 <img src="{{ asset('assets/images/checking-nav.png') }}" alt="">
                                 <span class="nav-item">Safety Guidelines</span>
                             </a>
@@ -51,7 +51,29 @@
                                         <span class="nav-item">Check Points</span>
                                     </a></li>
                             </ul>
+                        </li>--}}
+
+                        <li>
+                            <!-- Parent Link -->
+                            <a href="{{ route('guideline') }}"
+                               class="navigat-items {{ request()->routeIs('guideline') || request()->routeIs('checkpoint') ? 'active' : '' }}">
+                                <img src="{{ asset('assets/images/checking-nav.png') }}" alt="">
+                                <span class="nav-item">Safety Guidelines</span>
+                            </a>
+
+                            <!-- Child Submenu -->
+                            <ul id="navigation" class="{{ request()->routeIs('checkpoint') || request()->routeIs('guideline') ? 'active' : '' }}">
+                                <li>
+                                    <a href="{{ route('checkpoint') }}"
+                                       class="navigat-items {{ request()->routeIs('checkpoint') ? 'active' : '' }}">
+                                        <img src="{{ asset('assets/images/checkinglist-nav.png') }}" alt="">
+                                        <span class="nav-item">Check Points</span>
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
+
+
 
                         <li><a href="{{ route('users') }}" class="navigat-items">
                                 <img src="{{ asset('assets/images/user-nav.png') }}" alt="">
@@ -173,7 +195,7 @@
                     yValues.push(data[fullDayName] || 0);
                 });
 
-                
+
             })
             .catch(error => console.error('Error fetching data:', error));
         console.log(yValuesJS);

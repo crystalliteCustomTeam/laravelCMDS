@@ -97,6 +97,7 @@
                             <thead class="thead-dark">
                                 <tr>
                                     <th scope="col">Date</th>
+                                    <th scope="col">Alert Code</th>
                                     <th scope="col">Description</th>
                                     <th scope="col">Risk Level</th>
                                     <th scope="col">Area</th>
@@ -107,18 +108,21 @@
 
                                 @if ($frontalert)
                                     @foreach ($frontalert as $fal)
-                                        @foreach ($fal as $fa)
                                         <tr>
-                                            <td>{{ $fa->created_at }}</td>
-                                            <td>{{ $fa->description }}</td>
-                                            <td>{{ $fa->risk_level }}</td>
-                                            <td>Area {{ $fa->area_code}}</td>
-                                            <td><button onclick="viewpage({{ $fa->captured_image_url }})" ><i class="fa-solid fa-eye"></i></button></td>
+                                            <td>{{ $fal->created_at }}</td>
+                                            <td>{{ $fal->alert_code }}</td>
+                                            <td>{{ $fal->description }}</td>
+                                            <td>{{ $fal->risk_level }}</td>
+                                            <td>Area {{ $fal->area_code}}</td>
+                                            <td>
+                                                <a href="{{ $fal->captured_image_url }}" target="_blank">
+                                                    <i class="fa-solid fa-eye"></i>
+                                                </a>
+                                            </td>
                                         </tr>
-                                        @endforeach
                                     @endforeach
                                 @endif
-                                
+
                             </tbody>
                         </table>
                         <script>

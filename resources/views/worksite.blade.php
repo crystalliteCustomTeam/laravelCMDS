@@ -2,6 +2,14 @@
 @section('title', $PAGE_TITLE)
 @section('USERNAME', $USERNAME)
 
+<style>
+    #loader img {
+        width: 50px; /* Adjust size as needed */
+        height: 50px;
+    }
+
+</style>
+
 @section('contents')
 
     <section class="work-site mt-3">
@@ -47,7 +55,7 @@
                                                         <li>
                                                             <span><img src="{{ asset('assets/images/near-mises.png') }}"
                                                                     alt=""></span>
-                                                            <span>50</span>
+                                                            <span>{{ $SITE->total_area_accidents }}</span>
                                                         </li>
                                                         <li>
                                                             <span><img src="{{ asset('assets/images/accidents.png') }}"
@@ -85,7 +93,6 @@
 
     <!-- Button trigger modal -->
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <!-- Modal -->
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -110,11 +117,14 @@
                         <div class="flex-input two-flexx">
                             <div class="datess-input">
                                 <label for="Image">Start Date: </label>
-                                <input type="date" name="start_date" placeholder="Start Date ">
+                                <input type="date" name="start_date" placeholder="Start Date">
                             </div>
+                            @php
+                                $minDate = now()->format('Y-m-d'); // Current date only
+                            @endphp
                             <div class="datess-input">
                                 <label for="Image">End Date: </label>
-                                <input type="date" name="end_date" placeholder="End Date">
+                                <input type="date" name="end_date" placeholder="End Date" min="{{ $minDate }}">
                             </div>
 
                         </div>
@@ -259,6 +269,9 @@
         </div>
     </div>
 
+    <div id="loader" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); z-index: 9999; display: flex; justify-content: center; align-items: center;">
+        <img src="{{ asset('assets/images/loader.gif') }}" alt="Loading..." style="width: 50px; height: 50px;">
+    </div>
     {{-- end of Gallary modal  --}}
     {{--<script>
         function selectImage(imagePath) {
@@ -275,8 +288,9 @@
             $('.modal-backdrop').show();
         }
     </script>--}}
-
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
+
         function selectImage(imagePath) {
             // Set the selected image value
             $("#FeaturedImage").val(imagePath);
@@ -322,6 +336,7 @@
                 $('.modal-backdrop').remove();
             }
         });
+
     </script>
 
     {{-- user Gallary  --}}
@@ -329,6 +344,7 @@
 
     <script>
         $(document).ready(function(e) {
+            $('#loader').hide();
             $.ajaxSetup({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -337,30 +353,34 @@
 
 
 
-            $('#work_site_form').on('submit', (e) => {
-                e.preventDefault();
-                alert("working");
-                let formData1 = new FormData(document.getElementById("work_site_form"));
+            $('#work_site_form').on('submit', function (e) {
+                e.preventDefault(); // Prevent default form submission
+
+                let formData = new FormData(this);
+
                 $.ajax({
                     type: 'POST',
                     url: "{{ route('create.worksite') }}",
-                    data: formData1,
+                    data: formData,
                     contentType: false,
                     processData: false,
-                    success: function(response) {
+                    success: function (response) {
                         if (response.Code === 200) {
+                            // Show loader only after successful response
+                            $('#loader').show();
 
-                            alert("Work Site Created"); // Capture image ID
-                            window.location.reload(true);
+                            // Reload the page after showing the loader for 1 second
+                            setTimeout(() => {
+                                window.location.reload(true);
+                            }, 1000);
                         }
                     },
-                    error: function(response) {
-                        alert("Error ! : " + response.Message);
+                    error: function () {
+                        // Do not show loader on error
+                        alert("An error occurred.");
                     }
                 });
             });
-
-
         });
     </script>
 

@@ -173,6 +173,7 @@ class MainController extends Controller
         $user = Auth::user();
         $usermetaFM = UserMeta::where('userId', $user->id)->select('featuredImage')->first();
         $allsites = WorkSite::where('CreateBy', $user->id)
+            ->with('areaUsers')
             ->withCount('areaUsers') // Count of AreaUsers
             ->get();
         $allImages = Image::where('save_image_by', $user->id)->get();
@@ -183,6 +184,13 @@ class MainController extends Controller
         // echo "<pre>";
         // print_r($usersCount);
         // die();
+
+        foreach ($allsites as $SITE) {
+            $SITE->total_area_accidents = AreaUser::whereIn('ARID', $SITE->areaUsers->pluck('ARID'))
+                ->join('area_accidents', 'area_accidents.area_id', '=', 'areausers.ARID')
+                ->where('areausers.WSID', $SITE->id)
+                ->count();
+        }
 
         return view('worksite', ["PAGE_TITLE" => "WORKSITE", "USERNAME" => $user->name, "SITES" => $allsites, "Images" => $allImages, "UFM" => $usermetaFM]);
 
@@ -223,6 +231,11 @@ class MainController extends Controller
             $Alerts = Alerts::where('area_code', $area->id)->get();
             array_push($frontalert, $Alerts);
         }
+
+        $areaIds = AreaUser::where('WSID', $worksiteID)
+            ->pluck('ARID');
+
+        $frontalert = Alerts::whereIn('area_code', $areaIds)->get();
 
         $allImages = Image::where('save_image_by', $user->id)->get();
 
