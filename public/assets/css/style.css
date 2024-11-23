@@ -377,7 +377,7 @@ section.work-site.mt-3 .mt-5.main-card-container ul li .work-site-box .work-side
 }
 
 .modal-content .modal-body form .flex-input input {
-    flex: 0 0 70%;
+    /*flex: 0 0 70%;*/
     background: #D9D9D9;
     border-radius: 10px;
     padding: 5px 10px 5px 10px;
@@ -709,19 +709,19 @@ section.work-site.mt-3 .mt-5.main-safety-card ul li .safety-card .icons {
 
 @media only screen and (max-width:2000px){
 
-    
+
     section.mt-2 .container-fluid .row {
         justify-content: space-between !important;
     }
-    
+
     .container {
         width: 95%;
     }
-    
+
     section {
         padding: 80px 0;
     }
-    
+
     .dashboard-layout .body-sec {
         width: calc(100% - 280px);
         max-width: calc(100% - 280px) ;
