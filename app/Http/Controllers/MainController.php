@@ -220,8 +220,7 @@ class MainController extends Controller
         $usermetaFM = UserMeta::where('userId', $user->id)->select('featuredImage')->first();
         $worksite = WorkSite::where('CreateBy', $user->id)->where('id', $worksiteID)->first();
         $usersData = User::join('usermeta', 'users.id', '=', 'usermeta.userId')
-            ->where('usermeta.role', '!=', '0')
-            ->where('usermeta.role', '!=', '1')
+            ->where('usermeta.role', '=', '2')
             ->select('users.*', 'users.id as UID', 'usermeta.*')
             ->get();
 
@@ -318,7 +317,7 @@ class MainController extends Controller
             ->join('users', 'users.id', '=', 'areausers.WSID')
             ->select('users.name as UName', 'users.id as UID', 'areausers.id as ARUID')
             ->get();
-        $Allusers = User::join('usermeta', 'users.id', '=', 'usermeta.userId')->where('usermeta.role', '!=', 0)->where('usermeta.role', '!=', 2)->where('usermeta.createBy', $loginUser->id)
+        $Allusers = User::join('usermeta', 'users.id', '=', 'usermeta.userId')->where('usermeta.role', '=', 2)->where('usermeta.createBy', $loginUser->id)
             ->select('users.*', 'users.id as UID', 'usermeta.id as UMID')
             ->get();
 
