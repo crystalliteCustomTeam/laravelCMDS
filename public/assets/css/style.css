@@ -988,3 +988,22 @@ svg.svg-inline--fa.fa-eye {
     padding: 5px;
     border-radius: 5px;
 }
+
+.sg {
+    display: flex;
+    flex-direction: column;
+    gap: 25px 10px;
+}
+
+.sg-inner {
+    display: flex;
+        gap: 0 10px;
+        justify-content: center;
+        align-items: center;
+}
+
+.sg-inner-fl {
+    display: flex;
+        align-items: center;
+        gap: 0 15px;
+}
