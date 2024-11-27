@@ -17,32 +17,32 @@
                     </div>
                     <div class="mt-5 main-safety-card">
 
-                            <div class="row">
+                            <div class="row sg">
                                 <div class="col-2">
                                         
                                         <img src="{{ asset($Safety->Images) }}" id="FeaturedImageSRC" alt=""
-                                            style="border-radius: 10%" width="100px" height="100px">
+                                            style="border-radius: 10%" width="150px" height="150px">
                                         <input type="hidden" name="FeaturedImage" value="{{ asset($Safety->Images) }}" id="FeaturedImage" /></br>
                                         <button type="button" id="FeaturedImageBTN" class="btn btn-dark mt-2" data-bs-toggle="modal"
                                             data-bs-target="#exampleModal3" type="button">Change Image </button>
                                 </div>
-                                <div class="col-3">
-                                    <label for="">Name</label>
+                                <div class="col-4 sg-inner">
+                                    <label for=""><strong>Name</strong></label>
                                     <input type="text" name="safety_title" class="form-control" value="{{ $Safety->title }}">
                                 </div>
-                                <div class="col-4">
-                                    <label for="">description</label>
+                                <div class="col-4 sg-inner">
+                                    <label for=""><strong>Description</strong></label>
                                    
                                      <textarea name="description" class="form-control" >{{ $Safety->description }}</textarea>
                                 </div>
-                                <div class="col-2">
-                                    
+                                <div class="col-12 sg-inner-fl">
+                                    <label for=""><strong>Check Points</strong></label>
                                         @if ($checkpointSaf)
                                             @foreach ($checkpointSaf as $CSA)
                                                 <a class="btn btn-danger btn-sm" style="width: fit-content">{{ $CSA->title }}</a>
                                             @endforeach
                                         @endif
-                                        <button class="btn btn-success mt-3" type="button" data-bs-toggle="modal"  data-bs-target="#exampleModal1"
+                                        <button class="btn btn-success" type="button" data-bs-toggle="modal"  data-bs-target="#exampleModal1"
                                         type="button">Assign More </button>
                                 </div>
                             </div>
@@ -183,7 +183,7 @@
                                 <form id="imageuploadtab">
                                     <input type="file" id="fileInput" accept="image/*" multiple>
                                     <button type="submit" style="background: #14173A;
-                                    border-radius: 10px 10px 0 0;
+                                    border-radius: 10px;
                                     color: white;
                                     padding: 7px 20px 7px 20px;
                                     border: 0;

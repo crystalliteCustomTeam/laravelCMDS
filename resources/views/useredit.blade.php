@@ -175,7 +175,7 @@
                                     <form id="imageuploadtab">
                                         <input type="file" id="fileInput" accept="image/*" multiple>
                                         <button type="submit" style="background: #14173A;
-                                    border-radius: 10px 10px 0 0;
+                                    border-radius: 10px;
                                     color: white;
                                     padding: 7px 20px 7px 20px;
                                     border: 0;

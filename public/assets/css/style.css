@@ -7,7 +7,9 @@
 section.login-sec {
     background: #14173A;
     height: 100vh;
-    padding: 60px 0;
+    display: flex;
+    justify-content: center;
+    vertical-align: middle;
 }
 
 
@@ -987,4 +989,58 @@ svg.svg-inline--fa.fa-eye {
     background: #14173a;
     padding: 5px;
     border-radius: 5px;
+}
+
+.sg {
+    display: flex;
+    flex-direction: column;
+    gap: 25px 10px;
+}
+
+.sg-inner {
+    display: flex;
+        gap: 0 10px;
+        justify-content: center;
+        align-items: center;
+}
+
+.sg-inner-fl {
+    display: flex;
+        align-items: center;
+        gap: 0 15px;
+}
+
+form.login-pg {
+    width: 75%;
+    border: 1px solid white;
+    padding: 35px;
+    border-radius: 10px;
+}
+
+.inputss {
+    display: flex;
+    gap: 0 39px;
+    align-items: center;
+}
+
+.psw {
+    display: flex;
+    gap: 0 10px;
+    align-items: center;
+}
+
+.lg-bt {
+    width: 100%;
+    background: white !important;
+    color: #14173a !important;
+    font-weight: 600 !important;
+}
+
+.lg-fld {
+    display: flex;
+    justify-content: center;
+}
+
+.vnexia-logo {
+    text-align: center;
 }

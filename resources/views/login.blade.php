@@ -20,8 +20,8 @@
                         <div class="vnexia-logo">
                             <img src="assets/images/vnexia-white-logo.png" alt="">
                         </div>
-                        <div class="">
-                            <form method="POST" action="{{ route('login') }}">
+                        <div class="lg-fld">
+                            <form method="POST" action="{{ route('login') }}" class="login-pg">
                                 @csrf
                                 <div class="inputss">
                                     <label for="email" style="color:white">Email</label>
@@ -29,13 +29,13 @@
                                         required>
                                     <x-input-error :messages="$errors->get('email')" class="mt-2" />
                                 </div>
-                                <div class="mt-2">
+                                <div class="mt-2 psw">
                                     <label for="password" style="color:white">Password</label>
                                     <input type="password" type="password" name="password" required
                                         class="form-control mt-1" value="" required>
                                     <x-input-error :messages="$errors->get('password')" class="mt-2" />
                                 </div>
-                                <button type="submit" class="btn btn-dark mt-3">Login</button>
+                                <button type="submit" class="btn btn-dark mt-3 lg-bt">Login</button>
                             </form>
 
                         </div>
