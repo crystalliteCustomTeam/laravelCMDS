@@ -411,6 +411,7 @@ class MainController extends Controller
 
             if ($failureCount > 0) {
                 return response()->json([
+                    "Code" => 206,
                     "Message" => "Notification partially sent",
                     "SuccessCount" => $successCount,
                     "FailureCount" => $failureCount,
@@ -418,6 +419,7 @@ class MainController extends Controller
                 ], 206);
             } else {
                 return response()->json([
+                    "Code" => 200,
                     "Message" => "Notification sent successfully to all users",
                     "SuccessCount" => $successCount,
                 ], 200);
