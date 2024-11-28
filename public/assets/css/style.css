@@ -1044,3 +1044,61 @@ form.login-pg {
 .vnexia-logo {
     text-align: center;
 }
+
+
+/* Adjust safety card layout */
+.safety-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.safety-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Ensure image inside safety cards remains responsive */
+.safety-card .icons img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Adjust spacing between cards */
+ul.row.list-unstyled.g-3 > li {
+    margin-bottom: 15px;
+}
+
+/* Media queries for different screen sizes */
+@media (max-width: 768px) {
+    .first-top-headerrr {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .first-top-headerrr button {
+        align-self: flex-end;
+    }
+
+    .safety-card {
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .safety-card {
+        padding: 1rem;
+    }
+
+    .safety-card h5 {
+        font-size: 1rem;
+    }
+
+    ul.row.list-unstyled.g-3 > li {
+        margin-bottom: 10px;
+    }
+}

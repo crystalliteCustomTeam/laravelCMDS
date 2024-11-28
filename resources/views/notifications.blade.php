@@ -25,67 +25,45 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @if ($AllNotification)
+                            @if ($AllNotification)
+                                @php
+                                    $index = 1;
+                                @endphp
+                                @foreach ($AllNotification as $Notification)
                                     @php
-                                        $index = 1;
+                                        $worksiteIds = !empty($Notification->WSID) ? json_decode($Notification->WSID, true) : [];
+                                        $areaIds = !empty($Notification->ARIDS) ? json_decode($Notification->ARIDS, true) : [];
+
+                                        // Filter valid worksite and area associations
+                                        $validWorksites = $worksiteIds ? collect($WORKSITE)->whereIn('id', $worksiteIds) : collect();
+                                        $validAreas = $areaIds ? collect($AREAS)->whereIn('id', $areaIds) : collect();
                                     @endphp
-                                    @foreach ($AllNotification as $Notification)
+
+                                    @if ($validWorksites->isNotEmpty() || $validAreas->isNotEmpty())
                                         <tr>
                                             <td>{{ $index++ }}</td>
                                             <td>{{ $Notification->title }}</td>
                                             <td>
-                                                @if ($Notification->WSID != 0)
-                                                    @php
-                                                        $jsonDatas = json_decode($Notification->WSID);
-                                                    @endphp
-                                                    @if ($jsonDatas)
-                                                        @foreach ($jsonDatas as $JD)
-                                                            @foreach ($WORKSITE as $WK)
-                                                                @if ($WK->id != $JD)
-                                                                    @continue
-                                                                @else
-                                                                    <button
-                                                                        style="width: fit-content;color:white;padding:0px 10px">{{ $WK->Name }}</button>
-                                                                @endif
-                                                            @endforeach
-                                                        @endforeach
-                                                    @endif
-                                                @else
-                                                    @continue
-                                                @endif
+                                                @foreach ($validWorksites as $worksite)
+                                                    <button
+                                                        style="width: fit-content; color: white; padding: 0px 10px">{{ $worksite->Name }}</button>
+                                                @endforeach
                                             </td>
                                             <td>
-                                                @if ($Notification->ARIDS != 0)
-                                                    @php
-                                                        $jsonDatas = json_decode($Notification->ARIDS);
-                                                    @endphp
-                                                    @if ($jsonDatas)
-                                                        @foreach ($jsonDatas as $JD)
-                                                            @foreach ($AREAS as $WK)
-                                                                @if ($WK->id != $JD)
-                                                                    @continue
-                                                                @else
-                                                                    <button
-                                                                        style="width: fit-content;color:white;padding:0px 10px">{{ $WK->Area_Name }}</button>
-                                                                @endif
-                                                            @endforeach
-                                                        @endforeach
-                                                    @endif
-                                                @else
-                                                    @continue
-                                                @endif
+                                                @foreach ($validAreas as $area)
+                                                    <button
+                                                        style="width: fit-content; color: white; padding: 0px 10px">{{ $area->Area_Name }}</button>
+                                                @endforeach
                                             </td>
                                             <td>
-                                                <button class="delete"
-                                                    onclick="deleteNotification({{ $Notification->id }})"><i
-                                                        class="fa-solid fa-trash"></i></button>
+                                                <button class="delete" onclick="deleteNotification({{ $Notification->id }})">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </button>
                                             </td>
                                         </tr>
-                                    @endforeach
-                                @endif
-
-
-
+                                    @endif
+                                @endforeach
+                            @endif
                             </tbody>
                         </table>
                         <div class="main_loadmore-btn">
@@ -184,20 +162,41 @@
                     data: formData1,
                     contentType: false,
                     processData: false,
-                    success: function(response) {
+                    success: function (response) {
+                        console.log("AJAX Response:", response);
+
+                        // Check the response Code
                         if (response.Code === 200) {
-
-
-                            alert("NOTIFICATION SEND");
-                            window.location.reload();
+                            // Show success notification
+                            toastr.success(response.Message || 'Notification sent successfully!');
+                        } else if (response.Code === 206) {
+                            // Show warning notification for partial success
+                            toastr.warning(response.Message || 'Notification partially sent.');
+                            console.log('Partial Success - Failed Users:', response.FailedUsers);
+                        } else {
+                            toastr.error(response.Message || 'An error occurred.');
                         }
+
+                        // Hide both modals
+                        const modal1 = bootstrap.Modal.getInstance(document.getElementById('exampleModal1'));
+                        const modal2 = bootstrap.Modal.getInstance(document.getElementById('exampleModal'));
+                        if (modal1) modal1.hide();
+                        if (modal2) modal2.hide();
+
+                        // Delay for a moment to show the success message, then refresh the page
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000); // Adjust delay as needed
                     },
-                    error: function(response) {
-                        alert("Error ! : " + response.Message);
+                    error: function (response) {
+                        console.error("AJAX Error Response:", response);
+                        toastr.error(response.responseJSON?.Message || 'An error occurred while sending the notification.');
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000); // Adjust delay as needed
                     }
                 });
             });
-
 
         });
     </script>
@@ -215,47 +214,36 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form action="{{ route('notifications.send') }}" method="POST">
+                    <form id="notficationAssign" action="" method="POST">
                         @csrf
                         <input type="hidden" name="notificationID" id="notficationID" value="" />
                         <div class="side-roll">
-                            <input type="checkbox">
-                            <label for="">Select All</label>
+                            <input type="checkbox" id="select-all">
+                            <label for="select-all">Select All</label>
                         </div>
-                        <div class="main-checkboxx child-workside"
-                            style="overflow: hidden;height:500px;    overflow-y: scroll;
-">
+                        <div class="main-checkboxx child-workside" style="overflow: hidden; height: 500px; overflow-y: scroll;">
                             <ul>
                                 @if ($WORKSITE)
                                     @foreach ($WORKSITE as $WS)
                                         <li>
-                                            <input type="checkbox" id="worksite-{{ $WS->id }}" name="worksiteID[]"
-                                                value="{{ $WS->id }} ">
-                                            <label for="">{{ $WS->Name }}</label>
+                                            <input type="checkbox" class="select-item" id="worksite-{{ $WS->id }}" name="worksiteID[]" value="{{ $WS->id }}">
+                                            <label for="worksite-{{ $WS->id }}">{{ $WS->Name }}</label>
                                             <ul>
                                                 @if ($AREAS)
                                                     @foreach ($AREAS as $AR)
                                                         @if ($AR->WSID == $WS->id)
                                                             <li>
-                                                                <input id="areasite-{{ $WS->id }}" type="checkbox"
-                                                                    name="areas[]"  value="{{ $AR->id }}">
-                                                                <label for="">{{ $AR->Area_Name }}</label>
+                                                                <input type="checkbox" class="select-item" id="areasite-{{ $WS->id }}" name="areas[]" value="{{ $AR->id }}">
+                                                                <label for="areasite-{{ $WS->id }}">{{ $AR->Area_Name }}</label>
                                                             </li>
-                                                        @else
-                                                            @continue
                                                         @endif
                                                     @endforeach
                                                 @endif
-
                                             </ul>
                                         </li>
                                     @endforeach
                                 @endif
-
-
                             </ul>
-
-
                         </div>
                         <div class="main_creat-btn mt-3">
                             <button type="submit">Assign</button>
@@ -267,5 +255,76 @@
     </div>
 
     {{-- end of user assign modal  --}}
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Master checkbox for "Select All"
+            const selectAllCheckbox = document.getElementById("select-all");
+
+            // All worksite checkboxes
+            const worksiteCheckboxes = document.querySelectorAll('input[name="worksiteID[]"]');
+
+            // All child checkboxes (areas)
+            const areaCheckboxes = document.querySelectorAll('input[name="areas[]"]');
+
+            // Add event listener to "Select All" checkbox
+            selectAllCheckbox.addEventListener("change", function () {
+                const isChecked = this.checked;
+
+                // Toggle all worksite and area checkboxes
+                worksiteCheckboxes.forEach((checkbox) => (checkbox.checked = isChecked));
+                areaCheckboxes.forEach((checkbox) => (checkbox.checked = isChecked));
+            });
+
+            // Add event listener to each worksite checkbox
+            worksiteCheckboxes.forEach(function (worksiteCheckbox) {
+                worksiteCheckbox.addEventListener("change", function () {
+                    const worksiteId = this.id.split("-")[1]; // Extract worksite ID
+                    const relatedAreas = document.querySelectorAll(
+                        `input[id^="areasite-${worksiteId}"]`
+                    );
+
+                    // Check/uncheck all related area checkboxes
+                    relatedAreas.forEach((checkbox) => (checkbox.checked = this.checked));
+
+                    // Update "Select All" checkbox
+                    updateSelectAll();
+                });
+            });
+
+            // Add event listener to all area checkboxes to update their parent worksite
+            areaCheckboxes.forEach(function (areaCheckbox) {
+                areaCheckbox.addEventListener("change", function () {
+                    const worksiteId = this.id.split("-")[1]; // Extract worksite ID
+                    const relatedAreas = document.querySelectorAll(
+                        `input[id^="areasite-${worksiteId}"]`
+                    );
+                    const parentWorksite = document.getElementById(`worksite-${worksiteId}`);
+
+                    // If all areas are checked, check the parent worksite; otherwise, uncheck it
+                    const allChecked = Array.from(relatedAreas).every(
+                        (checkbox) => checkbox.checked
+                    );
+                    parentWorksite.checked = allChecked;
+
+                    // Update "Select All" checkbox
+                    updateSelectAll();
+                });
+            });
+
+            // Function to update "Select All" checkbox
+            function updateSelectAll() {
+                const allWorksitesChecked = Array.from(worksiteCheckboxes).every(
+                    (checkbox) => checkbox.checked
+                );
+                const allAreasChecked = Array.from(areaCheckboxes).every(
+                    (checkbox) => checkbox.checked
+                );
+                selectAllCheckbox.checked = allWorksitesChecked && allAreasChecked;
+            }
+        });
+
+    </script>
+
 
 @endsection

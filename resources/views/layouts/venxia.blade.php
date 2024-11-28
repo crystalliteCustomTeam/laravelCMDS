@@ -17,7 +17,7 @@
     <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore-compat.js"></script>
     <script src="{{ asset('assets/js/firebase.js') }}"></script>
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 </head>
 
 <body class="dashboard-layout">
@@ -106,9 +106,20 @@
                             </li>
                             <li>
                                 <div class="main_users_card-header">
+                                    @php
+                                    $userMeta = \App\Models\UserMeta::query()->where('userId', \Illuminate\Support\Facades\Auth::id())->first();
+                                    @endphp
                                     <div class="user-name">
                                         <h4>@yield('USERNAME')</h4>
-                                        <p>Safety Manager</p>
+                                        <p>
+                                            @if (empty($userMeta->role))
+                                                Super Admin
+                                            @elseif ($userMeta->role == 2)
+                                                Safety Manager
+                                            @elseif ($userMeta->role == 1)
+                                                Worker
+                                            @endif
+                                        </p>
                                     </div>
                                     <div class="user-img">
                                         @if ($UFM != null && $UFM->featuredImage != null)
@@ -152,6 +163,7 @@
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
     {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {

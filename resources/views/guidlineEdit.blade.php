@@ -1,6 +1,6 @@
 @extends('layouts.venxia')
 @section('title', $PAGE_TITLE)
-@section('USERNAME', $USERNAME) 
+@section('USERNAME', $USERNAME)
 
 @section('contents')
 
@@ -13,13 +13,13 @@
                         <form action="{{ route('safety.update') }}" method="POST">
                             @csrf
                             <input type="hidden" name="safety_id" value="{{ $Safety->id }}">
-                        <button type="submit">Save</button> 
+                        <button type="submit">Save</button>
                     </div>
                     <div class="mt-5 main-safety-card">
 
                             <div class="row sg">
                                 <div class="col-2">
-                                        
+
                                         <img src="{{ asset($Safety->Images) }}" id="FeaturedImageSRC" alt=""
                                             style="border-radius: 10%" width="150px" height="150px">
                                         <input type="hidden" name="FeaturedImage" value="{{ asset($Safety->Images) }}" id="FeaturedImage" /></br>
@@ -32,7 +32,7 @@
                                 </div>
                                 <div class="col-4 sg-inner">
                                     <label for=""><strong>Description</strong></label>
-                                   
+
                                      <textarea name="description" class="form-control" >{{ $Safety->description }}</textarea>
                                 </div>
                                 <div class="col-12 sg-inner-fl">
@@ -157,7 +157,7 @@
         <div class="modal-dialog assing-userss">
             <div class="modal-content assing-userss">
                 <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="exampleModalLabel1">Gallary </h1>
+                    <h1 class="modal-title fs-5" id="exampleModalLabel1">Gallery </h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -286,7 +286,7 @@
             $('.modal-backdrop').hide();
             const exampleModal1 = bootstrap.Modal.getInstance(document.getElementById('exampleModal3'));
             exampleModal1.hide();
-           
+
         }
     </script>
 
@@ -313,7 +313,7 @@
     </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    
+
 
 
 

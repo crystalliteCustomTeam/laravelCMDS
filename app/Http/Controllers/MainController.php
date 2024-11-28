@@ -220,7 +220,6 @@ class MainController extends Controller
         $usermetaFM = UserMeta::where('userId', $user->id)->select('featuredImage')->first();
         $worksite = WorkSite::where('CreateBy', $user->id)->where('id', $worksiteID)->first();
         $usersData = User::join('usermeta', 'users.id', '=', 'usermeta.userId')
-            ->where('usermeta.role', '!=', '0')
             ->where('usermeta.role', '=', '2')
             ->select('users.*', 'users.id as UID', 'usermeta.*')
             ->get();
@@ -318,7 +317,7 @@ class MainController extends Controller
             ->join('users', 'users.id', '=', 'areausers.WSID')
             ->select('users.name as UName', 'users.id as UID', 'areausers.id as ARUID')
             ->get();
-        $Allusers = User::join('usermeta', 'users.id', '=', 'usermeta.userId')->where('usermeta.role', '!=', 0)->where('usermeta.createBy', $loginUser->id)
+        $Allusers = User::join('usermeta', 'users.id', '=', 'usermeta.userId')->where('usermeta.role', '=', 2)->where('usermeta.createBy', $loginUser->id)
             ->select('users.*', 'users.id as UID', 'usermeta.id as UMID')
             ->get();
 
@@ -411,6 +410,7 @@ class MainController extends Controller
 
             if ($failureCount > 0) {
                 return response()->json([
+                    "Code" => 206,
                     "Message" => "Notification partially sent",
                     "SuccessCount" => $successCount,
                     "FailureCount" => $failureCount,
@@ -418,6 +418,7 @@ class MainController extends Controller
                 ], 206);
             } else {
                 return response()->json([
+                    "Code" => 200,
                     "Message" => "Notification sent successfully to all users",
                     "SuccessCount" => $successCount,
                 ], 200);
@@ -563,6 +564,11 @@ class MainController extends Controller
 
     public function guideAssign(Request $request)
     {
+        $request->validate([
+            'safety_id' => 'required',     // Ensure safety_id is provided
+            'checkpoint' => 'required', // Ensure checkpoint is an array
+        ]);
+
         $checkpoints = $request['checkpoint'];
         $safetyID = $request['safety_id'];
         for ($i = 0; $i < Count($checkpoints); $i++) {
@@ -572,7 +578,10 @@ class MainController extends Controller
             ]);
         }
 
-        return redirect()->back();
+        return response()->json([
+            'Message' => 'Checkpoints successfully assigned to the guideline.',
+            'Code' => 200,
+        ], 200);
     }
 
     public function media(Request $request)
