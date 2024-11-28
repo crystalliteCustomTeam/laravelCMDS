@@ -78,20 +78,53 @@
                                 @endforeach
                             @endif
                         </ul>
-                        <script>
-                            function ondelete(id) {
-                                window.location.href = window.location.href + '/delete/' + id;
-                            }
-                        </script>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    {{-- modal  --}}
 
-    <!-- Button trigger modal -->
+    <div class="modal fade" id="deleteSiteModal" tabindex="-1" aria-labelledby="deleteSiteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteSiteModalLabel">Confirm Deletion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this site?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmSiteDeleteBtn">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        let siteIdToDelete = null;
+
+        function ondelete(id) {
+            siteIdToDelete = id;
+
+            const deleteSiteModal = new bootstrap.Modal(document.getElementById('deleteSiteModal'));
+            deleteSiteModal.show();
+        }
+
+        document.getElementById('confirmSiteDeleteBtn').addEventListener('click', function () {
+            if (siteIdToDelete) {
+                window.location.href = window.location.href + '/delete/' + siteIdToDelete;
+            }
+
+            const deleteSiteModal = bootstrap.Modal.getInstance(document.getElementById('deleteSiteModal'));
+            deleteSiteModal.hide();
+        });
+
+    </script>
+
 
     <!-- Modal -->
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -107,36 +140,42 @@
                             <label for="Image">Image:</label>
                             <input type="hidden" name="FeaturedImage" value="" id="FeaturedImage" />
                             <img src="" id="FeaturedImageSRC" width="150px" height="150px" style="display: none" />
-                            <button type="button" id="FeaturedImageBTN" data-bs-toggle="modal"
-                                data-bs-target="#exampleModal3" type="button">Select Images </button>
+                            <button type="button" id="FeaturedImageBTN" data-bs-toggle="modal" data-bs-target="#exampleModal3" type="button">Select Images</button>
+                            <div class="validation-message" id="FeaturedImageValidation" style="color: red; display: none;">Please select an image.</div>
                         </div>
+
                         <div class="flex-input">
-                            <label for="Image">Work Site Name:</label>
-                            <input type="text" name="site_name" placeholder="Work Site Name ">
+                            <label for="site_name">Work Site Name:</label>
+                            <input type="text" name="site_name" placeholder="Work Site Name" id="site_name" required pattern=".{3,}" title="Work Site Name must be at least 3 characters long." />
                         </div>
+
                         <div class="flex-input two-flexx">
                             <div class="datess-input">
-                                <label for="Image">Start Date: </label>
-                                <input type="date" name="start_date" placeholder="Start Date">
+                                <label for="start_date">Start Date: </label>
+                                <input type="date" name="start_date" id="start_date" required />
                             </div>
+
                             @php
                                 $minDate = now()->format('Y-m-d'); // Current date only
                             @endphp
-                            <div class="datess-input">
-                                <label for="Image">End Date: </label>
-                                <input type="date" name="end_date" placeholder="End Date" min="{{ $minDate }}">
-                            </div>
 
+                            <div class="datess-input">
+                                <label for="end_date">End Date: </label>
+                                <input type="date" name="end_date" id="end_date" required min="{{ $minDate }}" />
+                                <div id="endDateValidation" style="color: red; display: none;">End date must be greater than or equal to start date.</div>
+                            </div>
                         </div>
 
                         <div class="flex-input brief">
-                            <label for="Image">Work Site Description </label>
-                            <textarea name="description" placeholder="Description"></textarea>
+                            <label for="description">Work Site Description</label>
+                            <textarea name="description" id="description" placeholder="Description" required minlength="10" title="Description must be at least 10 characters long."></textarea>
                         </div>
+
                         <div class="main_creat-btn">
                             <button name="submit" type="submit">Create</button>
                         </div>
                     </form>
+
                 </div>
 
             </div>
@@ -345,6 +384,12 @@
     <script>
         $(document).ready(function(e) {
             $('#loader').hide();
+
+            $('#start_date').on('change', function () {
+                const startDate = $(this).val();
+                $('#end_date').attr('min', startDate); // Set min attribute of End Date
+            });
+
             $.ajaxSetup({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -356,6 +401,27 @@
             $('#work_site_form').on('submit', function (e) {
                 e.preventDefault(); // Prevent default form submission
 
+
+                let featuredImage = $('#FeaturedImage').val();
+                let featuredImageValidation = $('#FeaturedImageValidation');
+
+                if (!featuredImage) {
+                    featuredImageValidation.show();
+                    return false;
+                } else {
+                    featuredImageValidation.hide();
+                }
+
+                const startDate = $('#start_date').val();
+                const endDate = $('#end_date').val();
+
+                if (endDate < startDate) {
+                    $('#endDateValidation').show();
+                    return false;
+                } else {
+                    $('#endDateValidation').hide();
+                }
+
                 let formData = new FormData(this);
 
                 $.ajax({
@@ -366,18 +432,18 @@
                     processData: false,
                     success: function (response) {
                         if (response.Code === 200) {
-                            // Show loader only after successful response
                             $('#loader').show();
-
-                            // Reload the page after showing the loader for 1 second
+                            toastr.success(response.Message || "Worksite Created");
                             setTimeout(() => {
                                 window.location.reload(true);
                             }, 1000);
                         }
                     },
                     error: function () {
-                        // Do not show loader on error
-                        alert("An error occurred.");
+                        toastr.error(response.responseJSON?.Message || "Error occurred while creating the guideline");
+                        setTimeout(() => {
+                            window.location.reload(true);
+                        }, 1000);
                     }
                 });
             });
