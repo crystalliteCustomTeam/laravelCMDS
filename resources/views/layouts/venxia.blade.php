@@ -106,9 +106,18 @@
                             </li>
                             <li>
                                 <div class="main_users_card-header">
+                                    @php
+                                    $userMeta = \App\Models\UserMeta::query()->where('userId', \Illuminate\Support\Facades\Auth::id())->first();
+                                    @endphp
                                     <div class="user-name">
                                         <h4>@yield('USERNAME')</h4>
-                                        <p>Safety Manager</p>
+                                        <p>
+                                            @if (empty($userMeta->role) || $userMeta->role == 2)
+                                                Safety Manager
+                                            @else
+                                                Worker
+                                            @endif
+                                        </p>
                                     </div>
                                     <div class="user-img">
                                         @if ($UFM != null && $UFM->featuredImage != null)

@@ -1,6 +1,6 @@
 @extends('layouts.venxia')
 @section('title', $PAGE_TITLE)
-@section('USERNAME', $USERNAME) 
+@section('USERNAME', $USERNAME)
 
 @section('contents')
 
@@ -8,36 +8,39 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-12">
-                    <div class="first-top-headerrr">
+                    <div class="first-top-headerrr d-flex justify-content-between align-items-center">
                         <h5>Safety Guidelines</h5>
-                        <button data-bs-toggle="modal" data-bs-target="#exampleModal" type="button">Create New</button>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" type="button">Create New</button>
                     </div>
                     <div class="mt-5 main-safety-card">
-                        <ul>
+                        <ul class="row list-unstyled g-3">
                             @if ($Safety)
                                 @foreach ($Safety as $Saf)
-                                    <li>
-                                        <div class="safety-card">
-                                            <div class="icons">
-                                                <img src="{{ asset('assets/images/setting-icon.png') }}" alt="">
+                                    <li class="col-12 col-sm-6 col-md-4 col-lg-3">
+                                        <div class="safety-card p-3 border rounded">
+                                            <div class="icons text-center mb-3">
+                                                <img src="{{ asset('assets/images/setting-icon.png') }}" alt="Icon" class="img-fluid" style="max-height: 100px;">
                                             </div>
-                                            <div class="card-content">
-                                                <h5>{{ $Saf->title }}</h5>
+                                            <div class="card-content text-center">
+                                                <h5 class="mb-3">{{ $Saf->title }}</h5>
                                             </div>
-                                            <ul>
-                                                <li><button onclick="edit({{ $Saf->id }})" data-bs-toggle="modal"
-                                                        type="button"><i class="fa-solid fa-pen-to-square"></i></button>
+                                            <ul class="d-flex justify-content-center list-unstyled mb-0">
+                                                <li class="mx-2">
+                                                    <button onclick="edit({{ $Saf->id }})" class="btn btn-sm btn-warning" data-bs-toggle="modal" type="button">
+                                                        <i class="fa-solid fa-pen-to-square"></i>
+                                                    </button>
                                                 </li>
-                                                <li><button onclick="checkDelete({{ $Saf->id }})"><i
-                                                            class="fa-solid fa-trash"></i></button></li>
+                                                <li class="mx-2">
+                                                    <button onclick="checkDelete({{ $Saf->id }})" class="btn btn-sm btn-danger">
+                                                        <i class="fa-solid fa-trash"></i>
+                                                    </button>
+                                                </li>
                                             </ul>
                                         </div>
                                     </li>
                                 @endforeach
                             @endif
-
                         </ul>
-
                     </div>
                 </div>
             </div>
@@ -67,27 +70,29 @@
                 </div>
                 <div class="modal-body">
                     <form id="guideline">
-                        <div class="flex-input">
+                        {{--<div class="flex-input">
                             <label for="Image">Icon:</label>
                             <button type="button" class="btn btn-secondary" data-bs-toggle="modal"
                                 data-bs-target="#iconModal">Select Icon</button>
                             <!-- Hidden Input to Store the Selected Icon Class -->
                             <input type="hidden" id="selectedIconInput" name="selectedIcon" value="fa-solid fa-icons">
-                        </div>
+                        </div>--}}
                         <div class="flex-input">
                             <label for="Image">Image:</label>
                             <input type="hidden" name="FeaturedImage" value="" id="FeaturedImage" />
-                            <img src="" id="FeaturedImageSRC" width="150px" height="150px" style="display: none" />
-                            <button type="button" data-bs-toggle="modal" id="FeaturedImageBTN"
-                                data-bs-target="#exampleModal3" type="button">Select Images </button>
+                            <img src="" id="FeaturedImageSRC" width="150px" height="150px" style="display: none;" />
+                            <button type="button" data-bs-toggle="modal" id="FeaturedImageBTN" data-bs-target="#exampleModal3" type="button">
+                                Select Images
+                            </button>
+                            <small id="imageError" style="color: red; display: none;">Please select an image.</small>
                         </div>
                         <div class="flex-input">
                             <label for="Image">Title: </label>
-                            <input type="text" placeholder="Title " name="title">
+                            <input type="text" placeholder="Title " name="title" required>
                         </div>
                         <div class="flex-input brief">
                             <label for="Image">Description: </label>
-                            <textarea placeholder="Description" name="description"></textarea>
+                            <textarea placeholder="Description" name="description" required></textarea>
                         </div>
                         {{-- <div class="assign-user-pop">
                             <button type="button" class="assign-user" data-bs-toggle="modal"
@@ -117,7 +122,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form  action="{{ route('guideline.checkpoint.assign') }}" method="POST">
+                    <form  id="assignForm" action="">
                         @csrf
                         <input type="hidden" value="" name="safety_id" id="safety_id">
                         <div class="main-checkboxx safetly-guide">
@@ -149,7 +154,7 @@
         <div class="modal-dialog assing-userss">
             <div class="modal-content assing-userss">
                 <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="exampleModalLabel1">Gallary </h1>
+                    <h1 class="modal-title fs-5" id="exampleModalLabel1">Gallery </h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -316,12 +321,19 @@
                 }
             });
 
-
-
-            
-
             $('#guideline').on('submit', (e) => {
                 e.preventDefault();
+
+                const featuredImage = $('#FeaturedImage').val(); // Get the value of the hidden input
+                const imageError = $('#imageError'); // Get the error message element
+
+                // Check if the image is selected
+                if (!featuredImage) {
+                    imageError.show(); // Show error message
+                    return; // Stop form submission
+                } else {
+                    imageError.hide(); // Hide error message if the field is valid
+                }
 
                 let formData1 = new FormData(document.getElementById("guideline"));
                 $.ajax({
@@ -330,30 +342,107 @@
                     data: formData1,
                     contentType: false,
                     processData: false,
-                    success: function(response) {
+                    success: function (response) {
                         if (response.Code === 200) {
-                            alert("Guidline Created");
+                            toastr.success(response.Message || "Guideline Created");
 
-                            const exampleModal4 = new bootstrap.Modal(document.getElementById(
-                                'exampleModal1'));
-                            exampleModal4.show();
-                            $('#safety_id').val(response.Safety_ID);
-
+                            // Show the second modal for assignment
+                            const exampleModal1 = new bootstrap.Modal(document.getElementById('exampleModal1'));
+                            exampleModal1.show();
+                            $('#safety_id').val(response.Safety_ID); // Set the safety_id for assignment
                         }
                     },
-                    error: function(response) {
-                        alert("Error ! : " + response.Message);
-                    }
+                    error: function (response) {
+                        toastr.error(response.responseJSON?.Message || "Error occurred while creating the guideline");
+                    },
                 });
             });
 
+            $('#assignForm').on('submit', function (e) {
+                e.preventDefault();
 
+                let formData = $(this).serialize(); // Serialize the form data
+                $.ajax({
+                    type: 'POST',
+                    url: "{{ route('guideline.checkpoint.assign') }}", // Update to your actual route
+                    data: formData,
+                    success: function (response) {
+                        if (response.Code === 200) {
+                            // Show success message
+                            toastr.success(response.Message || "Checkpoints Assigned Successfully");
+
+                            // Close all modals (exampleModal and exampleModal1)
+                            const exampleModal = bootstrap.Modal.getInstance(document.getElementById('exampleModal'));
+                            const exampleModal1 = bootstrap.Modal.getInstance(document.getElementById('exampleModal1'));
+
+                            if (exampleModal) exampleModal.hide();
+                            if (exampleModal1) exampleModal1.hide();
+
+                            // Remove the backdrop if any modals were closed
+                            $('.modal-backdrop').remove();
+
+                            // Refresh the page after a short delay
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 1000); // Adjust delay as needed (2 seconds here)
+                        }
+                    },
+                    error: function (response) {
+                        // Show error message
+                        toastr.error(response.responseJSON?.Message || "Error occurred during assignment");
+
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 1000); // Adjust delay as needed (2 seconds here)
+                    },
+                });
+            });
 
 
         });
     </script>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const modal = document.getElementById('exampleModal');
+            const closeModalButton = modal.querySelector('[data-bs-dismiss="modal"]');
 
+            // Function to close the modal
+            function closeModal() {
+                const modalInstance = bootstrap.Modal.getInstance(modal);
+                modalInstance.hide();
+            }
 
+            // Event listener for outside clicks
+            function handleOutsideClick(event) {
+                const modalContent = modal.querySelector('.modal-content');
+                if (!modalContent.contains(event.target)) {
+                    closeModal();
+                }
+            }
+
+            // Add event listeners for modal lifecycle events
+            modal.addEventListener('shown.bs.modal', function () {
+                // Add outside click listener when the modal is shown
+                window.addEventListener('click', handleOutsideClick);
+            });
+
+            modal.addEventListener('hidden.bs.modal', function () {
+                // Remove outside click listener when the modal is hidden
+                window.removeEventListener('click', handleOutsideClick);
+
+                // Remove any leftover modal-backdrop elements
+                const backdrop = document.querySelector('.modal-backdrop');
+                if (backdrop) {
+                    backdrop.remove();
+                }
+            });
+
+            // Add listener to the close button
+            closeModalButton.addEventListener('click', function () {
+                closeModal();
+            });
+        });
+    </script>
 
 @endsection

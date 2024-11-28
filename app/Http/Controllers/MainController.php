@@ -564,6 +564,11 @@ class MainController extends Controller
 
     public function guideAssign(Request $request)
     {
+        $request->validate([
+            'safety_id' => 'required',     // Ensure safety_id is provided
+            'checkpoint' => 'required', // Ensure checkpoint is an array
+        ]);
+
         $checkpoints = $request['checkpoint'];
         $safetyID = $request['safety_id'];
         for ($i = 0; $i < Count($checkpoints); $i++) {
@@ -573,7 +578,10 @@ class MainController extends Controller
             ]);
         }
 
-        return redirect()->back();
+        return response()->json([
+            'Message' => 'Checkpoints successfully assigned to the guideline.',
+            'Code' => 200,
+        ], 200);
     }
 
     public function media(Request $request)
