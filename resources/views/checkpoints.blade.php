@@ -64,26 +64,29 @@
                             <label for="Image">Image:</label>
                             <input type="hidden" name="FeaturedImage" value="" id="FeaturedImage" />
                             <img src="" id="FeaturedImageSRC" width="150px" height="150px" style="display: none" />
-                            <button type="button" id="FeaturedImageBTN" data-bs-toggle="modal"
-                                data-bs-target="#exampleModal1" type="button">Select Images </button>
+                            <button type="button" id="FeaturedImageBTN" data-bs-toggle="modal" data-bs-target="#exampleModal1" type="button">Select Images</button>
+                            <div class="validation-message" id="FeaturedImageValidation" style="color: red; display: none;">Please select an image.</div>
                         </div>
                         <div class="flex-input">
-                            <label for="Image">Video:</label>
-                            <input type="text" name="videoURL" placeholder="Video Url" />
+                            <label for="videoURL">Video:</label>
+                            <input type="url" name="videoURL" id="videoURL" placeholder="Video Url" pattern="https?://.+" />
+                            <div class="validation-message" id="VideoURLValidation" style="color: red; display: none;">Please enter a valid URL (e.g., https://example.com).</div>
                         </div>
                         <div class="flex-input">
-                            <label for="Image">Title:</label>
-                            <input type="text" name="title" placeholder="Title">
+                            <label for="title">Title:</label>
+                            <input type="text" name="title" id="title" placeholder="Title" required minlength="3" maxlength="100" />
+                            <div class="validation-message" id="TitleValidation" style="color: red; display: none;">Title must be between 3 and 100 characters.</div>
                         </div>
-
                         <div class="flex-input brief">
-                            <label for="Image">Description: </label>
-                            <textarea name="description" placeholder="Description"></textarea>
+                            <label for="description">Description:</label>
+                            <textarea name="description" id="description" placeholder="Description" required minlength="10" maxlength="500"></textarea>
+                            <div class="validation-message" id="DescriptionValidation" style="color: red; display: none;">Description must be between 10 and 500 characters.</div>
                         </div>
                         <div class="main_creat-btn">
                             <button type="submit">Create</button>
                         </div>
                     </form>
+
                 </div>
 
             </div>
@@ -94,6 +97,29 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // List of modal IDs to remove the backdrop
+            const modals = ['exampleModal', 'exampleModal1']; // Add your modal IDs here
+
+            modals.forEach(modalId => {
+                const modalElement = document.getElementById(modalId);
+
+                if (modalElement) {
+                    // Remove backdrop and keyboard on modal show
+                    modalElement.addEventListener('show.bs.modal', () => {
+                        // Dynamically set attributes to remove overlay effect
+                        modalElement.setAttribute('data-bs-backdrop', 'false');
+                        modalElement.setAttribute('data-bs-keyboard', 'false');
+
+                        // Manually remove any existing backdrop element
+                        document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
+                    });
+                }
+            });
+        });
+
+
         $(document).ready(function(e) {
             $.ajaxSetup({
                 headers: {
@@ -102,31 +128,52 @@
             });
 
 
-
-
-            $('#checkpointsform').on('submit', (e) => {
+            // Submit the form for checkpoint creation
+            $('#checkpointsform').on('submit', function(e) {
                 e.preventDefault();
 
-                let formData1 = new FormData(document.getElementById("checkpointsform"));
-                $.ajax({
-                    type: 'POST',
-                    url: "{{ route('checkpoint.create') }}",
-                    data: formData1,
-                    contentType: false,
-                    processData: false,
-                    success: function(response) {
-                        if (response.Code === 200) {
-                            alert("Checkpoint Created");
-                            window.location.reload();
+                let featuredImage = $('#FeaturedImage').val();
+                if (!featuredImage) {
+                    $('#FeaturedImageValidation').show(); // Show validation message
+                    return false; // Stop form submission
+                } else {
+                    $('#FeaturedImageValidation').hide();
+                    let formData1 = new FormData(document.getElementById("checkpointsform"));
+                    $.ajax({
+                        type: 'POST',
+                        url: "{{ route('checkpoint.create') }}",
+                        data: formData1,
+                        contentType: false,
+                        processData: false,
+                        success: function(response) {
+                            if (response.Code === 200) {
+                                // Show success toast
+                                toastr.success("Checkpoint Created Successfully!");
+
+                                // Optionally reset the form
+                                $('#checkpointsform')[0].reset();
+                                $('#FeaturedImageSRC').hide(); // Hide the preview image
+
+                                // Close the modal
+                                $('#exampleModal').modal('hide');
+
+                                setTimeout(function() {
+                                    window.location.reload();
+                                }, 1000);
+                            }
+                        },
+                        error: function(response) {
+                            // Show error toast
+                            toastr.error(response.responseJSON?.Message || "Error occurred while creating checkpoint.");
+
+                            setTimeout(function() {
+                                window.location.reload();
+                            }, 1000);
                         }
-                    },
-                    error: function(response) {
-                        alert("Error ! : " + response.Message);
-                    }
-                });
+                    });
+                }
+
             });
-
-
         });
     </script>
 
