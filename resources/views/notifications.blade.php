@@ -25,67 +25,45 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @if ($AllNotification)
+                            @if ($AllNotification)
+                                @php
+                                    $index = 1;
+                                @endphp
+                                @foreach ($AllNotification as $Notification)
                                     @php
-                                        $index = 1;
+                                        $worksiteIds = !empty($Notification->WSID) ? json_decode($Notification->WSID, true) : [];
+                                        $areaIds = !empty($Notification->ARIDS) ? json_decode($Notification->ARIDS, true) : [];
+
+                                        // Filter valid worksite and area associations
+                                        $validWorksites = $worksiteIds ? collect($WORKSITE)->whereIn('id', $worksiteIds) : collect();
+                                        $validAreas = $areaIds ? collect($AREAS)->whereIn('id', $areaIds) : collect();
                                     @endphp
-                                    @foreach ($AllNotification as $Notification)
+
+                                    @if ($validWorksites->isNotEmpty() || $validAreas->isNotEmpty())
                                         <tr>
                                             <td>{{ $index++ }}</td>
                                             <td>{{ $Notification->title }}</td>
                                             <td>
-                                                @if ($Notification->WSID != 0)
-                                                    @php
-                                                        $jsonDatas = json_decode($Notification->WSID);
-                                                    @endphp
-                                                    @if ($jsonDatas)
-                                                        @foreach ($jsonDatas as $JD)
-                                                            @foreach ($WORKSITE as $WK)
-                                                                @if ($WK->id != $JD)
-                                                                    @continue
-                                                                @else
-                                                                    <button
-                                                                        style="width: fit-content;color:white;padding:0px 10px">{{ $WK->Name }}</button>
-                                                                @endif
-                                                            @endforeach
-                                                        @endforeach
-                                                    @endif
-                                                @else
-                                                    @continue
-                                                @endif
+                                                @foreach ($validWorksites as $worksite)
+                                                    <button
+                                                        style="width: fit-content; color: white; padding: 0px 10px">{{ $worksite->Name }}</button>
+                                                @endforeach
                                             </td>
                                             <td>
-                                                @if ($Notification->ARIDS != 0)
-                                                    @php
-                                                        $jsonDatas = json_decode($Notification->ARIDS);
-                                                    @endphp
-                                                    @if ($jsonDatas)
-                                                        @foreach ($jsonDatas as $JD)
-                                                            @foreach ($AREAS as $WK)
-                                                                @if ($WK->id != $JD)
-                                                                    @continue
-                                                                @else
-                                                                    <button
-                                                                        style="width: fit-content;color:white;padding:0px 10px">{{ $WK->Area_Name }}</button>
-                                                                @endif
-                                                            @endforeach
-                                                        @endforeach
-                                                    @endif
-                                                @else
-                                                    @continue
-                                                @endif
+                                                @foreach ($validAreas as $area)
+                                                    <button
+                                                        style="width: fit-content; color: white; padding: 0px 10px">{{ $area->Area_Name }}</button>
+                                                @endforeach
                                             </td>
                                             <td>
-                                                <button class="delete"
-                                                    onclick="deleteNotification({{ $Notification->id }})"><i
-                                                        class="fa-solid fa-trash"></i></button>
+                                                <button class="delete" onclick="deleteNotification({{ $Notification->id }})">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </button>
                                             </td>
                                         </tr>
-                                    @endforeach
-                                @endif
-
-
-
+                                    @endif
+                                @endforeach
+                            @endif
                             </tbody>
                         </table>
                         <div class="main_loadmore-btn">

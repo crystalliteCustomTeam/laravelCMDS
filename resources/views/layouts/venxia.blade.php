@@ -112,9 +112,11 @@
                                     <div class="user-name">
                                         <h4>@yield('USERNAME')</h4>
                                         <p>
-                                            @if (empty($userMeta->role) || $userMeta->role == 2)
+                                            @if (empty($userMeta->role))
+                                                Super Admin
+                                            @elseif ($userMeta->role == 2)
                                                 Safety Manager
-                                            @else
+                                            @elseif ($userMeta->role == 1)
                                                 Worker
                                             @endif
                                         </p>
