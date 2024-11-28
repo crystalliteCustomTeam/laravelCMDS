@@ -282,25 +282,36 @@ class MainController extends Controller
 
     public function areaUserAssign(Request $request)
     {
-        $users = $request['users'];
-        $loginUser = Auth::user();
-        $usermetaFM = UserMeta::where('userId', $loginUser->id)->select('featuredImage')->first();
+        try {
+            $users = $request['users'];
+            $loginUser = Auth::user();
+            $usermetaFM = UserMeta::where('userId', $loginUser->id)->select('featuredImage')->first();
 
-        $AREAID = $request['AreaID'];
+            $AREAID = $request['AreaID'];
 
-        $workSiteId = Area::where('id', $AREAID)->select('WSID')->first();
+            $workSiteId = Area::where('id', $AREAID)->select('WSID')->first();
 
-        for ($i = 0; $i < Count($users); $i++) {
-            AreaUser::create([
-                "WSID" => $workSiteId->WSID,
-                "ARID" => $AREAID,
-                "UID" => $users[$i],
+            for ($i = 0; $i < Count($users); $i++) {
+                AreaUser::create([
+                    "WSID" => $workSiteId->WSID,
+                    "ARID" => $AREAID,
+                    "UID" => $users[$i],
+                ]);
+            }
+
+            return response()->json([
+                'Code' => 200,
+                'Message' => 'Users assigned to the area successfully!',
             ]);
+        } catch (\Exception $e) {
+
+            return response()->json([
+                'Code' => 500,
+                'Message' => 'An error occurred while assigning users. Please try again later.',
+            ], 500);
         }
-
-        return redirect()->back();
-
     }
+
 
     public function worksiteDelete(Request $request, $id)
     {

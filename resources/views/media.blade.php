@@ -1,6 +1,6 @@
 @extends('layouts.venxia')
 @section('title', $PAGE_TITLE)
-@section('USERNAME', $USERNAME) 
+@section('USERNAME', $USERNAME)
 
 @section('contents')
     <style>
@@ -122,10 +122,46 @@
             </div>
         </div>
     </section>
+
+
+    <div class="modal fade" id="deleteMediaModal" tabindex="-1" aria-labelledby="deleteMediaModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteMediaModalLabel">Confirm Deletion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this media item?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmMediaDeleteBtn">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <script>
+        let mediaIdToDelete = null;
+
         function deleteMedia(mediaID) {
-            window.location.href = window.location.href+"/delete/"+mediaID;
+            mediaIdToDelete = mediaID;
+
+            const deleteMediaModal = new bootstrap.Modal(document.getElementById('deleteMediaModal'));
+            deleteMediaModal.show();
         }
+
+        document.getElementById('confirmMediaDeleteBtn').addEventListener('click', function () {
+            if (mediaIdToDelete) {
+                window.location.href = window.location.href + "/delete/" + mediaIdToDelete;
+            }
+
+            const deleteMediaModal = bootstrap.Modal.getInstance(document.getElementById('deleteMediaModal'));
+            deleteMediaModal.hide();
+        });
+
     </script>
 
     <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">

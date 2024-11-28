@@ -80,16 +80,6 @@
                             @endif
 
                         </ul>
-                        <script>
-                            function nextpage(id) {
-                                window.location.href = window.location.href + "/" + id
-                            }
-
-                            function deletearea(id) {
-
-                                window.location.href = window.location.href + "/delete/" + id
-                            }
-                        </script>
                     </div>
                     <div class="hr-line"></div>
                     <div class="main-natification-table">
@@ -139,10 +129,48 @@
         </div>
     </section>
 
-    {{-- modal  --}}
+    <div class="modal fade" id="deleteAreaModal" tabindex="-1" aria-labelledby="deleteAreaModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteAreaModalLabel">Confirm Deletion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this area?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmAreaDeleteBtn">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <!-- Button trigger modal -->
+    <script>
+        function nextpage(id) {
+            window.location.href = window.location.href + "/" + id
+        }
 
+
+        let areaIdToDelete = null;
+        function deletearea(id) {
+            areaIdToDelete = id;
+
+            const deleteAreaModal = new bootstrap.Modal(document.getElementById('deleteAreaModal'));
+            deleteAreaModal.show();
+        }
+
+        document.getElementById('confirmAreaDeleteBtn').addEventListener('click', function () {
+            if (areaIdToDelete) {
+                window.location.href = window.location.href + "/delete/" + areaIdToDelete;
+            }
+
+            const deleteAreaModal = bootstrap.Modal.getInstance(document.getElementById('deleteAreaModal'));
+            deleteAreaModal.hide();
+        });
+
+    </script>
 
     <!-- Modal -->
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -202,8 +230,7 @@
 
             $('#createArea').on('submit', (e) => {
                 e.preventDefault();
-                let form = document.getElementById(
-                    'createArea'); // Make sure this is an actual form element
+                let form = document.getElementById('createArea');
                 let formData = new FormData(form);
                 $.ajax({
                     type: 'POST',
@@ -211,26 +238,32 @@
                     data: formData,
                     contentType: false,
                     processData: false,
-                    success: function(response) {
+                    success: function (response) {
                         if (response.Code === 200) {
-                            alert(response.Message); // Capture image ID
+                            toastr.success(response.Message || "Area created successfully.")
                             $("#AreaID").val(response.AID);
-                            let modal = new bootstrap.Modal(document.getElementById(
-                                'exampleModal1'));
-                            modal.show();
+
+                            const createAreaModal = bootstrap.Modal.getInstance(document.getElementById('exampleModal'));
+                            createAreaModal.hide();
+
+                            const assignUserModal = new bootstrap.Modal(document.getElementById('exampleModal1'));
+                            assignUserModal.show();
+
                         }
                     },
-                    error: function(response) {
-                        alert("Error ! : " + response.Message);
+                    error: function (response) {
+                        toastr.error(response.responseJSON?.Message || "Error occurred while creating the area.");
+
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
                     }
                 });
             });
 
-
             $('#assignuser').on('submit', (e) => {
                 e.preventDefault();
-                let form = document.getElementById(
-                    'assignuser'); // Make sure this is an actual form element
+                let form = document.getElementById('assignuser');
                 let formData = new FormData(form);
                 $.ajax({
                     type: 'POST',
@@ -238,17 +271,28 @@
                     data: formData,
                     contentType: false,
                     processData: false,
-                    success: function(response) {
+                    success: function (response) {
                         if (response.Code === 200) {
-                            alert(response.Message); // Capture image ID
+                            toastr.success(response.Message || "User assigned successfully.");
 
+                            const assignUserModal = bootstrap.Modal.getInstance(document.getElementById('exampleModal1'));
+                            assignUserModal.hide();
+
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1000);
                         }
                     },
-                    error: function(response) {
-                        alert("Error ! : " + response.Message);
+                    error: function (response) {
+                        toastr.error(response.responseJSON?.Message || "Error occurred while assigning the user.");
+
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
                     }
                 });
             });
+
         });
     </script>
     <div class="modal fade" id="exampleModal1" tabindex="-1" aria-labelledby="exampleModalLabel1" aria-hidden="true">
@@ -259,7 +303,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="assignusers" action="{{ route('worksite.area.user') }}" method="POST">
+                    <form id="assignuser" action="" >
                         @csrf
                         <input type="hidden" name="AreaID" value="" id="AreaID" />
                         <div class="main-checkboxx">

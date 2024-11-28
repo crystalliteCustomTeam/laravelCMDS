@@ -49,15 +49,46 @@
 
     {{-- modal  --}}
 
-    <!-- Button trigger modal -->
+    <div class="modal fade" id="deleteSafetyModal" tabindex="-1" aria-labelledby="deleteSafetyModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteSafetyModalLabel">Confirm Deletion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this safety item?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmSafetyDeleteBtn">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         function edit(id) {
             window.location.href = window.location.href + '/edit/' + id
         }
 
+        let safetyIdToDelete = null;
         function checkDelete(id) {
-            window.location.href = window.location.href + '/delete/' + id
+            safetyIdToDelete = id;
+
+            const deleteSafetyModal = new bootstrap.Modal(document.getElementById('deleteSafetyModal'));
+            deleteSafetyModal.show();
         }
+
+        document.getElementById('confirmSafetyDeleteBtn').addEventListener('click', function () {
+            if (safetyIdToDelete) {
+                window.location.href = window.location.href + '/delete/' + safetyIdToDelete;
+            }
+
+            const deleteSafetyModal = bootstrap.Modal.getInstance(document.getElementById('deleteSafetyModal'));
+            deleteSafetyModal.hide();
+        });
+
     </script>
 
     <!-- Modal -->
