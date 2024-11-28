@@ -263,7 +263,7 @@
                         @csrf
                         <input type="hidden" name="AreaID" value="" id="AreaID" />
                         <div class="main-checkboxx">
-                            <h2>UN LISTED USERS</h2>
+                            {{-- <h2>UN LISTED USERS</h2> --}}
                             @if ($USERS)
                                 @foreach ($USERS as $USER)
                                     <ul style="columns: 4; -webkit-columns: 2; -moz-columns: 2;">

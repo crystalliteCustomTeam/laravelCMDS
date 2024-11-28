@@ -115,9 +115,9 @@
                                             @if (empty($userMeta->role))
                                                 Super Admin
                                             @elseif ($userMeta->role == 2)
-                                                Safety Manager
-                                            @elseif ($userMeta->role == 1)
                                                 Worker
+                                            @elseif ($userMeta->role == 1)
+                                                Safety Manager
                                             @endif
                                         </p>
                                     </div>
