@@ -939,7 +939,7 @@ section.work-site.mt-3 .mt-5.area-boxes ul li:hover ul li {
 }
 
 .modal-content.assing-userss {
-    height: 100vh;
+    height: fit-content;
 }
 
 .main-upload {

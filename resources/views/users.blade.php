@@ -125,7 +125,7 @@
                             <label for="Image">Role:</label>
                             <div class="device-status new-userss">
                                 <span><input required type="radio" name="role" value="1"> <label
-                                        for="safety Manager">safety Manager</label></span>
+                                        for="safety Manager">Safety Manager</label></span>
                                 <span><input required type="radio" name="role" value="2"> <label
                                         for="safety Manager">Worker</label></span>
                             </div>

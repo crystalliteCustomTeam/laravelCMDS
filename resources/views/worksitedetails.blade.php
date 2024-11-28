@@ -24,7 +24,7 @@
                                     <input type="hidden" name="FeaturedImage" value="{{ asset($WORKSITE->FeaturedImage) }}"
                                         id="FeaturedImage" />
                                     <img src="{{ asset($WORKSITE->FeaturedImage) }}" id="FeaturedImageSRC" width="100px"
-                                        height="100px" style="width: 150px;height: 150px; border-radius: 10%; margin-bottom: 10px;" />
+                                        height="100px" style="width: 150px;height: 150px; border-radius: 10%; margin-bottom: 10px; object-fit: cover;" />
                                     <button type="button" id="FeaturedImageBTN" data-bs-toggle="modal"
                                         data-bs-target="#exampleModal3" type="button">Select Images </button>
                                 </div>
