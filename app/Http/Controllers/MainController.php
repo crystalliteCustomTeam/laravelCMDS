@@ -509,6 +509,7 @@ class MainController extends Controller
 
     public function guide(Request $request)
     {
+        $loginUser = Auth::user();
         $usermetaFM = UserMeta::where('userId', $loginUser->id)->select('featuredImage')->first();
         $checkpoint = Checkpoints::where('CreatedBy', $loginUser->id)->get();
         $Safety = Safety::where('CreatedBy', $loginUser->id)->get();
@@ -518,6 +519,7 @@ class MainController extends Controller
 
     public function checkpoint(Request $request)
     {
+        $loginUser = Auth::user();
 
             $usermetaFM = UserMeta::where('userId', $loginUser->id)->select('featuredImage')->first();
             $checkpoint = Checkpoints::where('CreatedBy', $loginUser->id)->get();
