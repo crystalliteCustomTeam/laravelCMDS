@@ -11,86 +11,87 @@
                     <div class="user-edit-form p-4 shadow-sm rounded">
                         <h5 class="text-center mb-4">Edit Users</h5>
                         <form id="imageUploadForm" enctype="multipart/form-data">
-                            @if (count($USER_DATA) > 0)
-                                @foreach ($USER_DATA as $user)
-                                    <!-- User Details Section -->
-                                    <input type="hidden" name="userID" value="{{ $user->UID }}" />
-
-                                    <div class="mb-3">
-                                        <label for="name_{{ $user->UID }}" class="form-label">Name</label>
-                                        <input
-                                            type="text"
-                                            name="name"
-                                            id="name_{{ $user->UID }}"
-                                            class="editable-field form-control"
-                                            data-user-id="{{ $user->UID }}"
-                                            data-field="name"
-                                            value="{{ $user->name }}"
-                                            required
+                            @if ($USER_DATA)
+                                <!-- Hidden User ID -->
+                                <input type="hidden" name="userID" value="{{ $USER_DATA->UID }}" />
+                        
+                                <!-- Name Field -->
+                                <div class="mb-3">
+                                    <label for="name_{{ $USER_DATA->UID }}" class="form-label">Name</label>
+                                    <input
+                                        type="text"
+                                        name="name"
+                                        id="name_{{ $USER_DATA->UID }}"
+                                        class="editable-field form-control"
+                                        data-user-id="{{ $USER_DATA->UID }}"
+                                        data-field="name"
+                                        value="{{ $USER_DATA->name }}"
+                                        required
+                                    />
+                                </div>
+                        
+                                <!-- Email Field -->
+                                <div class="mb-3">
+                                    <label for="email_{{ $USER_DATA->UID }}" class="form-label">Email</label>
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        id="email_{{ $USER_DATA->UID }}"
+                                        class="editable-field form-control"
+                                        data-user-id="{{ $USER_DATA->UID }}"
+                                        data-field="email"
+                                        value="{{ $USER_DATA->email }}"
+                                        required
+                                    />
+                                </div>
+                        
+                                <!-- Role Field -->
+                                <div class="mb-3">
+                                    <label for="role_{{ $USER_DATA->UID }}" class="form-label">Role</label>
+                                    <select
+                                        name="role"
+                                        id="role_{{ $USER_DATA->UID }}"
+                                        class="editable-field form-select"
+                                        data-user-id="{{ $USER_DATA->UID }}"
+                                        data-field="role"
+                                        required
+                                    >
+                                        <option value="1" {{ $USER_DATA->role == 1 ? 'selected' : '' }}>Safety Manager</option>
+                                        <option value="2" {{ $USER_DATA->role == 2 ? 'selected' : '' }}>Worker</option>
+                                        <option value="" {{ is_null($USER_DATA->role) ? 'selected' : '' }}>Super Admin</option>
+                                    </select>
+                                </div>
+                        
+                                <!-- Image Section -->
+                                <div class="text-center">
+                                    <label class="form-label">Image</label>
+                                    <div class="image-preview mb-3 mx-auto">
+                                        <img
+                                            id="FeaturedImageSRC_{{ $USER_DATA->UID }}"
+                                            src="{{ asset($USER_DATA->featuredImage) }}"
+                                            alt="Featured Image"
+                                            class="img-thumbnail rounded-circle"
+                                            style="width: 150px; height: 150px;"
                                         />
                                     </div>
-
-                                    <div class="mb-3">
-                                        <label for="email_{{ $user->UID }}" class="form-label">Email</label>
-                                        <input
-                                            type="email"
-                                            name="email"
-                                            id="email_{{ $user->UID }}"
-                                            class="editable-field form-control"
-                                            data-user-id="{{ $user->UID }}"
-                                            data-field="email"
-                                            value="{{ $user->email }}"
-                                            required
-                                        />
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="role_{{ $user->UID }}" class="form-label">Role</label>
-                                        <select
-                                            name="role"
-                                            id="role_{{ $user->UID }}"
-                                            class="editable-field form-select"
-                                            data-user-id="{{ $user->UID }}"
-                                            data-field="role"
-                                            required
-                                        >
-                                            <option value="1" {{ $user->role == 1 ? 'selected' : '' }}>Safety Manager</option>
-                                            <option value="2" {{ $user->role == 2 ? 'selected' : '' }}>Worker</option>
-                                        </select>
-                                    </div>
-
-                                    <!-- Image Section -->
-                                    <div class="text-center">
-                                        <label class="form-label">Image</label>
-                                        <div class="image-preview mb-3 mx-auto">
-                                            <img
-                                                id="FeaturedImageSRC_{{ $user->UID }}"
-                                                src="{{ asset($user->featuredImage) }}"
-                                                alt="Featured Image"
-                                                class="img-thumbnail rounded-circle"
-                                                style="width: 150px; height: 150px;"
-                                            />
-                                        </div>
-                                        <input
-                                            type="hidden"
-                                            name="FeaturedImage"
-                                            id="FeaturedImage_{{ $user->UID }}"
-                                            value="{{ $user->featuredImage }}"
-                                        />
-                                        <button
-                                            type="button"
-                                            id="FeaturedImageBTN_{{ $user->UID }}"
-                                            class="btn btn-primary w-50"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#exampleModal1"
-                                            onclick="setCurrentImageField({{ $user->UID }})"
-                                        >
-                                            Change Image
-                                        </button>
-                                    </div>
-
-
-                                @endforeach
+                                    <input
+                                        type="hidden"
+                                        name="FeaturedImage"
+                                        id="FeaturedImage_{{ $USER_DATA->UID }}"
+                                        value="{{ $USER_DATA->featuredImage }}"
+                                    />
+                                    <button
+                                        type="button"
+                                        id="FeaturedImageBTN_{{ $USER_DATA->UID }}"
+                                        class="btn btn-primary w-50"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#exampleModal1"
+                                        onclick="setCurrentImageField({{ $USER_DATA->UID }})"
+                                    >
+                                        Change Image
+                                    </button>
+                                </div>
+                        
                                 <!-- Save Button -->
                                 <div class="text-center mt-4">
                                     <button type="submit" id="saveButton" class="btn btn-success px-5">Save</button>
@@ -99,6 +100,7 @@
                                 <p class="text-center">No User Found</p>
                             @endif
                         </form>
+                        
                     </div>
                 </div>
             </div>

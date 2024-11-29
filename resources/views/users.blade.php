@@ -24,38 +24,39 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @if (Count($USER_DATA) > 0)
-                                    @php
-                                        $user_count = 0;
-                                    @endphp
+                                @if ($USER_DATA->isNotEmpty())
                                     @foreach ($USER_DATA as $user)
-                                        <tr>
-                                            <td>{{ ++$user_count }}</td>
-                                            <td>{{ $user->name }}</td>
-                                            <td>{{ $user->email }}</td>
-                                            <td>
-                                                @if ($user->role == 1)
-                                                    Safety Manager
-                                                @else
-                                                    Worker
-                                                @endif
-                                            </td>
-                                            <td><button onclick="editPage({{ $user->UID }})" class="edit mr-2"><i
-                                                        class="fa-solid fa-pen-to-square"></i></button>
-                                                <button onclick="deleteuser({{ $user->UID }})" class="delete"><i
-                                                        class="fa-solid fa-trash"></i></button>
-                                            </td>
-                                        </tr>
+                                    <tr>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td>{{ $user->name }}</td>
+                                        <td>{{ $user->email }}</td>
+                                        <td>
+                                            @if ($user->role == 1)
+                                                Safety Manager
+                                            @elseif ($user->role == 2)
+                                                Worker
+                                            @elseif (is_null($user->role))
+                                                Super Admin
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <button onclick="editPage({{ $user->UID }})" class="edit mr-2">
+                                                <i class="fa-solid fa-pen-to-square"></i>
+                                            </button>
+                                            <button onclick="deleteuser({{ $user->UID }})" class="delete">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
                                     @endforeach
                                 @else
                                     <tr>
-                                        <td colspan="6"> NO User Found</td>
+                                        <td colspan="6">No User Found</td>
                                     </tr>
-
                                 @endif
-
-
                             </tbody>
+                            
+                            
                         </table>
                         <div class="main_loadmore-btn">
                             <button class="load-more">

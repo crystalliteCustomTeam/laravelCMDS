@@ -19,6 +19,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class MainController extends Controller
 {
@@ -68,17 +69,42 @@ class MainController extends Controller
 
     public function GetAllUser(Request $request)
     {
-        $user = Auth::user();
+        $user = Auth::user(); // Get logged-in user
         $usermetaFM = UserMeta::where('userId', $user->id)->select('featuredImage')->first();
-        $usersData = User::join('usermeta', 'users.id', '=', 'usermeta.userId')
-            ->where('usermeta.role', '!=', '0')
-            ->where('usermeta.createBy', '=', $user->id)
-            ->select('users.*', 'users.id as UID', 'usermeta.*')
+    
+        // Check if the logged-in user is a Super Admin
+        $isSuperAdmin = is_null(UserMeta::where('userId', $user->id)->value('role'));
+    
+        // Fetch users
+        $usersData = User::leftJoin('usermeta', 'users.id', '=', 'usermeta.userId')
+            ->when(!$isSuperAdmin, function ($query) use ($user) {
+                // If not a Super Admin, exclude Super Admins and fetch users created by the logged-in user
+                return $query->where('usermeta.role', '!=', '0') // Exclude workers with role = 0
+                             ->whereNotNull('usermeta.role')      // Exclude Super Admins
+                             ->where('usermeta.createBy', '=', $user->id);
+            })
+            ->when($isSuperAdmin, function ($query) {
+                // If a Super Admin, include all users
+                return $query;
+            })
+            ->select('users.*', 'users.id as UID', 'usermeta.role', 'usermeta.createBy', 'usermeta.featuredImage')
+            ->orderByRaw('CASE WHEN usermeta.role IS NULL THEN 0 ELSE 1 END') // Super Admins first
+            ->orderBy('users.id') // Secondary order by user ID
             ->get();
+    
         $images = Image::where('save_image_by', $user->id)->get();
-
-        return view('users', ["PAGE_TITLE" => "USERS", "USERNAME" => $user->name, "USER_DATA" => $usersData, "Images" => $images, "UFM" => $usermetaFM]);
+    
+        return view('users', [
+            "PAGE_TITLE" => "USERS",
+            "USERNAME" => $user->name,
+            "USER_DATA" => $usersData,
+            "Images" => $images,
+            "UFM" => $usermetaFM,
+        ]);
     }
+    
+    
+    
 
     public function upload(Request $request)
     {
@@ -155,17 +181,39 @@ class MainController extends Controller
 
     public function EditUser(Request $request, $userID)
     {
-
         $user = Auth::user();
-        $usermetaFM = UserMeta::where('userId', $user->id)->select('featuredImage')->first();
-        $usersData = User::join('usermeta', 'users.id', '=', 'usermeta.userId')
+    
+        // Fetch UserMeta for logged-in user
+        $usermetaFM = UserMeta::where('userId', $user->id)
+            ->select('featuredImage')
+            ->first();
+    
+        // Fetch the specific user and their meta
+        $userData = User::leftJoin('usermeta', 'users.id', '=', 'usermeta.userId')
             ->where('users.id', '=', $userID)
-            ->select('users.*', 'users.id as UID', 'usermeta.*')
-            ->get();
-        $Images = Image::where('save_image_by', $user->id)->get();
-        return view('useredit', ["PAGE_TITLE" => "EDIT USER", "USERNAME" => $user->name, "USER_DATA" => $usersData, "Images" => $Images, "UFM" => $usermetaFM]);
-
+            ->select('users.*', 'users.id as UID', 'usermeta.role', 'usermeta.featuredImage')
+            ->first(); // Ensure a single record is fetched
+    
+        // Check if the user exists
+        if (!$userData) {
+            return redirect()->back()->withErrors(['error' => 'User not found.']);
+        }
+    
+        // Fetch all images
+        $images = Image::where('save_image_by', $user->id)->get();
+    
+        return view('useredit', [
+            "PAGE_TITLE" => "EDIT USER",
+            "USERNAME" => $user->name,
+            "USER_DATA" => $userData, // Pass the single user object
+            "Images" => $images,
+            "UFM" => $usermetaFM,
+        ]);
     }
+    
+    
+    
+    
 
     public function worksite(Request $request)
     {
