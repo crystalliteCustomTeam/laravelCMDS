@@ -179,47 +179,38 @@ class MainController extends Controller
         return response()->json(['success' => true, 'image' => $imageName, 'name' => $imageName]);
     }
 
-    public function EditUserPOST(Request $request)
+    public function EditUser(Request $request, $userID)
     {
-        $name = $request['name'];
-        $email = $request['email'];
-        $role = $request['role'];
-        $FeaturedImage = $request['FeaturedImage'];
-        $userID = $request['userID'];
+        $user = Auth::user();
     
-        try {
-            // Update user details
-            $user = User::where('id', $userID)->update([
-                'name' => $name,
-                'email' => $email,
-            ]);
+        // Fetch UserMeta for logged-in user
+        $usermetaFM = UserMeta::where('userId', $user->id)
+            ->select('featuredImage')
+            ->first();
     
-            if ($user) {
-                // Check if usermeta exists
-                $userMeta = UserMeta::where('userId', $userID)->first();
-                if ($userMeta) {
-                    // Update usermeta if exists
-                    $userMeta->update([
-                        "featuredImage" => $FeaturedImage,
-                        'role' => $role,
-                    ]);
-                } else {
-                    // Create a new usermeta record if it doesn't exist
-                    UserMeta::create([
-                        "userId" => $userID,
-                        "featuredImage" => $FeaturedImage,
-                        'role' => $role,
-                    ]);
-                }
+        // Fetch the specific user and their meta
+        $usersData = User::leftJoin('usermeta', 'users.id', '=', 'usermeta.userId')
+            ->where('users.id', '=', $userID)
+            ->select('users.*', 'users.id as UID', 'usermeta.role', 'usermeta.featuredImage')
+            ->first(); // Ensure a single record is fetched
     
-                return response()->json(['Message' => 'User Updated', 'Code' => 200], 200);
-            }
-        } catch (\Exception $e) {
-            return response()->json(['Message' => 'Error: ' . $e->getMessage(), 'Code' => 500], 500);
+        // Check if the user exists
+        if (!$usersData) {
+            return redirect()->back()->withErrors(['error' => 'User not found.']);
         }
+    
+        // Fetch all images
+        $Images = Image::where('save_image_by', $user->id)->get();
+    
+        // Pass data to the view
+        return view('useredit', [
+            "PAGE_TITLE" => "EDIT USER",
+            "USERNAME" => $user->name,
+            "USER_DATA" => $usersData, // Pass the single user object
+            "Images" => $Images,
+            "UFM" => $usermetaFM,
+        ]);
     }
-    
-    
     
     
     
