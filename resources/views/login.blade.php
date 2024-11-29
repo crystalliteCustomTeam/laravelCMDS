@@ -25,13 +25,13 @@
                                 @csrf
                                 <div class="inputss">
                                     <label for="email" style="color:white">Email</label>
-                                    <input type="email" name="email" class="form-control mt-1" value=""
+                                    <input type="email" name="email" placeholder="email" class="form-control mt-1" value=""
                                         required>
                                     <x-input-error :messages="$errors->get('email')" class="mt-2" />
                                 </div>
                                 <div class="mt-2 psw">
                                     <label for="password" style="color:white">Password</label>
-                                    <input type="password" type="password" name="password" required
+                                    <input type="password" type="password" placeholder="password" name="password" required
                                         class="form-control mt-1" value="" required>
                                     <x-input-error :messages="$errors->get('password')" class="mt-2" />
                                 </div>
