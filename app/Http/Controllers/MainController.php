@@ -71,10 +71,10 @@ class MainController extends Controller
     {
         $user = Auth::user(); // Get logged-in user
         $usermetaFM = UserMeta::where('userId', $user->id)->select('featuredImage')->first();
-    
+
         // Check if the logged-in user is a Super Admin
         $isSuperAdmin = is_null(UserMeta::where('userId', $user->id)->value('role'));
-    
+
         // Fetch users
         $usersData = User::leftJoin('usermeta', 'users.id', '=', 'usermeta.userId')
             ->when(!$isSuperAdmin, function ($query) use ($user) {
@@ -91,9 +91,9 @@ class MainController extends Controller
             ->orderByRaw('CASE WHEN usermeta.role IS NULL THEN 0 ELSE 1 END') // Super Admins first
             ->orderBy('users.id') // Secondary order by user ID
             ->get();
-    
+
         $images = Image::where('save_image_by', $user->id)->get();
-    
+
         return view('users', [
             "PAGE_TITLE" => "USERS",
             "USERNAME" => $user->name,
@@ -102,9 +102,9 @@ class MainController extends Controller
             "UFM" => $usermetaFM,
         ]);
     }
-    
-    
-    
+
+
+
 
     public function upload(Request $request)
     {
@@ -182,26 +182,26 @@ class MainController extends Controller
     public function EditUser(Request $request, $userID)
     {
         $user = Auth::user();
-    
+
         // Fetch UserMeta for logged-in user
         $usermetaFM = UserMeta::where('userId', $user->id)
             ->select('featuredImage')
             ->first();
-    
+
         // Fetch the specific user and their meta
         $usersData = User::leftJoin('usermeta', 'users.id', '=', 'usermeta.userId')
             ->where('users.id', '=', $userID)
             ->select('users.*', 'users.id as UID', 'usermeta.role', 'usermeta.featuredImage')
             ->first(); // Ensure a single record is fetched
-    
+
         // Check if the user exists
         if (!$usersData) {
             return redirect()->back()->withErrors(['error' => 'User not found.']);
         }
-    
+
         // Fetch all images
         $Images = Image::where('save_image_by', $user->id)->get();
-    
+
         // Pass data to the view
         return view('useredit', [
             "PAGE_TITLE" => "EDIT USER",
@@ -211,10 +211,10 @@ class MainController extends Controller
             "UFM" => $usermetaFM,
         ]);
     }
-    
-    
-    
-    
+
+
+
+
 
     public function worksite(Request $request)
     {
@@ -334,13 +334,11 @@ class MainController extends Controller
         try {
             $users = $request['users'];
             $loginUser = Auth::user();
-            $usermetaFM = UserMeta::where('userId', $loginUser->id)->select('featuredImage')->first();
 
             $AREAID = $request['AreaID'];
-
             $workSiteId = Area::where('id', $AREAID)->select('WSID')->first();
 
-            for ($i = 0; $i < Count($users); $i++) {
+            for ($i = 0; $i < count($users); $i++) {
                 AreaUser::create([
                     "WSID" => $workSiteId->WSID,
                     "ARID" => $AREAID,
@@ -351,9 +349,8 @@ class MainController extends Controller
             return response()->json([
                 'Code' => 200,
                 'Message' => 'Users assigned to the area successfully!',
-            ]);
+            ], 200);
         } catch (\Exception $e) {
-
             return response()->json([
                 'Code' => 500,
                 'Message' => 'An error occurred while assigning users. Please try again later.',
@@ -373,11 +370,14 @@ class MainController extends Controller
         $loginUser = Auth::user();
         $usermetaFM = UserMeta::where('userId', $loginUser->id)->select('featuredImage')->first();
         $areaDetail = Area::where('CreateBy', $loginUser->id)->where('id', $area)->first();
+
         $users = AreaUser::where('ARID', $area)
-            ->join('users', 'users.id', '=', 'areausers.WSID')
+            ->join('users', 'users.id', '=', 'areausers.UID')
             ->select('users.name as UName', 'users.id as UID', 'areausers.id as ARUID')
             ->get();
-        $Allusers = User::join('usermeta', 'users.id', '=', 'usermeta.userId')->where('usermeta.role', '=', 2)->where('usermeta.createBy', $loginUser->id)
+        $Allusers = User::join('usermeta', 'users.id', '=', 'usermeta.userId')
+            //->where('usermeta.createBy', $loginUser->id)
+            ->whereIn('usermeta.role', [1, 2])
             ->select('users.*', 'users.id as UID', 'usermeta.id as UMID')
             ->get();
 
@@ -803,10 +803,15 @@ class MainController extends Controller
         }
     }
 
-    public function areaUserRemove(Request $request, $id)
+    public function areaUserRemove($id)
     {
-        AreaUser::where('id', $id)->delete();
-        return redirect()->back();
+        try {
+            AreaUser::where('id', $id)->delete();
+
+            return redirect()->back()->with('success', 'User removed successfully!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to remove user. Please try again.');
+        }
     }
 
     public function safetyUpdate(Request $request)

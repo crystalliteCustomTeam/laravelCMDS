@@ -20,6 +20,7 @@ use App\Models\WorkSite;
 use App\Services\FirebaseService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
@@ -295,6 +296,20 @@ class MainAPIController extends Controller
                 ->join('users', 'users.id', '=', 'areausers.UID')
                 ->select('users.fcm_token', 'users.id as UID', 'areausers.id as ARUID')
                 ->get();
+
+            // Include the current authenticated user
+            $currentUser = Auth::user();
+            if ($currentUser) {
+                $existsInData = $userData->contains('UID', $currentUser->id);
+
+                if (!$existsInData) {
+                    $userData->push((object)[
+                        'fcm_token' => $currentUser->fcm_token,
+                        'UID' => $currentUser->id,
+                        'ARUID' => null,
+                    ]);
+                }
+            }
 
             $resArr = [
                 'title' => $alert_code,
@@ -733,6 +748,13 @@ class MainAPIController extends Controller
                     foreach ($allusers as $user) {
                         array_push($setusers, $user->UID);
                     }
+                }
+
+
+                // Include the current authenticated user
+                $currentUser = Auth::user(); // Get the currently authenticated user
+                if ($currentUser && !in_array($currentUser->id, $setusers)) {
+                    $setusers[] = $currentUser->id; // Add the current user if not already included
                 }
 
                 $request = [
