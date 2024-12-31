@@ -439,6 +439,11 @@ class MainController extends Controller
                 }
             }
 
+            $currentUser = Auth::user(); // Get the currently authenticated user
+            if ($currentUser && !in_array($currentUser->id, $setusers)) {
+                $setusers[] = $currentUser->id; // Add the current user if not already included
+            }
+
             $firebaseData = [
                 "title" => $resp->title,
                 "MESSAGE" => $resp->message,

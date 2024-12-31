@@ -296,21 +296,7 @@ class MainAPIController extends Controller
                 ->join('users', 'users.id', '=', 'areausers.UID')
                 ->select('users.fcm_token', 'users.id as UID', 'areausers.id as ARUID')
                 ->get();
-
-            // Include the current authenticated user
-            $currentUser = Auth::user();
-            if ($currentUser) {
-                $existsInData = $userData->contains('UID', $currentUser->id);
-
-                if (!$existsInData) {
-                    $userData->push((object)[
-                        'fcm_token' => $currentUser->fcm_token,
-                        'UID' => $currentUser->id,
-                        'ARUID' => null,
-                    ]);
-                }
-            }
-
+            
             $resArr = [
                 'title' => $alert_code,
                 'MESSAGE' => 'Alert Code: ' . $alert_code . ' Area Code: ' . $area_id . ' '.$description,
@@ -716,6 +702,7 @@ class MainAPIController extends Controller
             ];
             return response()->json($data, 500);
         }
+
         $User = User::where('email', $useremail)->first();
         if ($User) {
             if ($request['title'] == "" || $request['message'] == "" || $request['WorksiteID'] == "" || $request['AreaID'] == "") {
@@ -750,11 +737,8 @@ class MainAPIController extends Controller
                     }
                 }
 
-
-                // Include the current authenticated user
-                $currentUser = Auth::user(); // Get the currently authenticated user
-                if ($currentUser && !in_array($currentUser->id, $setusers)) {
-                    $setusers[] = $currentUser->id; // Add the current user if not already included
+                if ($User->id && !in_array($User->id, $setusers)) {
+                    $setusers[] = $User->id; // Add the current user if not already included
                 }
 
                 $request = [
