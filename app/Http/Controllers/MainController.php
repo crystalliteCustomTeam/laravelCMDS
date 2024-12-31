@@ -373,15 +373,37 @@ class MainController extends Controller
 
         $users = AreaUser::where('ARID', $area)
             ->join('users', 'users.id', '=', 'areausers.UID')
-            ->select('users.name as UName', 'users.id as UID', 'areausers.id as ARUID')
+            ->join('usermeta', 'users.id', '=', 'usermeta.userId')
+            ->select('users.name as UName', 'users.id as UID', 'areausers.id as ARUID', 'usermeta.role')
             ->get();
+
         $Allusers = User::join('usermeta', 'users.id', '=', 'usermeta.userId')
             //->where('usermeta.createBy', $loginUser->id)
             ->whereIn('usermeta.role', [1, 2])
-            ->select('users.*', 'users.id as UID', 'usermeta.id as UMID')
+            ->select('users.*', 'users.id as UID', 'usermeta.id as UMID', 'usermeta.role')
             ->get();
 
-        return view('areaedit', ["PAGE_TITLE" => "AREA DETAIL EDIT", "USERNAME" => $loginUser->name, 'Areas' => $areaDetail, 'AreaUsers' => $users, 'ALLUSERS' => $Allusers, "UFM" => $usermetaFM]);
+        // Separate workers (role = 2) and safety managers (role = 1)
+        $workers = User::join('usermeta', 'users.id', '=', 'usermeta.userId')
+            ->where('usermeta.role', 2)
+            ->select('users.*', 'users.id as UID', 'usermeta.id as UMID', 'usermeta.role')
+            ->get();
+
+        $safetyManagers = User::join('usermeta', 'users.id', '=', 'usermeta.userId')
+            ->where('usermeta.role', 1)
+            ->select('users.*', 'users.id as UID', 'usermeta.id as UMID', 'usermeta.role')
+            ->get();
+
+        return view('areaedit', [
+            "PAGE_TITLE" => "AREA DETAIL EDIT",
+            "USERNAME" => $loginUser->name,
+            'Areas' => $areaDetail,
+            'AreaUsers' => $users,
+            'Workers' => $workers,
+            'SafetyManagers' => $safetyManagers,
+            "UFM" => $usermetaFM,
+        ]);
+
     }
 
     public function createWorksite(Request $request)

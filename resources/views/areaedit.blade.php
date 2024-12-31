@@ -48,11 +48,12 @@
                     </div>
                     <div class="hr-line"></div>
                     <div class="main-natification-table">
-                        <h2 style="margin-left:15px;margin-top:15px;margin-bottom:15px">Safety Manager + Workers</h2>
+                        <h2 style="margin-left:15px;margin-top:15px;margin-bottom:15px">Workers - Safety Manager</h2>
                         <table class="table">
                             <thead class="thead-dark">
                                 <tr>
                                     <th colspan="6">Name</th>
+                                    <th colspan="6">Role</th>
                                     <th colspan="6">Action</th>
                                 </tr>
                             </thead>
@@ -61,8 +62,18 @@
 
                                 @if ($AreaUsers)
                                     @foreach ($AreaUsers as $AreaUser)
+                                        @php
+                                            $role = "-";
+                                            if($AreaUser->role == 1){
+                                                $role = "Safety Manager";
+                                            } else if ($AreaUser->role == 2){
+                                                $role = "Workers";
+                                            }
+                                        @endphp
+
                                         <tr>
                                             <td colspan="6">{{ $AreaUser->UName }}</td>
+                                            <td colspan="6">{{ $role }}</td>
                                             <td colspan="6"><a href="javascript:void(0);" class="btn btn-danger remove-user-btn" onclick="removeUser({{ $AreaUser->ARUID }})">Remove</a>
                                             </td>
                                             {{--<td colspan="6">
@@ -94,13 +105,27 @@
                                             <div class="modal-body">
                                                 <input type="hidden" value="{{$Areas->id }}" name="AreaID">
                                                 <div class="row">
+                                                    <h5>Workers</h5>
                                                     <ul style="list-style:none;columns:2">
-                                                        @if ($ALLUSERS)
-                                                            @foreach ($ALLUSERS as $ALLUSER)
+                                                        @if ($Workers)
+                                                            @foreach ($Workers as $Worker)
                                                                 <li>
-                                                                    <input type="checkbox" name="users[]"
-                                                                        value="{{ $ALLUSER->UID }}">
-                                                                    <label for="">{{ $ALLUSER->name }}</label>
+                                                                    <input type="checkbox" name="users[]" value="{{ $Worker->UID }}">
+                                                                    <label for="">{{ $Worker->name }}</label>
+                                                                </li>
+                                                            @endforeach
+                                                        @endif
+                                                    </ul>
+                                                </div>
+
+                                                <div class="row mt-4">
+                                                    <h5>Safety Managers</h5>
+                                                    <ul style="list-style:none;columns:2">
+                                                        @if ($SafetyManagers)
+                                                            @foreach ($SafetyManagers as $SafetyManager)
+                                                                <li>
+                                                                    <input type="checkbox" name="users[]" value="{{ $SafetyManager->UID }}">
+                                                                    <label for="">{{ $SafetyManager->name }}</label>
                                                                 </li>
                                                             @endforeach
                                                         @endif

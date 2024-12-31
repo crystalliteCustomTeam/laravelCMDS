@@ -296,7 +296,7 @@ class MainAPIController extends Controller
                 ->join('users', 'users.id', '=', 'areausers.UID')
                 ->select('users.fcm_token', 'users.id as UID', 'areausers.id as ARUID')
                 ->get();
-            
+
             $resArr = [
                 'title' => $alert_code,
                 'MESSAGE' => 'Alert Code: ' . $alert_code . ' Area Code: ' . $area_id . ' '.$description,
