@@ -419,7 +419,7 @@ class MainAPIController extends Controller
 
     }
 
-    public function worksiteMobilewitharea(Request $request,$email)
+    public function worksiteMobilewithareabk(Request $request,$email)
     {
         if ($email == "") {
             $data = [
@@ -432,6 +432,7 @@ class MainAPIController extends Controller
 
         if ($User) {
             $workSites = WorkSite::with('areas')->get();
+
             $data = WorkSiteResource::collection($workSites);
             return response()->json($data, 200);
         } else {
@@ -442,6 +443,80 @@ class MainAPIController extends Controller
             return response()->json($data, 404);
         }
     }
+
+
+    public function worksiteMobilewitharea(Request $request, $email)
+    {
+        if (empty($email)) {
+            return response()->json([
+                "Message" => "Email is required",
+                "status" => "fail",
+            ], 500);
+        }
+
+        $User = User::where('email', $email)->first();
+
+        if ($User) {
+            $workSites = DB::table('worksite')
+                ->leftJoin('areas', 'worksite.id', '=', 'areas.WSID')
+                ->select(
+                    'worksite.id as worksite_id',
+                    'worksite.name as worksite_name',
+                    'areas.id as area_id',
+                    'areas.area_name'
+                )
+                ->get();
+
+            // Fetch safety manager details for areas
+            $safetyManagers = DB::table('areausers')
+                ->join('users', 'areausers.ARID', '=', 'users.id')
+                ->join('usermeta', 'users.id', '=', 'usermeta.userId')
+                ->select(
+                    'areausers.ARID as area_id',
+                    'users.name as safety_manager_name',
+                    'users.email as safety_manager_email',
+                    'usermeta.role'
+                )
+                ->where('usermeta.role', 1) // Only fetch safety managers
+                ->orderBy('areausers.updated_at', 'desc') // Order by latest
+                ->get()
+                ->groupBy('area_id');
+
+            // Transform worksite data
+            $data = $workSites->groupBy('worksite_id')->map(function ($areas, $worksiteId) use ($safetyManagers) {
+                $worksiteName = $areas->first()->worksite_name;
+
+                return [
+                    'worksite' => [
+                        'id' => $worksiteId,
+                        'name' => $worksiteName,
+                        'areas' => $areas->map(function ($area) use ($safetyManagers) {
+                            $safetyManager = $safetyManagers->get($area->area_id)?->first();
+
+                            return [
+                                'id' => $area->area_id,
+                                'name' => $area->area_name,
+                                'safety_manager' => $safetyManager
+                                    ? [
+                                        'name' => $safetyManager->safety_manager_name,
+                                        'email' => $safetyManager->safety_manager_email,
+                                    ]
+                                    : null,
+                            ];
+                        })->values(),
+                    ],
+                ];
+            })->values();
+
+            return response()->json($data, 200);
+        } else {
+            return response()->json([
+                "Message" => "Email Not Found",
+                "status" => "fail",
+            ], 404);
+        }
+    }
+
 
     public function allcommunication(Request $request)
     {
