@@ -220,8 +220,11 @@ class MainController extends Controller
     {
 
         $user = Auth::user();
-        $usermetaFM = UserMeta::where('userId', $user->id)->select('featuredImage')->first();
-        $allsites = WorkSite::where('CreateBy', $user->id)
+        $usermetaFM = UserMeta::where('userId', $user->id)->select('featuredImage', 'role')->first();
+
+        $allsites = WorkSite::when($usermetaFM->role, function ($query) use ($user) {
+                    return $query->where('CreateBy', $user->id);
+            })
             ->with('areaUsers')
             ->withCount('areaUsers') // Count of AreaUsers
             ->get();
@@ -545,9 +548,13 @@ class MainController extends Controller
     public function notifications(Request $request)
     {
         $loginUser = Auth::user();
-        $usermetaFM = UserMeta::where('userId', $loginUser->id)->select('featuredImage')->first();
-        $worksites = WorkSite::where('CreateBy', $loginUser->id)->get();
-        $Areas = Area::where('CreateBy', $loginUser->id)->get();
+        $usermetaFM = UserMeta::where('userId', $loginUser->id)->select('featuredImage', 'role')->first();
+        $worksites = WorkSite::when($usermetaFM->role, function ($query) use ($loginUser) {
+                    return $query->where('CreateBy', $loginUser->id);
+                    })->get();
+        $Areas = Area::when($usermetaFM->role, function ($query) use ($loginUser) {
+                    return $query->where('CreateBy', $loginUser->id);
+                 })->get();
         $AllNotifications = Notification::all();
         // $Notifications = [];
         // foreach ($AllNotifications as $AllNotification) {
@@ -586,9 +593,13 @@ class MainController extends Controller
     public function guide(Request $request)
     {
         $loginUser = Auth::user();
-        $usermetaFM = UserMeta::where('userId', $loginUser->id)->select('featuredImage')->first();
-        $checkpoint = Checkpoints::where('CreatedBy', $loginUser->id)->get();
-        $Safety = Safety::where('CreatedBy', $loginUser->id)->get();
+        $usermetaFM = UserMeta::where('userId', $loginUser->id)->select('featuredImage', 'role')->first();
+        $checkpoint = Checkpoints::when($usermetaFM->role, function ($query) use ($loginUser) {
+            return $query->where('CreatedBy', $loginUser->id);
+        })->get();
+        $Safety = Safety::when($usermetaFM->role, function ($query) use ($loginUser) {
+            return $query->where('CreatedBy', $loginUser->id);
+        })->get();
         $allImages = Image::where('save_image_by', $loginUser->id)->get();
         return view('guidelines', ["PAGE_TITLE" => "SAFETY GUIDELINES ", "USERNAME" => $loginUser->name, "Checkpoint" => $checkpoint, "Safety" => $Safety, "Images" => $allImages, "UFM" => $usermetaFM]);
     }
