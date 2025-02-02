@@ -373,12 +373,72 @@ class MainAPIController extends Controller
         $User = User::where('email', $email)->first();
 
         if ($User) {
-            $WorkSite = WorkSite::whereDate('Start_Date', Carbon::today())->get();
-            $upcomming = WorkSite::where('Start_Date', '>', Carbon::today())->get();
+            $todayWorkSites = WorkSite::whereDate('Start_Date', Carbon::today())->get();
+            $upcomingWorkSites = WorkSite::where('Start_Date', '>', Carbon::today())->get();
+
+
+            // Fetch safety manager details for worksites
+            $safetyManagers = DB::table('areausers')
+                ->join('users', 'areausers.UID', '=', 'users.id')
+                ->join('usermeta', 'users.id', '=', 'usermeta.userId')
+                ->select(
+                    'areausers.WSID as worksite_id',
+                    'users.name as safety_manager_name',
+                    'users.email as safety_manager_email',
+                    'usermeta.role'
+                )
+                ->where('usermeta.role', 1) // Only fetch safety managers
+                ->orderBy('areausers.updated_at', 'desc') // Order by latest updated manager
+                ->get()
+                ->groupBy('worksite_id');
+
+            // Attach safety manager to each worksite
+            $today = $todayWorkSites->map(function ($worksite) use ($safetyManagers) {
+                $safetyManager = $safetyManagers->get($worksite->id)?->first();
+                return [
+                    "id" => $worksite->id,
+                    "Name" => $worksite->Name,
+                    "Start_Date" => $worksite->Start_Date,
+                    "End_Date" => $worksite->End_Date,
+                    "Description" => $worksite->Description,
+                    "FeaturedImage" => $worksite->FeaturedImage,
+                    "CreateBy" => $worksite->CreateBy,
+                    "created_at" => $worksite->created_at,
+                    "updated_at" => $worksite->updated_at,
+                    "safety_manager" => $safetyManager
+                        ? [
+                            "name" => $safetyManager->safety_manager_name,
+                            "email" => $safetyManager->safety_manager_email,
+                        ]
+                        : null,
+                ];
+            });
+
+            $upcoming = $upcomingWorkSites->map(function ($worksite) use ($safetyManagers) {
+                $safetyManager = $safetyManagers->get($worksite->id)?->first();
+                return [
+                    "id" => $worksite->id,
+                    "Name" => $worksite->Name,
+                    "Start_Date" => $worksite->Start_Date,
+                    "End_Date" => $worksite->End_Date,
+                    "Description" => $worksite->Description,
+                    "FeaturedImage" => $worksite->FeaturedImage,
+                    "CreateBy" => $worksite->CreateBy,
+                    "created_at" => $worksite->created_at,
+                    "updated_at" => $worksite->updated_at,
+                    "safety_manager" => $safetyManager
+                        ? [
+                            "name" => $safetyManager->safety_manager_name,
+                            "email" => $safetyManager->safety_manager_email,
+                        ]
+                        : null,
+                ];
+            });
+
             $data = [
                 "data" => [
-                    "today" => $WorkSite,
-                    "upcomming" => $upcomming,
+                    "today" => $today,
+                    "upcomming" => $upcoming,
                 ],
                 "status" => "success",
             ];
@@ -393,7 +453,7 @@ class MainAPIController extends Controller
 
     }
 
-    public function worksiteMobiledetails(Request $request, $id)
+    public function worksiteMobiledetailsBk(Request $request, $id)
     {
         $WorkSite = WorkSite::where('id', $id)->first();
         if ($WorkSite == "") {
@@ -418,6 +478,63 @@ class MainAPIController extends Controller
         }
 
     }
+
+    public function worksiteMobiledetails(Request $request, $id)
+    {
+        $WorkSite = WorkSite::where('id', $id)->first();
+
+        if (!$WorkSite) {
+            return response()->json([
+                "Message" => "Worksite not found",
+                "status" => "fail",
+            ], 404);
+        }
+
+        // Fetch Areas related to Worksite
+        $Areas = Area::where('WSID', $WorkSite->id)->get();
+
+        // ✅ Fetch Safety Manager assigned to the Worksite (from areausers table)
+        $safetyManager = DB::table('areausers')
+            ->join('users', 'areausers.UID', '=', 'users.id') // Join users table
+            ->join('usermeta', 'users.id', '=', 'usermeta.userId') // Join usermeta for roles
+            ->select(
+                'users.id as safety_manager_id',
+                'users.name as safety_manager_name',
+                'users.email as safety_manager_email',
+                'usermeta.role'
+            )
+            ->where('areausers.WSID', $WorkSite->id) // Match worksite
+            ->where('usermeta.role', 1) // Ensure user role is safety manager
+            ->orderBy('areausers.updated_at', 'desc') // Get latest
+            ->first(); // Fetch only one (latest) safety manager
+
+        // Format worksite and area details
+        $WorksiteDetail = [
+            "Worksite" => [
+                "id" => $WorkSite->id,
+                "Name" => $WorkSite->Name,
+                "Start_Date" => $WorkSite->Start_Date,
+                "End_Date" => $WorkSite->End_Date,
+                "Description" => $WorkSite->Description,
+                "FeaturedImage" => $WorkSite->FeaturedImage ? asset('uploads/' . $WorkSite->FeaturedImage) : null,
+                "CreateBy" => $WorkSite->CreateBy,
+                "created_at" => $WorkSite->created_at,
+                "updated_at" => $WorkSite->updated_at,
+                "safety_manager" => $safetyManager ? [
+                    "id" => $safetyManager->safety_manager_id,
+                    "name" => $safetyManager->safety_manager_name,
+                    "email" => $safetyManager->safety_manager_email,
+                ] : null,
+            ],
+            "Areas" => $Areas,
+        ];
+
+        return response()->json([
+            "data" => $WorksiteDetail,
+            "status" => "success",
+        ], 200);
+    }
+
 
     public function worksiteMobilewithareabk(Request $request,$email)
     {
@@ -467,12 +584,13 @@ class MainAPIController extends Controller
                 )
                 ->get();
 
-            // Fetch safety manager details for areas
+            // Fetch safety manager details for each worksite
             $safetyManagers = DB::table('areausers')
-                ->join('users', 'areausers.ARID', '=', 'users.id')
+                ->join('users', 'areausers.UID', '=', 'users.id')
                 ->join('usermeta', 'users.id', '=', 'usermeta.userId')
                 ->select(
-                    'areausers.ARID as area_id',
+                    'areausers.WSID as worksite_id',
+                    'users.id as safety_manager_id',
                     'users.name as safety_manager_name',
                     'users.email as safety_manager_email',
                     'usermeta.role'
@@ -480,34 +598,33 @@ class MainAPIController extends Controller
                 ->where('usermeta.role', 1) // Only fetch safety managers
                 ->orderBy('areausers.updated_at', 'desc') // Order by latest
                 ->get()
-                ->groupBy('area_id');
+                ->groupBy('worksite_id'); // Group safety managers by worksite
 
             // Transform worksite data
+
             $data = $workSites->groupBy('worksite_id')->map(function ($areas, $worksiteId) use ($safetyManagers) {
                 $worksiteName = $areas->first()->worksite_name;
+                $safetyManager = $safetyManagers->get($worksiteId)?->first(); // Fetch manager for worksite
 
                 return [
                     'worksite' => [
                         'id' => $worksiteId,
                         'name' => $worksiteName,
-                        'areas' => $areas->map(function ($area) use ($safetyManagers) {
-                            $safetyManager = $safetyManagers->get($area->area_id)?->first();
-
+                        'safety_manager' => $safetyManager
+                            ? [
+                                'name' => $safetyManager->safety_manager_name,
+                                'email' => $safetyManager->safety_manager_email,
+                            ]
+                            : null,
+                        'areas' => $areas->map(function ($area) {
                             return [
                                 'id' => $area->area_id,
                                 'name' => $area->area_name,
-                                'safety_manager' => $safetyManager
-                                    ? [
-                                        'name' => $safetyManager->safety_manager_name,
-                                        'email' => $safetyManager->safety_manager_email,
-                                    ]
-                                    : null,
                             ];
                         })->values(),
                     ],
                 ];
             })->values();
-
             return response()->json($data, 200);
         } else {
             return response()->json([
